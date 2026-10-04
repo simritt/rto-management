@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: rto-management
+  config:
+    import: optional:file:.env[.properties]     # backend-java/.env (git-ignored); real environment variables win
+  datasource:
+    url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:rto_management}?useUnicode=true&characterEncoding=utf8&yearIsDateType=false&connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true&allowPublicKeyRetrieval=true&sslMode=PREFERRED
+    username: ${DB_USER:}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 20
+      transaction-isolation: TRANSACTION_READ_COMMITTED
+      max-lifetime: 1800000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none                               # the SQL files in /database are the source of truth
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  servlet:
+    multipart:
+      max-file-size: ${MAX_UPLOAD_MB:10}MB
+      max-request-size: ${MAX_UPLOAD_MB:10}MB
+
+server:
+  port: ${PORT:8000}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+rto:
+  jwt-secret: ${JWT_SECRET:}
+  access-token-minutes: ${ACCESS_TOKEN_MINUTES:30}
+  refresh-token-days: ${REFRESH_TOKEN_DAYS:7}
+  cors-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
+  storage-dir: ${STORAGE_DIR:./storage}
+  max-upload-mb: ${MAX_UPLOAD_MB:10}
+  notification-provider: ${NOTIFICATION_PROVIDER:mock}
+  payment-gateway-key: ${PAYMENT_GATEWAY_KEY:}
+  bootstrap-admin-username: ${BOOTSTRAP_ADMIN_USERNAME:admin}
+  bootstrap-admin-password: ${BOOTSTRAP_ADMIN_PASSWORD:}
+
+springdoc:
+  api-docs:
+    path: /openapi.json
+  swagger-ui:
+    path: /docs
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+logging:
+  level:
+    org.hibernate.SQL: warn
+    com.zaxxer.hikari: warn
