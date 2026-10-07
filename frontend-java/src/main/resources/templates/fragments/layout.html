@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:replace="${title}">RTO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+<div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="w-60 shrink-0 bg-slate-900 text-slate-200 flex flex-col">
+        <div class="px-5 py-5 border-b border-slate-700">
+            <div class="text-lg font-semibold text-white">RTO Management</div>
+            <div class="text-xs text-slate-400">Regional Transport Office</div>
+        </div>
+        <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
+            <a th:href="@{/}"
+               th:classappend="${currentPath == '/'} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Dashboard</a>
+            <a th:if="${user.can('citizen.view')}" th:href="@{/citizens}"
+               th:classappend="${#strings.startsWith(currentPath, '/citizens')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Citizens</a>
+        </nav>
+        <div class="px-5 py-4 border-t border-slate-700 text-xs">
+            <div class="text-white font-medium" th:text="${user.username}">user</div>
+            <div class="text-slate-400 mb-3" th:text="${#strings.listJoin(user.roles, ', ')}"></div>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="w-full rounded bg-slate-700 hover:bg-slate-600 px-3 py-1.5 text-white">Sign out</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 p-8 overflow-x-auto">
+        <div th:if="${flash}" class="mb-4 rounded bg-green-50 border border-green-200 px-4 py-2 text-sm text-green-800" th:text="${flash}"></div>
+        <div th:if="${flashError}" class="mb-4 rounded bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-800" th:text="${flashError}"></div>
+        <th:block th:replace="${content}"></th:block>
+    </main>
+</div>
+</body>
+</html>

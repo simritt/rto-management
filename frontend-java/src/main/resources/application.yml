@@ -1,0 +1,19 @@
+server:
+  port: ${FRONTEND_PORT:8080}
+  servlet:
+    session:
+      tracking-modes: cookie
+      timeout: 60m
+
+spring:
+  application:
+    name: rto-management-frontend
+  thymeleaf:
+    cache: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+rto:
+  api-base-url: ${RTO_API_BASE_URL:http://127.0.0.1:8000/api/v1}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Text/date/select-less input bound to model maps `form` (values) and `fieldErrors` (messages). -->
+<div th:fragment="input(label, name, type, required)">
+    <label class="block text-sm font-medium text-slate-700 mb-1" th:for="${name}">
+        <span th:text="${label}">Label</span><span th:if="${required}" class="text-red-500"> *</span>
+    </label>
+    <input th:id="${name}" th:name="${name}" th:type="${type}" th:value="${form[name]}" th:required="${required}"
+           th:classappend="${fieldErrors[name] != null} ? 'border-red-400' : 'border-slate-300'"
+           class="w-full rounded border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+    <p th:if="${fieldErrors[name] != null}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors[name]}"></p>
+</div>
+
+<!-- Select; `options` is a list of strings. -->
+<div th:fragment="select(label, name, options, required)">
+    <label class="block text-sm font-medium text-slate-700 mb-1" th:for="${name}">
+        <span th:text="${label}">Label</span><span th:if="${required}" class="text-red-500"> *</span>
+    </label>
+    <select th:id="${name}" th:name="${name}" th:required="${required}"
+            th:classappend="${fieldErrors[name] != null} ? 'border-red-400' : 'border-slate-300'"
+            class="w-full rounded border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none bg-white">
+        <option value="" th:unless="${required}">-</option>
+        <option th:each="o : ${options}" th:value="${o}" th:text="${o}" th:selected="${o == form[name]}"></option>
+    </select>
+    <p th:if="${fieldErrors[name] != null}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors[name]}"></p>
+</div>
+
+<!-- Pager for the backend page shape {page, pages, total}; `base` ends with ? or &amp;. -->
+<div th:fragment="pager(result, base)" th:if="${result.path('pages').asInt() > 1}"
+     class="mt-4 flex items-center justify-between text-sm text-slate-600">
+    <span th:text="|Page ${result.path('page').asInt()} of ${result.path('pages').asInt()} - ${result.path('total').asInt()} records|"></span>
+    <span class="space-x-2">
+        <a th:if="${result.path('page').asInt() > 1}" th:href="@{|${base}page=${result.path('page').asInt() - 1}|}"
+           class="rounded border border-slate-300 bg-white px-3 py-1 hover:bg-slate-50">Previous</a>
+        <a th:if="${result.path('page').asInt() < result.path('pages').asInt()}" th:href="@{|${base}page=${result.path('page').asInt() + 1}|}"
+           class="rounded border border-slate-300 bg-white px-3 py-1 hover:bg-slate-50">Next</a>
+    </span>
+</div>
+
+<!-- Coloured status pill. -->
+<span th:fragment="badge(text, tone)" th:text="${text}"
+      th:classappend="${tone == 'green'} ? 'bg-green-100 text-green-800' : (${tone == 'red'} ? 'bg-red-100 text-red-800' : (${tone == 'amber'} ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'))"
+      class="inline-block rounded-full px-2 py-0.5 text-xs font-medium">status</span>
+
+</body>
+</html>

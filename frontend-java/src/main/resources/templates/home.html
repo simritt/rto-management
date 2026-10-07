@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Dashboard - RTO Management</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="mb-6 flex items-end justify-between">
+        <div>
+            <h1 class="text-2xl font-semibold">Welcome, <span th:text="${user.displayName}">User</span></h1>
+            <p class="text-slate-500" th:if="${d != null}" th:text="|Figures as of ${d.path('as_of').asText()}|"></p>
+        </div>
+        <form th:if="${d != null}" method="get" th:action="@{/}" class="text-sm">
+            <label class="text-slate-600">Expiry window</label>
+            <select name="days" onchange="this.form.submit()" class="ml-1 rounded border border-slate-300 bg-white px-2 py-1">
+                <option th:each="n : ${#arrays.asList(15, 30, 60, 90)}" th:value="${n}" th:text="|${n} days|" th:selected="${n == days}"></option>
+            </select>
+        </form>
+    </div>
+
+    <p th:if="${d == null}" class="rounded bg-white p-5 text-slate-600 shadow-sm">
+        Use the menu on the left to get started.
+    </p>
+
+    <th:block th:if="${d != null}">
+        <h2 class="mb-2 text-sm font-semibold uppercase text-slate-500">Overview</h2>
+        <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-lg bg-white p-5 shadow-sm"><div class="text-xs uppercase text-slate-500">Citizens</div><div class="mt-1 text-2xl font-semibold" th:text="${d.path('total_citizens').asLong()}"></div></div>
+            <div class="rounded-lg bg-white p-5 shadow-sm"><div class="text-xs uppercase text-slate-500">Vehicles</div><div class="mt-1 text-2xl font-semibold" th:text="${d.path('total_vehicles').asLong()}"></div></div>
+            <div class="rounded-lg bg-white p-5 shadow-sm"><div class="text-xs uppercase text-slate-500">Active licences</div><div class="mt-1 text-2xl font-semibold" th:text="${d.path('active_licences').asLong()}"></div></div>
+            <div class="rounded-lg bg-white p-5 shadow-sm"><div class="text-xs uppercase text-slate-500">Active permits</div><div class="mt-1 text-2xl font-semibold" th:text="${d.path('active_permits').asLong()}"></div></div>
+        </div>
+
+        <h2 class="mb-2 text-sm font-semibold uppercase text-slate-500">Work queue</h2>
+        <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-lg bg-white p-5 shadow-sm"><div class="text-xs uppercase text-slate-500">Pending applications</div><div class="mt-1 text-2xl font-semibold" th:text="${d.path('pending_applications').asLong()}"></div></div>
+            <div class="rounded-lg bg-white p-5 shadow-sm"><div class="text-xs uppercase text-slate-500">Under verification</div><div class="mt-1 text-2xl font-semibold" th:text="${d.path('applications_under_verification').asLong()}"></div></div>
+            <div class="rounded-lg bg-white p-5 shadow-sm"><div class="text-xs uppercase text-slate-500">Appointments today</div><div class="mt-1 text-2xl font-semibold" th:text="${d.path('appointments_today').asLong()}"></div></div>
+            <div class="rounded-lg bg-white p-5 shadow-sm"><div class="text-xs uppercase text-slate-500">Open complaints / appeals</div><div class="mt-1 text-2xl font-semibold" th:text="|${d.path('open_complaints').asLong()} / ${d.path('pending_appeals').asLong()}|"></div></div>
+        </div>
+
+        <h2 class="mb-2 text-sm font-semibold uppercase text-slate-500" th:text="|Expiring within ${d.path('expiry_window_days').asInt()} days|"></h2>
+        <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-lg bg-white p-5 shadow-sm"><div class="text-xs uppercase text-slate-500">Licences</div><div class="mt-1 text-2xl font-semibold text-amber-600" th:text="${d.path('licences_expiring_soon').asLong()}"></div></div>
+            <div class="rounded-lg bg-white p-5 shadow-sm"><div class="text-xs uppercase text-slate-500">Fitness</div><div class="mt-1 text-2xl font-semibold text-amber-600" th:text="${d.path('fitness_expiring_soon').asLong()}"></div></div>
+            <div class="rounded-lg bg-white p-5 shadow-sm"><div class="text-xs uppercase text-slate-500">Pollution</div><div class="mt-1 text-2xl font-semibold text-amber-600" th:text="${d.path('pollution_expiring_soon').asLong()}"></div></div>
+            <div class="rounded-lg bg-white p-5 shadow-sm"><div class="text-xs uppercase text-slate-500">Insurance</div><div class="mt-1 text-2xl font-semibold text-amber-600" th:text="${d.path('insurance_expiring_soon').asLong()}"></div></div>
+        </div>
+
+        <div class="grid gap-4 lg:grid-cols-2">
+            <div class="rounded-lg bg-white p-5 shadow-sm">
+                <h3 class="mb-3 font-semibold">Applications by status</h3>
+                <p th:if="${!d.path('applications_by_status').fields().hasNext()}" class="text-sm text-slate-500">No applications yet.</p>
+                <table class="w-full text-sm" th:if="${d.path('applications_by_status').fields().hasNext()}">
+                    <tr th:each="e : ${d.path('applications_by_status').fields()}" class="border-t border-slate-100">
+                        <td class="py-1.5" th:text="${e.key}"></td>
+                        <td class="py-1.5 text-right font-medium" th:text="${e.value.asLong()}"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="rounded-lg bg-white p-5 shadow-sm">
+                <h3 class="mb-3 font-semibold">Money</h3>
+                <table class="w-full text-sm">
+                    <tr class="border-t border-slate-100"><td class="py-1.5">Unpaid challans</td>
+                        <td class="py-1.5 text-right font-medium" th:text="|${d.path('unpaid_challans').path('count').asLong()} (Rs ${d.path('unpaid_challans').path('amount').asText()})|"></td></tr>
+                    <tr class="border-t border-slate-100"><td class="py-1.5">Overdue road tax records</td>
+                        <td class="py-1.5 text-right font-medium" th:text="${d.path('overdue_road_tax').asLong()}"></td></tr>
+                    <tr class="border-t border-slate-100"><td class="py-1.5">Gross collected</td>
+                        <td class="py-1.5 text-right font-medium" th:text="|Rs ${d.path('payments').path('gross_collected').asText()}|"></td></tr>
+                    <tr class="border-t border-slate-100"><td class="py-1.5">Refunded</td>
+                        <td class="py-1.5 text-right font-medium" th:text="|Rs ${d.path('payments').path('refunded').asText()}|"></td></tr>
+                    <tr class="border-t border-slate-100"><td class="py-1.5">Net collected</td>
+                        <td class="py-1.5 text-right font-semibold" th:text="|Rs ${d.path('payments').path('net_collected').asText()}|"></td></tr>
+                </table>
+            </div>
+        </div>
+    </th:block>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Citizen - RTO Management</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="mb-4 flex items-start justify-between">
+        <div>
+            <a th:href="@{/citizens}" class="text-sm text-blue-600 hover:underline">&larr; All citizens</a>
+            <h1 class="mt-1 text-2xl font-semibold" th:text="|${c.path('first_name').asText()} ${c.path('last_name').asText()}|"></h1>
+            <div class="mt-1 flex items-center gap-2 text-sm text-slate-500">
+                <span th:text="${c.path('citizen_code').asText()}"></span>
+                <span th:if="${c.path('blacklisted').asBoolean()}" th:replace="~{fragments/ui :: badge('Blacklisted', 'red')}"></span>
+                <span th:unless="${c.path('blacklisted').asBoolean()}" th:replace="~{fragments/ui :: badge('Active', 'green')}"></span>
+            </div>
+        </div>
+        <a th:if="${user.can('citizen.update')}" th:href="@{/citizens/{id}/edit(id=${c.path('citizen_id').asLong()})}"
+           class="rounded border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50">Edit</a>
+    </div>
+
+    <div th:if="${c.path('blacklisted').asBoolean()}" class="mb-4 rounded bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-800">
+        <strong>Blacklisted:</strong> <span th:text="${c.path('blacklist_reason').asText('No reason recorded')}"></span>
+    </div>
+
+    <div class="grid gap-4 lg:grid-cols-2">
+        <div class="rounded-lg bg-white p-6 shadow-sm">
+            <h2 class="mb-3 font-semibold">Personal details</h2>
+            <dl class="grid grid-cols-3 gap-y-2 text-sm">
+                <dt class="text-slate-500">Date of birth</dt><dd class="col-span-2" th:text="${c.path('date_of_birth').asText()}"></dd>
+                <dt class="text-slate-500">Gender</dt><dd class="col-span-2" th:text="${c.path('gender').asText()}"></dd>
+                <dt class="text-slate-500">National ID</dt>
+                <dd class="col-span-2" th:text="${c.path('national_id_number').isNull() ? 'Hidden (no permission)' : c.path('national_id_number').asText()}"></dd>
+                <dt class="text-slate-500">Primary phone</dt><dd class="col-span-2" th:text="${c.path('phone_primary').asText()}"></dd>
+                <dt class="text-slate-500">Secondary phone</dt><dd class="col-span-2" th:text="${c.path('phone_secondary').asText('-')}"></dd>
+                <dt class="text-slate-500">Email</dt><dd class="col-span-2" th:text="${c.path('email').asText('-')}"></dd>
+                <dt class="text-slate-500">Registered</dt><dd class="col-span-2" th:text="${#strings.substringBefore(c.path('registered_at').asText(), 'T')}"></dd>
+            </dl>
+        </div>
+
+        <div class="rounded-lg bg-white p-6 shadow-sm">
+            <h2 class="mb-3 font-semibold">Addresses</h2>
+            <p th:if="${addresses.size() == 0}" class="text-sm text-slate-500">No addresses on file.</p>
+            <ul class="divide-y divide-slate-100 text-sm">
+                <li th:each="a : ${addresses}" class="py-2">
+                    <div class="flex items-center gap-2">
+                        <span class="font-medium" th:text="${a.path('address_type').asText()}"></span>
+                        <span th:if="${a.path('is_current').asBoolean()}" th:replace="~{fragments/ui :: badge('Current', 'green')}"></span>
+                        <span th:unless="${a.path('is_current').asBoolean()}" th:replace="~{fragments/ui :: badge('Past', 'slate')}"></span>
+                    </div>
+                    <div th:text="|${a.path('line1').asText()}${a.path('line2').isNull() ? '' : ', ' + a.path('line2').asText()}|"></div>
+                    <div class="text-slate-500" th:text="|${a.path('city').asText()}, ${a.path('state').asText()} - ${a.path('pincode').asText()}|"></div>
+                    <div class="text-xs text-slate-400" th:text="|From ${a.path('valid_from').asText()}${a.path('valid_to').isNull() ? '' : ' to ' + a.path('valid_to').asText()}|"></div>
+                </li>
+            </ul>
+
+            <form th:if="${user.can('citizen.update')}" th:action="@{/citizens/{id}/addresses(id=${c.path('citizen_id').asLong()})}" method="post"
+                  class="mt-4 border-t border-slate-100 pt-4">
+                <h3 class="mb-2 text-sm font-semibold">Add address</h3>
+                <div class="grid gap-2 sm:grid-cols-2 text-sm">
+                    <input name="line1" required placeholder="Line 1" class="rounded border border-slate-300 px-2 py-1.5">
+                    <input name="line2" placeholder="Line 2" class="rounded border border-slate-300 px-2 py-1.5">
+                    <input name="city" required placeholder="City" class="rounded border border-slate-300 px-2 py-1.5">
+                    <input name="state" required placeholder="State" class="rounded border border-slate-300 px-2 py-1.5">
+                    <input name="pincode" required placeholder="Pincode" class="rounded border border-slate-300 px-2 py-1.5">
+                    <select name="address_type" class="rounded border border-slate-300 bg-white px-2 py-1.5">
+                        <option>CURRENT</option><option>PERMANENT</option><option>OFFICE</option>
+                    </select>
+                </div>
+                <button type="submit" class="mt-2 rounded bg-slate-800 px-3 py-1.5 text-sm text-white hover:bg-slate-700">Add address</button>
+            </form>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

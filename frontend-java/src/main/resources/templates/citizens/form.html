@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Citizen - RTO Management</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <h1 class="mb-4 text-2xl font-semibold" th:text="${formTitle}">Register citizen</h1>
+
+    <div th:if="${formError}" class="mb-4 max-w-3xl rounded bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-800" th:text="${formError}"></div>
+
+    <form th:action="@{${action}}" method="post" class="max-w-3xl space-y-6">
+        <div class="rounded-lg bg-white p-6 shadow-sm">
+            <h2 class="mb-4 font-semibold">Personal details</h2>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div th:replace="~{fragments/ui :: input('First name', 'first_name', 'text', true)}"></div>
+                <div th:replace="~{fragments/ui :: input('Last name', 'last_name', 'text', true)}"></div>
+                <div th:replace="~{fragments/ui :: input('Date of birth', 'date_of_birth', 'date', true)}"></div>
+                <div th:replace="~{fragments/ui :: select('Gender', 'gender', ${#arrays.asList('MALE','FEMALE','OTHER')}, true)}"></div>
+                <div th:replace="~{fragments/ui :: input('National ID number', 'national_id_number', 'text', true)}"></div>
+                <div th:unless="${editing}" th:replace="~{fragments/ui :: input('Citizen code (optional, auto if blank)', 'citizen_code', 'text', false)}"></div>
+                <div th:replace="~{fragments/ui :: input('Primary phone', 'phone_primary', 'text', true)}"></div>
+                <div th:replace="~{fragments/ui :: input('Secondary phone', 'phone_secondary', 'text', false)}"></div>
+                <div class="sm:col-span-2" th:replace="~{fragments/ui :: input('Email', 'email', 'email', false)}"></div>
+            </div>
+        </div>
+
+        <div th:unless="${editing}" class="rounded-lg bg-white p-6 shadow-sm">
+            <h2 class="mb-1 font-semibold">Address <span class="text-sm font-normal text-slate-500">(optional)</span></h2>
+            <p class="mb-4 text-xs text-slate-500">Leave "Address line 1" blank to skip the address.</p>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div th:replace="~{fragments/ui :: input('Address line 1', 'address.line1', 'text', false)}"></div>
+                <div th:replace="~{fragments/ui :: input('Address line 2', 'address.line2', 'text', false)}"></div>
+                <div th:replace="~{fragments/ui :: input('City', 'address.city', 'text', false)}"></div>
+                <div th:replace="~{fragments/ui :: input('State', 'address.state', 'text', false)}"></div>
+                <div th:replace="~{fragments/ui :: input('Pincode', 'address.pincode', 'text', false)}"></div>
+                <div th:replace="~{fragments/ui :: select('Address type', 'address.address_type', ${#arrays.asList('CURRENT','PERMANENT','OFFICE')}, false)}"></div>
+            </div>
+        </div>
+
+        <div th:if="${editing}" class="rounded-lg bg-white p-6 shadow-sm">
+            <h2 class="mb-4 font-semibold">Blacklist</h2>
+            <label class="flex items-center gap-2 text-sm">
+                <input type="checkbox" name="blacklisted" value="true" th:checked="${form['blacklisted'] == 'true'}">
+                Blacklist this citizen
+            </label>
+            <div class="mt-4" th:replace="~{fragments/ui :: input('Reason', 'blacklist_reason', 'text', false)}"></div>
+        </div>
+
+        <div class="flex gap-3">
+            <button type="submit" class="rounded bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700">Save</button>
+            <a th:href="${editing} ? @{/citizens/{id}(id=${c.path('citizen_id').asLong()})} : @{/citizens}"
+               class="rounded border border-slate-300 bg-white px-5 py-2 text-sm hover:bg-slate-50">Cancel</a>
+        </div>
+    </form>
+</th:block>
+</body>
+</html>
