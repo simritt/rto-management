@@ -1,14 +1,31 @@
-# Claude Code / assistant artifacts — never publish
-.claude/
-CLAUDE.md
-*.original.md
-
-# Secrets and local config
+# Secrets and local config — NEVER commit these
 .env
 .env.*
+!.env.example
 config.local.*
 *credentials*
 *secret*
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+
+# Java / Maven build artifacts
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+.mvn/wrapper/maven-wrapper.jar
+
+# Spring Boot local runtime directories
+backend-java/logs/
+backend-java/storage/
+backend-java/uploads/
 
 # Python
 __pycache__/
@@ -16,16 +33,47 @@ __pycache__/
 venv/
 .venv/
 
-# Node
+# Node / Frontend
 node_modules/
+dist/
+build/
+.next/
+.nuxt/
+*.tsbuildinfo
 
-# Editor / OS
+# Editor / IDE — each developer uses their own settings locally
 .vscode/
 .idea/
-.DS_Store
-Thumbs.db
+*.iml
+*.iws
+*.ipr
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.project
+.classpath
+.settings/
 
-# Database dumps and logs
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Database dumps and raw data exports — never commit
 *.log
 *.sql.bak
 dump.sql
+*.dump
+mysql-error.log
+
+# Temporary / scratch files
+*.tmp
+*.temp
+scratch/
