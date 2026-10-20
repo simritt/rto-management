@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="|${cfg.title()} - Master Data - RTO Management|">Reference Data</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="mb-4">
+        <a th:href="@{/admin/reference}" class="text-sm font-medium text-blue-600 hover:underline">&larr; Master Reference Data</a>
+        <div class="mt-2 flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900" th:text="${cfg.title()}">Reference Data</h1>
+                <p class="text-sm text-slate-500" th:text="${cfg.description()}">Description</p>
+            </div>
+            <button onclick="document.getElementById('createCard').classList.toggle('hidden')"
+                    class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">
+                + Add Record
+            </button>
+        </div>
+    </div>
+
+    <!-- Create Card (collapsible) -->
+    <div id="createCard" class="hidden mb-6 rounded-xl border border-blue-200 bg-blue-50/50 p-6 shadow-sm">
+        <h2 class="mb-4 text-base font-semibold text-slate-900" th:text="|New ${cfg.title()} Record|">New Record</h2>
+        <form th:action="@{/admin/reference/{type}(type=${cfg.key()})}" method="post" class="space-y-4">
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div th:each="f : ${cfg.fields()}">
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1" th:for="${'new_' + f.name()}">
+                        <span th:text="${f.label()}">Field</span>
+                        <span th:if="${f.required()}" class="text-red-500">*</span>
+                    </label>
+
+                    <!-- Text input -->
+                    <input th:if="${f.type() == 'text'}" th:id="${'new_' + f.name()}" th:name="${f.name()}"
+                           type="text" th:required="${f.required()}" th:placeholder="${f.placeholder()}"
+                           class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+
+                    <!-- Number input -->
+                    <input th:if="${f.type() == 'number'}" th:id="${'new_' + f.name()}" th:name="${f.name()}"
+                           type="number" th:required="${f.required()}" th:placeholder="${f.placeholder()}"
+                           class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+
+                    <!-- Decimal input -->
+                    <input th:if="${f.type() == 'decimal'}" th:id="${'new_' + f.name()}" th:name="${f.name()}"
+                           type="number" step="0.01" th:required="${f.required()}" th:placeholder="${f.placeholder()}"
+                           class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+
+                    <!-- Boolean input -->
+                    <label th:if="${f.type() == 'boolean'}" class="mt-2 flex items-center gap-2 text-sm text-slate-700">
+                        <input type="checkbox" th:id="${'new_' + f.name()}" th:name="${f.name()}" value="true" class="rounded text-blue-600">
+                        <span th:text="${f.helpText() != null ? f.helpText() : 'Enable'}">Option</span>
+                    </label>
+
+                    <!-- Select Parent Region -->
+                    <select th:if="${f.type() == 'select_parent_region'}" th:id="${'new_' + f.name()}" th:name="${f.name()}"
+                            class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                        <option value="">None (Top-Level Jurisdiction)</option>
+                        <option th:each="r : ${parentRegionOptions}" th:value="${r.path('region_id').asLong()}"
+                                th:text="|${r.path('region_name').asText()} (${r.path('region_code').asText()})|"></option>
+                    </select>
+
+                    <!-- Select Manufacturer -->
+                    <select th:if="${f.type() == 'select_manufacturer'}" th:id="${'new_' + f.name()}" th:name="${f.name()}" th:required="${f.required()}"
+                            class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                        <option value="">Select Manufacturer...</option>
+                        <option th:each="m : ${manufacturerOptions}" th:value="${m.path('manufacturer_id').asLong()}"
+                                th:text="${m.path('name').asText()}"></option>
+                    </select>
+
+                    <p th:if="${f.helpText() != null and f.type() != 'boolean'}" class="mt-1 text-xs text-slate-500" th:text="${f.helpText()}"></p>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">Save Record</button>
+                <button type="button" onclick="document.getElementById('createCard').classList.add('hidden')"
+                        class="rounded border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Search bar -->
+    <form method="get" th:action="@{/admin/reference/{type}(type=${cfg.key()})}" class="mb-4 flex gap-2">
+        <input type="text" name="search" th:value="${search}" placeholder="Search..."
+               class="w-72 rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+        <button type="submit" class="rounded bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">Search</button>
+        <a th:href="@{/admin/reference/{type}(type=${cfg.key()})}" class="px-3 py-2 text-sm text-slate-500 hover:underline">Reset</a>
+    </form>
+
+    <!-- Table -->
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table class="w-full text-left text-sm">
+            <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase font-semibold text-slate-600">
+            <tr>
+                <th class="px-4 py-3">ID</th>
+                <th th:each="f : ${cfg.fields()}" class="px-4 py-3" th:text="${f.label()}">Field</th>
+                <th class="px-4 py-3 text-right">Actions</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+            <tr th:each="row : ${result.path('items')}" class="hover:bg-slate-50/75 transition">
+                <td class="px-4 py-3 font-mono text-xs text-slate-500" th:text="${row.path(cfg.idField()).asLong()}">1</td>
+                <td th:each="f : ${cfg.fields()}" class="px-4 py-3">
+                    <!-- Text or Number -->
+                    <span th:if="${f.type() == 'text' or f.type() == 'number'}" th:text="${row.path(f.name()).asText('-')}">Value</span>
+
+                    <!-- Decimal -->
+                    <span th:if="${f.type() == 'decimal'}" class="font-medium" th:text="|Rs ${row.path(f.name()).asText('0.00')}|">Rs 0.00</span>
+
+                    <!-- Boolean -->
+                    <span th:if="${f.type() == 'boolean'}">
+                        <span th:if="${row.path(f.name()).asBoolean()}"
+                              class="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">Yes</span>
+                        <span th:unless="${row.path(f.name()).asBoolean()}"
+                              class="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">No</span>
+                    </span>
+
+                    <!-- Select Parent Region -->
+                    <span th:if="${f.type() == 'select_parent_region'}"
+                          th:text="${row.path('parent_region_id').isNull() ? 'None (Root)' : 'Region #' + row.path('parent_region_id').asLong()}">Parent</span>
+
+                    <!-- Select Manufacturer -->
+                    <span th:if="${f.type() == 'select_manufacturer'}"
+                          th:text="${row.path('manufacturer_id').asText()}">Manufacturer</span>
+                </td>
+                <td class="px-4 py-3 text-right">
+                    <form th:action="@{/admin/reference/{type}/{id}/delete(type=${cfg.key()}, id=${row.path(cfg.idField()).asLong()})}"
+                          method="post" onsubmit="return confirm('Are you sure you want to delete this record?');" class="inline">
+                        <button type="submit" class="text-xs font-medium text-red-600 hover:text-red-800 hover:underline">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${result.path('items').size() == 0}">
+                <td th:colspan="${cfg.fields().size() + 2}" class="px-4 py-8 text-center text-slate-500">
+                    No records found in <span th:text="${cfg.title()}">this table</span>. Click <strong>+ Add Record</strong> to create one.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pager -->
+    <div th:replace="~{fragments/ui :: pager(${result}, ${pagerBase})}"></div>
+</th:block>
+</body>
+</html>

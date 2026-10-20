@@ -26,6 +26,8 @@ replay_pid*
 backend-java/logs/
 backend-java/storage/
 backend-java/uploads/
+storage/
+**/storage/
 
 # Python
 __pycache__/
@@ -77,3 +79,4 @@ mysql-error.log
 *.tmp
 *.temp
 scratch/
+**/scratch/

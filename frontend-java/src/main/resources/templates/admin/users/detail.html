@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>User Account Details - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <a th:href="@{/admin/users}" class="text-xs font-medium text-slate-500 hover:text-slate-800">&larr; Back to Users</a>
+            <div class="mt-2 flex items-center gap-3">
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900"
+                    th:text="|@${targetUser.path('username').asText()}|">@admin</h1>
+                <span th:if="${targetUser.path('is_active').asBoolean()}" class="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">ACTIVE</span>
+                <span th:unless="${targetUser.path('is_active').asBoolean()}" class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 border border-slate-200">INACTIVE</span>
+            </div>
+            <p class="mt-1 text-sm text-slate-600 font-medium"
+               th:text="|User ID: #${targetUser.path('user_id').asLong()} (Person #${targetUser.path('person_id').asLong()})|">User ID: #1</p>
+        </div>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-3">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Role Assignment Card -->
+            <div th:if="${user.can('rbac.manage')}" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Assigned Security Roles</h2>
+                <p class="text-xs text-slate-500 mb-4">Roles dictate granular permissions and API resource capabilities granted to this user.</p>
+
+                <form method="post" th:action="@{'/admin/users/' + ${targetUser.path('user_id').asLong()} + '/roles'}">
+                    <div class="grid grid-cols-2 gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 mb-4">
+                        <div th:each="r : ${allRoles}" class="flex items-center gap-2">
+                            <input type="checkbox" name="role_ids" th:id="|role_${r.path('role_id').asLong()}|"
+                                   th:value="${r.path('role_id').asLong()}"
+                                   th:checked="${#lists.contains(targetUser.path('roles').findValuesAsText('roles'), r.path('role_name').asText()) || targetUser.path('roles').toString().contains(r.path('role_name').asText())}"
+                                   class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                            <label th:for="|role_${r.path('role_id').asLong()}|" class="text-xs text-slate-800 font-medium"
+                                   th:text="${r.path('role_name').asText()}">Role Name</label>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">
+                            Save Role Assignments
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Password Reset Card -->
+            <div th:if="${user.can('user.manage')}" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Reset Authentication Password</h2>
+                <p class="text-xs text-slate-500 mb-4">Direct administrative password override. Bcrypt encrypted before persistence.</p>
+
+                <form method="post" th:action="@{'/admin/users/' + ${targetUser.path('user_id').asLong()} + '/password'}" class="flex items-end gap-3">
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">New Password *</label>
+                        <input type="password" name="password" required minlength="8" maxlength="72" placeholder="Minimum 8 characters"
+                               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <button type="submit" class="rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700">
+                        Reset Password
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar Meta -->
+        <div class="space-y-6">
+            <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm text-xs space-y-4">
+                <h3 class="font-semibold uppercase tracking-wider text-slate-500">Account Meta</h3>
+
+                <div>
+                    <span class="block text-slate-400">Username</span>
+                    <span class="font-bold text-slate-900" th:text="${targetUser.path('username').asText()}">admin</span>
+                </div>
+
+                <div>
+                    <span class="block text-slate-400">Person Identity</span>
+                    <span class="font-mono font-medium text-slate-800" th:text="|Person #${targetUser.path('person_id').asLong()}|">#1</span>
+                </div>
+
+                <div>
+                    <span class="block text-slate-400">Last Login At</span>
+                    <span class="font-mono text-slate-700"
+                          th:text="${targetUser.path('last_login_at').isNull() ? 'Never logged in' : targetUser.path('last_login_at').asText()}">2026-10-20</span>
+                </div>
+            </div>
+
+            <!-- Status Control -->
+            <div th:if="${user.can('user.manage')}" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm text-xs space-y-4">
+                <h3 class="font-semibold uppercase tracking-wider text-slate-500">Account Access</h3>
+
+                <form method="post" th:action="@{'/admin/users/' + ${targetUser.path('user_id').asLong()} + '/status'}">
+                    <input type="hidden" name="is_active" th:value="${!targetUser.path('is_active').asBoolean()}">
+                    <button th:if="${targetUser.path('is_active').asBoolean()}" type="submit"
+                            class="w-full rounded-lg bg-rose-600 px-3 py-2 text-xs font-semibold text-white hover:bg-rose-700">
+                        Deactivate User Account
+                    </button>
+                    <button th:unless="${targetUser.path('is_active').asBoolean()}" type="submit"
+                            class="w-full rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700">
+                        Re-activate User Account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

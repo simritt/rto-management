@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Refunds - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <!-- Page Header & Action Bar -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Refunds</h1>
+            <p class="mt-1 text-sm text-slate-500">Registry of fee and penalty reversals issued back to citizens and commercial operators.</p>
+        </div>
+        <div>
+            <a th:href="@{/payments}"
+               class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
+                &larr; Back to Payments
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Bar Card -->
+    <div class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form method="get" th:action="@{/refunds}" class="grid gap-4 sm:grid-cols-2 md:grid-cols-4 items-end">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Status</label>
+                <select name="status" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <option value="">All Statuses</option>
+                    <option value="INITIATED" th:selected="${paramStatus == 'INITIATED'}">INITIATED</option>
+                    <option value="COMPLETED" th:selected="${paramStatus == 'COMPLETED'}">COMPLETED</option>
+                    <option value="FAILED" th:selected="${paramStatus == 'FAILED'}">FAILED</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Payment ID</label>
+                <input type="number" name="payment_id" th:value="${paramPaymentId}" placeholder="Filter by Payment ID"
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+            </div>
+            <div class="flex gap-2 sm:col-span-2">
+                <button type="submit" class="w-full rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700">Filter</button>
+                <a th:href="@{/refunds}" class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <table class="min-w-full divide-y divide-slate-200 text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold">
+                <tr>
+                    <th scope="col" class="px-5 py-3.5 text-left">Refund ID</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Payment Link</th>
+                    <th scope="col" class="px-5 py-3.5 text-right">Refund Amount</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Reason</th>
+                    <th scope="col" class="px-5 py-3.5 text-center">Status</th>
+                    <th scope="col" class="px-5 py-3.5 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
+                <tr th:each="row : ${data.path('items')}" class="hover:bg-slate-50/75 transition-colors">
+                    <td class="px-5 py-4 whitespace-nowrap font-mono font-semibold text-blue-600">
+                        <a th:href="@{/refunds/{id}(id=${row.path('refundId').asLong(row.path('refund_id').asLong(0))})}"
+                           class="hover:underline">
+                            #<span th:text="${row.path('refundId').asLong(row.path('refund_id').asLong(0))}">1</span>
+                        </a>
+                    </td>
+                    <td class="px-5 py-4 whitespace-nowrap font-mono text-slate-600">
+                        <a th:href="@{/payments/{id}(id=${row.path('paymentId').asLong(row.path('payment_id').asLong(0))})}"
+                           class="hover:text-blue-600">
+                            Payment #<span th:text="${row.path('paymentId').asLong(row.path('payment_id').asLong(0))}">1</span>
+                        </a>
+                    </td>
+                    <td class="px-5 py-4 whitespace-nowrap text-right font-mono font-bold text-rose-600 text-sm">
+                        ₹<span th:text="${row.path('amount').asText()}">100.00</span>
+                    </td>
+                    <td class="px-5 py-4 whitespace-nowrap text-slate-600"
+                        th:text="${row.path('reason').asText()}">Duplicate payment reversal</td>
+                    <td class="px-5 py-4 whitespace-nowrap text-center">
+                        <span th:if="${row.path('status').asText() == 'COMPLETED'}"
+                              class="inline-block rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">COMPLETED</span>
+                        <span th:if="${row.path('status').asText() == 'INITIATED'}"
+                              class="inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">INITIATED</span>
+                        <span th:if="${row.path('status').asText() == 'FAILED'}"
+                              class="inline-block rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-semibold text-rose-800">FAILED</span>
+                    </td>
+                    <td class="px-5 py-4 whitespace-nowrap text-right">
+                        <a th:href="@{/refunds/{id}(id=${row.path('refundId').asLong(row.path('refund_id').asLong(0))})}"
+                           class="rounded border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50">
+                            Details &rarr;
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${data.path('items').isEmpty()}">
+                    <td colspan="6" class="px-6 py-12 text-center text-sm text-slate-400">
+                        No refunds found.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div th:replace="~{fragments/ui :: pager(${data}, '?')}"></div>
+
+</div>
+</body>
+</html>

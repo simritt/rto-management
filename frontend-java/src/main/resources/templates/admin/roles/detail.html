@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Role Permissions Matrix - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <a th:href="@{/admin/roles}" class="text-xs font-medium text-slate-500 hover:text-slate-800">&larr; Back to Roles</a>
+            <div class="mt-2 flex items-center gap-3">
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900"
+                    th:text="${role.path('role_name').asText()}">Admin</h1>
+                <span class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 border border-blue-200"
+                      th:text="|${role.path('permissions').size()} Permissions|">15 Permissions</span>
+            </div>
+            <p class="mt-1 text-sm text-slate-600 font-medium"
+               th:text="|Role ID: #${role.path('role_id').asLong()}|">Role ID: #1</p>
+        </div>
+    </div>
+
+    <!-- Permissions Matrix Form -->
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="mb-4 flex items-center justify-between">
+            <div>
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500">Security Permissions Matrix</h2>
+                <p class="text-xs text-slate-500">Check or uncheck permissions to grant or revoke system capabilities for this role.</p>
+            </div>
+        </div>
+
+        <form method="post" th:action="@{'/admin/roles/' + ${role.path('role_id').asLong()} + '/permissions'}">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 max-h-[500px] overflow-y-auto mb-6">
+                <div th:each="p : ${allPermissions}" class="flex items-center gap-2 p-1.5 rounded hover:bg-white transition-colors">
+                    <input type="checkbox" name="permission_keys" th:id="|perm_${p.path('permission_id').asLong()}|"
+                           th:value="${p.path('permission_key').asText()}"
+                           th:checked="${#lists.contains(role.path('permissions').findValuesAsText('permissions'), p.path('permission_key').asText()) || role.path('permissions').toString().contains(p.path('permission_key').asText())}"
+                           class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <label th:for="|perm_${p.path('permission_id').asLong()}|" class="text-xs font-mono text-slate-800"
+                           th:text="${p.path('permission_key').asText()}">citizen.view</label>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                <a th:href="@{/admin/roles}" class="rounded-lg border border-slate-300 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Cancel</a>
+                <button type="submit" class="rounded-lg bg-blue-600 px-5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">
+                    Save Permission Changes
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

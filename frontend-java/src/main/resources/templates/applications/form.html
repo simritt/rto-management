@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Submit Application - RTO Management</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="mb-4">
+        <a th:href="@{/applications}" class="text-sm font-medium text-blue-600 hover:underline">&larr; All Applications</a>
+        <h1 class="mt-2 text-2xl font-bold text-slate-900">Submit New Citizen Application</h1>
+        <p class="text-sm text-slate-500">Initiate an official RTO service request on behalf of a citizen.</p>
+    </div>
+
+    <div th:if="${formError}" class="mb-4 max-w-2xl rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-800" th:text="${formError}"></div>
+
+    <form th:action="@{/applications}" method="post" class="max-w-2xl space-y-6">
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+            <!-- Citizen Selector -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1" for="citizen_id">
+                    Applicant (Citizen) <span class="text-red-500">*</span>
+                </label>
+                <select id="citizen_id" name="citizen_id" required
+                        class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <option value="">Select Citizen...</option>
+                    <option th:each="c : ${citizens}" th:value="${c.path('citizen_id').asLong()}"
+                            th:text="|${c.path('first_name').asText()} ${c.path('last_name').asText()} (${c.path('citizen_code').asText()} - ${c.path('phone_primary').asText()})|"
+                            th:selected="${form['citizen_id'] != null and form['citizen_id'] == c.path('citizen_id').asText()}"></option>
+                </select>
+                <p th:if="${fieldErrors['citizen_id'] != null}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['citizen_id']}"></p>
+                <p class="mt-1 text-xs text-slate-500">Only verified, non-blacklisted citizens can submit applications.</p>
+            </div>
+
+            <!-- Service Type Selector -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1" for="service_type_id">
+                    Requested Service <span class="text-red-500">*</span>
+                </label>
+                <select id="service_type_id" name="service_type_id" required
+                        class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <option value="">Select Service...</option>
+                    <option th:each="s : ${serviceTypes}" th:value="${s.path('service_type_id').asLong()}"
+                            th:text="|${s.path('service_name').asText()} (${s.path('service_code').asText()} - Rs ${s.path('base_fee').asText()} - SLA ${s.path('sla_days').asInt()} days)|"
+                            th:selected="${form['service_type_id'] != null and form['service_type_id'] == s.path('service_type_id').asText()}"></option>
+                </select>
+                <p th:if="${fieldErrors['service_type_id'] != null}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['service_type_id']}"></p>
+            </div>
+
+            <!-- Office Selector -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1" for="office_id">
+                    Jurisdiction RTO Office <span class="text-red-500">*</span>
+                </label>
+                <select id="office_id" name="office_id" required
+                        class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <option value="">Select Processing Office...</option>
+                    <option th:each="o : ${offices}" th:value="${o.path('office_id').asLong()}"
+                            th:text="|${o.path('office_name').asText()} (${o.path('office_code').asText()})|"
+                            th:selected="${form['office_id'] != null and form['office_id'] == o.path('office_id').asText()}"></option>
+                </select>
+                <p th:if="${fieldErrors['office_id'] != null}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['office_id']}"></p>
+            </div>
+
+            <!-- Application Number (Optional) -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1" for="application_number">
+                    Custom Application Number <span class="text-xs text-slate-400 font-normal">(Optional, auto-generated if left blank)</span>
+                </label>
+                <input id="application_number" name="application_number" type="text" th:value="${form['application_number']}"
+                       placeholder="e.g. APP-2026-001 (5-30 alphanumeric characters)"
+                       class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none font-mono">
+                <p th:if="${fieldErrors['application_number'] != null}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['application_number']}"></p>
+            </div>
+
+            <!-- Remarks -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1" for="remarks">Remarks / Notes</label>
+                <textarea id="remarks" name="remarks" rows="3" placeholder="Additional notes or application context"
+                          class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          th:text="${form['remarks']}"></textarea>
+                <p th:if="${fieldErrors['remarks'] != null}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['remarks']}"></p>
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <button type="submit" class="rounded bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700">Submit Application</button>
+            <a th:href="@{/applications}" class="rounded border border-slate-300 bg-white px-5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</a>
+        </div>
+    </form>
+</th:block>
+</body>
+</html>

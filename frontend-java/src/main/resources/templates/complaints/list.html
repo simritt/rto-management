@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Citizen Complaints - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <!-- Page Header & Action Bar -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Citizen Complaints</h1>
+            <p class="mt-1 text-sm text-slate-500">Track and manage citizen service grievances, RTO counter complaints, and ticket resolution workflows.</p>
+        </div>
+        <div>
+            <a th:if="${user.can('complaint.create')}" th:href="@{/complaints/new}"
+               class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">
+                + File Complaint
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Bar Card -->
+    <div class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form method="get" th:action="@{/complaints}" class="grid gap-4 sm:grid-cols-2 md:grid-cols-5 items-end">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Status</label>
+                <select name="status" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <option value="">All Statuses</option>
+                    <option value="OPEN" th:selected="${status == 'OPEN'}">OPEN</option>
+                    <option value="IN_PROGRESS" th:selected="${status == 'IN_PROGRESS'}">IN_PROGRESS</option>
+                    <option value="RESOLVED" th:selected="${status == 'RESOLVED'}">RESOLVED</option>
+                    <option value="CLOSED" th:selected="${status == 'CLOSED'}">CLOSED</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Office</label>
+                <select name="office_id" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <option value="">All Offices</option>
+                    <option th:each="off : ${offices}" th:value="${off.path('office_id').asLong()}"
+                            th:text="|${off.path('office_code').asText()} - ${off.path('office_name').asText()}|"
+                            th:selected="${officeId != null && officeId == off.path('office_id').asLong()}"></option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Citizen ID</label>
+                <input type="number" name="citizen_id" th:value="${citizenId}" placeholder="Filter by Citizen ID"
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Search</label>
+                <input type="text" name="search" th:value="${search}" placeholder="Subject or keywords"
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="w-full rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700">Filter</button>
+                <a th:href="@{/complaints}" class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <table class="min-w-full divide-y divide-slate-200 text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold">
+                <tr>
+                    <th scope="col" class="px-5 py-3.5 text-left">Ticket ID</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Subject</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Office ID</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Citizen ID</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Filed At</th>
+                    <th scope="col" class="px-5 py-3.5 text-center">Status</th>
+                    <th scope="col" class="px-5 py-3.5 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                <tr th:if="${page == null || page.path('items').isEmpty()}">
+                    <td colspan="7" class="px-5 py-8 text-center text-slate-400">No complaints found matching the criteria.</td>
+                </tr>
+                <tr th:each="c : ${page.path('items')}" class="hover:bg-slate-50/80 transition-colors">
+                    <td class="px-5 py-3.5 font-mono font-medium text-blue-600">
+                        <a th:href="@{'/complaints/' + ${c.path('complaint_id').asLong()}}" class="hover:underline"
+                           th:text="|#${c.path('complaint_id').asLong()}|">#1</a>
+                    </td>
+                    <td class="px-5 py-3.5 font-medium text-slate-900 max-w-xs truncate" th:text="${c.path('subject').asText()}">Service delay</td>
+                    <td class="px-5 py-3.5 text-slate-600" th:text="${c.path('office_id').asLong()}">1</td>
+                    <td class="px-5 py-3.5 text-slate-600 font-mono">
+                        <a th:href="@{'/citizens/' + ${c.path('citizen_id').asLong()}}" class="text-blue-600 hover:underline"
+                           th:text="|Citizen #${c.path('citizen_id').asLong()}|">#1</a>
+                    </td>
+                    <td class="px-5 py-3.5 text-slate-500" th:text="${c.path('filed_at').asText()}">2026-10-20</td>
+                    <td class="px-5 py-3.5 text-center">
+                        <span th:if="${c.path('status').asText() == 'OPEN'}" class="inline-flex rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700 border border-amber-200">OPEN</span>
+                        <span th:if="${c.path('status').asText() == 'IN_PROGRESS'}" class="inline-flex rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700 border border-blue-200">IN_PROGRESS</span>
+                        <span th:if="${c.path('status').asText() == 'RESOLVED'}" class="inline-flex rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200">RESOLVED</span>
+                        <span th:if="${c.path('status').asText() == 'CLOSED'}" class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700 border border-slate-200">CLOSED</span>
+                    </td>
+                    <td class="px-5 py-3.5 text-right">
+                        <a th:href="@{'/complaints/' + ${c.path('complaint_id').asLong()}}" class="font-medium text-blue-600 hover:text-blue-800">View &rarr;</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination Bar -->
+        <div th:if="${page != null && page.path('pages').asInt() > 1}" class="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-5 py-3 text-xs">
+            <span class="text-slate-600" th:text="|Page ${page.path('page').asInt()} of ${page.path('pages').asInt()} (${page.path('total').asLong()} total complaints)|"></span>
+            <div class="flex gap-1">
+                <a th:if="${page.path('page').asInt() > 1}"
+                   th:href="@{/complaints(page=${page.path('page').asInt() - 1}, status=${status}, office_id=${officeId}, citizen_id=${citizenId}, search=${search})}"
+                   class="rounded border border-slate-300 bg-white px-3 py-1 text-slate-700 hover:bg-slate-100">&larr; Previous</a>
+                <a th:if="${page.path('page').asInt() < page.path('pages').asInt()}"
+                   th:href="@{/complaints(page=${page.path('page').asInt() + 1}, status=${status}, office_id=${officeId}, citizen_id=${citizenId}, search=${search})}"
+                   class="rounded border border-slate-300 bg-white px-3 py-1 text-slate-700 hover:bg-slate-100">Next &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

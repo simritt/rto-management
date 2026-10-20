@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Appeal Details - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <a th:href="@{/appeals}" class="text-xs font-medium text-slate-500 hover:text-slate-800">&larr; Back to Appeals</a>
+            <div class="mt-2 flex items-center gap-3">
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900" th:text="|Appeal #${appeal.path('appeal_id').asLong()}|">Appeal #1</h1>
+                <span th:if="${appeal.path('status').asText() == 'FILED'}" class="inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 border border-amber-200">FILED</span>
+                <span th:if="${appeal.path('status').asText() == 'UNDER_REVIEW'}" class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 border border-blue-200">UNDER_REVIEW</span>
+                <span th:if="${appeal.path('status').asText() == 'UPHELD'}" class="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">UPHELD</span>
+                <span th:if="${appeal.path('status').asText() == 'DISMISSED'}" class="inline-flex rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700 border border-rose-200">DISMISSED</span>
+            </div>
+            <p class="mt-1 text-sm text-slate-600 font-medium"
+               th:text="|Contesting ${appeal.path('against_type').asText()} #${appeal.path('against_id').asLong()}|">Contesting CHALLAN #10</p>
+        </div>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-3">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Grounds of Appeal Card -->
+            <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4">Grounds of Appeal</h2>
+                <div class="rounded-lg bg-slate-50 p-4 text-sm text-slate-800 whitespace-pre-line border border-slate-100 leading-relaxed"
+                     th:text="${appeal.path('grounds').asText()}">
+                    Grounds text goes here...
+                </div>
+            </div>
+
+            <!-- Judicial Review Actions (Staff with appeal.review) -->
+            <div th:if="${user.can('appeal.review')}" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Appellate Adjudication</h2>
+                <p class="text-xs text-slate-500 mb-4">Statutory decision panel. Upholding an appeal automatically applies the appropriate administrative remedy.</p>
+
+                <!-- If FILED -->
+                <div th:if="${appeal.path('status').asText() == 'FILED'}">
+                    <form method="post" th:action="@{'/appeals/' + ${appeal.path('appeal_id').asLong()} + '/review'}">
+                        <button type="submit" class="rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">
+                            Begin Formal Review (Move to UNDER_REVIEW)
+                        </button>
+                    </form>
+                </div>
+
+                <!-- If UNDER_REVIEW -->
+                <div th:if="${appeal.path('status').asText() == 'UNDER_REVIEW'}" class="space-y-4">
+                    <div class="rounded-lg border border-slate-200 p-4 bg-emerald-50/50">
+                        <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-2">Option 1: Uphold Appeal & Apply Remedy</h4>
+                        <p class="text-[11px] text-slate-600 mb-3">
+                            Cancels contested challan, reopens rejected application, or reinstates suspended licence.
+                        </p>
+                        <form method="post" th:action="@{'/appeals/' + ${appeal.path('appeal_id').asLong()} + '/uphold'}" class="flex flex-wrap items-center gap-3">
+                            <input type="text" name="note" placeholder="Adjudication order note (e.g. Evidence confirmed driver misidentification)"
+                                   class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none bg-white">
+                            <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700">
+                                Uphold Appeal
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="rounded-lg border border-slate-200 p-4 bg-rose-50/50">
+                        <h4 class="text-xs font-bold text-rose-800 uppercase tracking-wider mb-2">Option 2: Dismiss Appeal</h4>
+                        <p class="text-[11px] text-slate-600 mb-3">
+                            Rejection stands, or disputed challan is returned to ISSUED status.
+                        </p>
+                        <form method="post" th:action="@{'/appeals/' + ${appeal.path('appeal_id').asLong()} + '/dismiss'}" class="flex flex-wrap items-center gap-3">
+                            <input type="text" name="note" placeholder="Dismissal grounds (e.g. Insufficient evidentiary support)"
+                                   class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none bg-white">
+                            <button type="submit" class="rounded-lg bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-700">
+                                Dismiss Appeal
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- If UPHELD or DISMISSED -->
+                <div th:if="${appeal.path('status').asText() == 'UPHELD' || appeal.path('status').asText() == 'DISMISSED'}"
+                     class="rounded-lg bg-slate-50 p-4 text-xs text-slate-600">
+                    This appeal was resolved on <span class="font-semibold" th:text="${appeal.path('resolved_at').asText()}">2026-10-20</span> with decision <span class="font-semibold uppercase" th:text="${appeal.path('status').asText()}">UPHELD</span>.
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Meta -->
+        <div class="space-y-6">
+            <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm text-xs space-y-4">
+                <h3 class="font-semibold uppercase tracking-wider text-slate-500">Case Meta</h3>
+
+                <div>
+                    <span class="block text-slate-400">Target Type</span>
+                    <span class="font-semibold text-slate-900" th:text="${appeal.path('against_type').asText()}">CHALLAN</span>
+                </div>
+
+                <div>
+                    <span class="block text-slate-400">Target Record</span>
+                    <div class="mt-1 font-mono">
+                        <a th:if="${appeal.path('against_type').asText() == 'CHALLAN'}"
+                           th:href="@{'/challans/' + ${appeal.path('against_id').asLong()}}"
+                           class="text-blue-600 hover:underline font-medium"
+                           th:text="|Challan #${appeal.path('against_id').asLong()}|">#10</a>
+
+                        <a th:if="${appeal.path('against_type').asText() == 'APPLICATION_REJECTION'}"
+                           th:href="@{'/applications/' + ${appeal.path('against_id').asLong()}}"
+                           class="text-blue-600 hover:underline font-medium"
+                           th:text="|Application #${appeal.path('against_id').asLong()}|">#10</a>
+
+                        <a th:if="${appeal.path('against_type').asText() == 'LICENCE_SUSPENSION'}"
+                           th:href="@{'/licences/' + ${appeal.path('against_id').asLong()}}"
+                           class="text-blue-600 hover:underline font-medium"
+                           th:text="|Licence #${appeal.path('against_id').asLong()}|">#10</a>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="block text-slate-400">Appellant Citizen</span>
+                    <div th:if="${citizen != null}" class="mt-1">
+                        <a th:href="@{'/citizens/' + ${citizen.path('citizen_id').asLong()}}" class="font-medium text-blue-600 hover:underline"
+                           th:text="|${citizen.path('first_name').asText()} ${citizen.path('last_name').asText()}|">Jane Doe</a>
+                        <div class="text-[11px] text-slate-500 font-mono" th:text="|ID: #${citizen.path('citizen_id').asLong()}|"></div>
+                    </div>
+                    <div th:unless="${citizen != null}" class="font-medium text-slate-800 font-mono"
+                         th:text="|Citizen #${appeal.path('citizen_id').asLong()}|">1</div>
+                </div>
+
+                <div>
+                    <span class="block text-slate-400">Filed At</span>
+                    <span class="font-medium text-slate-800" th:text="${appeal.path('filed_at').asText()}">2026-10-20</span>
+                </div>
+
+                <div th:if="${!appeal.path('resolved_at').isNull()}">
+                    <span class="block text-slate-400">Resolved At</span>
+                    <span class="font-medium text-slate-800" th:text="${appeal.path('resolved_at').asText()}">2026-10-20</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

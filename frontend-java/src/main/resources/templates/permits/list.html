@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Commercial Permits - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Commercial Permits</h1>
+            <p class="text-sm text-slate-500">Manage route and transport permits issued to commercial vehicles</p>
+        </div>
+        <div class="flex gap-2">
+            <a th:href="@{/routes}" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                Transport Routes &rarr;
+            </a>
+            <form th:action="@{/permits/expire-overdue}" method="post">
+                <button type="submit" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Expire Overdue Permits
+                </button>
+            </form>
+            <a th:href="@{/permits/new}"
+               class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700">
+                + Issue Permit
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <form method="get" th:action="@{/permits}" class="grid gap-3 sm:grid-cols-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Status</label>
+                <select name="status" class="w-full rounded border border-slate-300 bg-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none">
+                    <option value="">All Statuses</option>
+                    <option value="ACTIVE" th:selected="${status == 'ACTIVE'}">ACTIVE</option>
+                    <option value="SUSPENDED" th:selected="${status == 'SUSPENDED'}">SUSPENDED</option>
+                    <option value="CANCELLED" th:selected="${status == 'CANCELLED'}">CANCELLED</option>
+                    <option value="EXPIRED" th:selected="${status == 'EXPIRED'}">EXPIRED</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Permit Type</label>
+                <select name="permit_type_id" class="w-full rounded border border-slate-300 bg-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none">
+                    <option value="">All Permit Types</option>
+                    <option th:each="pt : ${permitTypes}"
+                            th:value="${pt.path('permit_type_id').asLong()}"
+                            th:text="${pt.path('type_name').asText()}"
+                            th:selected="${permitTypeId != null and permitTypeId == pt.path('permit_type_id').asLong()}"></option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Expiring Within</label>
+                <select name="expiring_within_days" class="w-full rounded border border-slate-300 bg-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none">
+                    <option value="">Any time</option>
+                    <option value="30">Within 30 Days</option>
+                    <option value="60">Within 60 Days</option>
+                    <option value="90">Within 90 Days</option>
+                </select>
+            </div>
+
+            <div class="flex items-end gap-2">
+                <button type="submit" class="flex-1 rounded bg-slate-800 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-700">Filter</button>
+                <a th:href="@{/permits}" class="rounded border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-xs uppercase font-medium text-slate-500">
+            <tr>
+                <th class="px-6 py-3">Permit #</th>
+                <th class="px-6 py-3">Vehicle</th>
+                <th class="px-6 py-3">Permit Type</th>
+                <th class="px-6 py-3">Holder (Citizen)</th>
+                <th class="px-6 py-3">Validity</th>
+                <th class="px-6 py-3">Status</th>
+                <th class="px-6 py-3 text-right">Action</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+            <tr th:if="${data.path('items').isEmpty()}">
+                <td colspan="7" class="px-6 py-8 text-center text-slate-400">No permits found.</td>
+            </tr>
+            <tr th:each="p : ${data.path('items')}" class="hover:bg-slate-50">
+                <td class="px-6 py-4 font-mono font-semibold text-slate-900">
+                    <a th:href="@{/permits/{id}(id=${p.path('permit_id').asLong()})}"
+                       class="text-blue-600 hover:underline" th:text="${p.path('permit_number').asText()}">PMT-001</a>
+                </td>
+                <td class="px-6 py-4 font-mono text-xs">
+                    <a th:href="@{/vehicles/{id}(id=${p.path('vehicle_id').asLong()})}"
+                       class="text-blue-600 hover:underline" th:text="|Vehicle #${p.path('vehicle_id').asLong()}|">Vehicle #1</a>
+                </td>
+                <td class="px-6 py-4 text-xs font-medium text-slate-800"
+                    th:text="|Type #${p.path('permit_type_id').asLong()}|">Permit Type</td>
+                <td class="px-6 py-4 font-mono text-xs text-slate-600">
+                    <a th:href="@{/citizens/{id}(id=${p.path('citizen_id').asLong()})}"
+                       class="text-blue-600 hover:underline" th:text="|Citizen #${p.path('citizen_id').asLong()}|">Citizen #1</a>
+                </td>
+                <td class="px-6 py-4 text-xs text-slate-600">
+                    <span th:text="${p.path('issue_date').asText()}">2026-01-01</span> &rarr;
+                    <span class="font-medium text-slate-900" th:text="${p.path('expiry_date').asText()}">2027-01-01</span>
+                </td>
+                <td class="px-6 py-4">
+                    <span th:if="${p.path('status').asText() == 'ACTIVE'}"
+                          class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">ACTIVE</span>
+                    <span th:if="${p.path('status').asText() == 'SUSPENDED'}"
+                          class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">SUSPENDED</span>
+                    <span th:if="${p.path('status').asText() == 'CANCELLED'}"
+                          class="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800">CANCELLED</span>
+                    <span th:if="${p.path('status').asText() == 'EXPIRED'}"
+                          class="rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-semibold text-slate-800">EXPIRED</span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <a th:href="@{/permits/{id}(id=${p.path('permit_id').asLong()})}"
+                       class="rounded border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50">Manage</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div th:replace="~{fragments/ui :: pager(${data}, '?')}"></div>
+    </div>
+
+</div>
+</body>
+</html>

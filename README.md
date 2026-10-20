@@ -303,36 +303,33 @@ The modules are connected through database relationships and service-layer workf
 
 ## 📁 Project Structure
 
-A typical backend structure is organized as follows:
-
 ```text
 rto-management/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── .../
-│   │   │       ├── config/
-│   │   │       ├── core/
-│   │   │       ├── domain/
-│   │   │       ├── dto/
-│   │   │       ├── security/
-│   │   │       ├── service/
-│   │   │       ├── web/
-│   │   │       └── cli/
-│   │   │
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── ...
-│   │
-│   └── test/
-│       └── ...
-│
-├── pom.xml
-├── README.md
-└── ...
+├── database/                    # MySQL 8 schema, constraints, views, triggers, procedures, and seed data
+│   ├── 00_run_all.sql
+│   ├── schema/                  # Core entity tables
+│   ├── constraints/             # Foreign keys and check constraints
+│   ├── indexes/                 # Performance indexes
+│   ├── views/                   # Operational and reporting views
+│   ├── triggers/                # Audit & status history triggers
+│   ├── procedures/              # Stored procedures
+│   ├── queries/                 # Advanced analytical queries
+│   └── seed/                    # Realistic reference & demo seed data
+├── backend-java/                # Spring Boot 3.3.5 REST API backend (Port 8000)
+│   ├── pom.xml
+│   └── src/main/java/com/rto/
+│       ├── domain/              # JPA entities & relationships
+│       ├── core/                # Database abstraction, locking, audit, pagination
+│       ├── security/            # JWT authentication, BCrypt, RBAC
+│       ├── service/             # Business rules & transactional workflows
+│       ├── web/                 # REST controllers (OpenAPI / Swagger at /docs)
+│       └── cli/                 # Bootstrap & database setup commands
+└── frontend-java/               # Spring Boot 3.3.5 + Thymeleaf + Tailwind CSS portal (Port 8080)
+    ├── pom.xml
+    └── src/main/
+        ├── java/com/rto/web/    # UI controllers & JSON REST client
+        └── resources/templates/ # Server-rendered responsive HTML views
 ```
-
-> The exact package/file names may vary as the project evolves; the structure above reflects the architectural separation used by the application.
 
 ---
 
@@ -340,11 +337,11 @@ rto-management/
 
 Install the following before running the project:
 
-- **JDK 21**
+- **JDK 21** (Eclipse Adoptium Temurin or Oracle JDK)
 - **Maven 3.9+**
-- **MySQL 8**
+- **MySQL 8.0+**
 - Git
-- A REST client such as Postman
+- A web browser (for the portal) or REST client (Postman/Curl)
 
 Check your installations:
 
@@ -366,52 +363,64 @@ git clone https://github.com/simritt/rto-management.git
 cd rto-management
 ```
 
-### 2. Create the database
+### 2. Setup the MySQL Database
 
-Create a MySQL database for the application.
+Create the MySQL database and initialize the schema:
 
 ```sql
 CREATE DATABASE rto_management;
 ```
 
-### 3. Configure database credentials
+Run the consolidated schema runner to set up all tables, constraints, views, triggers, procedures, and seed data:
 
-Update the application's database configuration with your local MySQL credentials.
+```bash
+mysql -u root -p rto_management < database/00_run_all.sql
+```
 
-Typical Spring Boot configuration:
+### 3. Configure Backend Environment
+
+Copy `.env.example` (or create `.env`) in `backend-java/`:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/rto_management
-spring.datasource.username=YOUR_USERNAME
-spring.datasource.password=YOUR_PASSWORD
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=false
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USER=YOUR_DB_USER
+DB_PASSWORD=YOUR_DB_PASSWORD
+DB_NAME=rto_management
+JWT_SECRET=your_32_character_minimum_random_secret_string_here
+PORT=8000
 ```
 
-If the project uses a separate schema/migration workflow, run the project's SQL/schema scripts before starting the application.
-
-> Never commit real database passwords, JWT secrets, API keys, or other credentials to Git.
-
-### 4. Build the project
+Bootstrap initial admin credentials and default reference roles:
 
 ```bash
-mvn clean install
+cd backend-java
+mvn clean package -DskipTests
+java -jar target/rto-management-backend-1.0.0.jar --rto.command=bootstrap
 ```
 
-### 5. Start the backend
+### 4. Start the Backend API (Port 8000)
 
 ```bash
-mvn spring-boot:run
+cd backend-java
+java -jar target/rto-management-backend-1.0.0.jar
 ```
 
-The backend will start on the port configured by the application.
+- REST API Base URL: `http://localhost:8000/api/v1`
+- Swagger / OpenAPI Interactive UI: `http://localhost:8000/docs`
 
-For the default Spring Boot configuration this is commonly:
+### 5. Start the Frontend Portal (Port 8080)
 
-```text
-http://localhost:8080
+In a separate terminal:
+
+```bash
+cd frontend-java
+mvn clean package -DskipTests
+java -jar target/rto-management-frontend-1.0.0.jar
 ```
+
+- Web Portal URL: `http://localhost:8080`
+- Log in with your admin credentials to access the executive dashboard, citizen services, vehicle registrations, licences, challans, payments, legal appeals, staff directory, and RBAC matrix.
 
 ---
 

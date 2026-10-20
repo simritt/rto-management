@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>New Employee - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <div class="mb-6">
+        <a th:href="@{/employees}" class="text-xs font-medium text-slate-500 hover:text-slate-800">&larr; Back to Employees</a>
+        <h1 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">Add RTO Employee</h1>
+        <p class="mt-1 text-sm text-slate-500">Register an active employee record and establish their initial office posting.</p>
+    </div>
+
+    <div class="max-w-2xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <form method="post" th:action="@{/employees}" class="space-y-5">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">Person ID *</label>
+                <input type="number" name="person_id" required placeholder="Numeric Person ID of the employee"
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                <p class="mt-1 text-[11px] text-slate-500">The person identity record to associate with this employment profile.</p>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">Employee Code (Optional)</label>
+                    <input type="text" name="employee_code" placeholder="e.g. EMP-KA01-09"
+                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <p class="mt-1 text-[11px] text-slate-500">Leave blank to auto-generate.</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">Designation *</label>
+                    <select name="designation_id" required class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                        <option value="">-- Select Designation --</option>
+                        <option th:each="d : ${designations}" th:value="${d.path('designation_id').asLong()}"
+                                th:text="|${d.path('title').asText()} (Rank ${d.path('rank_level').asInt()})|"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">Date Joined *</label>
+                <input type="date" name="date_joined" required
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+            </div>
+
+            <div class="pt-4 border-t border-slate-100">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 mb-3">Initial Office Posting (Optional)</h3>
+                <div class="grid gap-4 sm:grid-cols-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">RTO Office</label>
+                        <select name="office_id" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                            <option value="">-- None --</option>
+                            <option th:each="off : ${offices}" th:value="${off.path('office_id').asLong()}"
+                                    th:text="|${off.path('office_code').asText()} - ${off.path('office_name').asText()}|"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Department</label>
+                        <select name="department_id" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                            <option value="">-- None --</option>
+                            <option th:each="dept : ${departments}" th:value="${dept.path('department_id').asLong()}"
+                                    th:text="${dept.path('department_name').asText()}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Posted From</label>
+                        <input type="date" name="posted_from"
+                               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                <a th:href="@{/employees}" class="rounded-lg border border-slate-300 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">Cancel</a>
+                <button type="submit" class="rounded-lg bg-blue-600 px-5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">Save Employee</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

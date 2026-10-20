@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="|Licence ${licence.path('licence_number').asText()} - RTO Management|">Driving Licence Details</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <!-- Top Breadcrumb & Action Header -->
+    <div class="mb-6">
+        <a th:href="@{/licences}" class="text-sm font-medium text-blue-600 hover:underline">&larr; Back to Driving Licences</a>
+        <div class="mt-2 flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl font-bold font-mono text-slate-900" th:text="${licence.path('licence_number').asText()}">DL-123456</h1>
+                    <span th:if="${licence.path('current_status').asText() == 'ACTIVE'}"
+                          class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">ACTIVE</span>
+                    <span th:if="${licence.path('current_status').asText() == 'SUSPENDED'}"
+                          class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">SUSPENDED</span>
+                    <span th:if="${licence.path('current_status').asText() == 'EXPIRED'}"
+                          class="rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-800">EXPIRED</span>
+                    <span th:if="${licence.path('current_status').asText() == 'REVOKED'}"
+                          class="rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-800">REVOKED</span>
+                </div>
+                <p class="mt-1 text-sm text-slate-500">
+                    <span>Issued: <strong class="text-slate-700" th:text="${licence.path('issue_date').asText()}">2026-01-01</strong></span> &bull;
+                    <span>Expires: <strong class="text-slate-700" th:text="${licence.path('expiry_date').asText()}">2046-01-01</strong></span>
+                </p>
+            </div>
+
+            <!-- Lifecycle Action Buttons -->
+            <div class="flex flex-wrap gap-2">
+                <!-- Suspend Modal Button -->
+                <button th:if="${licence.path('current_status').asText() == 'ACTIVE' and user.can('licence.suspend')}"
+                        onclick="document.getElementById('modal-suspend').classList.remove('hidden')"
+                        class="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 hover:bg-amber-100">
+                    Suspend Licence
+                </button>
+
+                <!-- Reinstate Modal Button -->
+                <button th:if="${licence.path('current_status').asText() == 'SUSPENDED' and user.can('licence.issue')}"
+                        onclick="document.getElementById('modal-reinstate').classList.remove('hidden')"
+                        class="rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800 hover:bg-emerald-100">
+                    Reinstate Licence
+                </button>
+
+                <!-- Renew Modal Button -->
+                <button th:if="${(licence.path('current_status').asText() == 'ACTIVE' or licence.path('current_status').asText() == 'EXPIRED') and user.can('licence.issue')}"
+                        onclick="document.getElementById('modal-renew').classList.remove('hidden')"
+                        class="rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">
+                    Renew Licence &rarr;
+                </button>
+
+                <!-- Revoke Modal Button -->
+                <button th:if="${licence.path('current_status').asText() != 'REVOKED' and user.can('licence.revoke')}"
+                        onclick="document.getElementById('modal-revoke').classList.remove('hidden')"
+                        class="rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-800 hover:bg-rose-100">
+                    Revoke Licence
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid: 2 Columns -->
+    <div class="grid gap-6 lg:grid-cols-3">
+
+        <!-- Left 2 Cols: Details & Endorsement Classes -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- Holder & Registry Details -->
+            <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="mb-4 text-base font-semibold text-slate-900">Licence Holder & Office Details</h2>
+                <dl class="grid grid-cols-2 gap-4 sm:grid-cols-3 text-xs">
+                    <div>
+                        <dt class="text-slate-500 uppercase tracking-wider">Citizen / Holder</dt>
+                        <dd class="mt-1 font-medium text-slate-900 text-sm">
+                            <a th:href="@{/citizens/{id}(id=${licence.path('citizen_id').asLong()})}"
+                               class="text-blue-600 hover:underline">
+                                Citizen #<span th:text="${licence.path('citizen_id').asLong()}">1</span>
+                            </a>
+                            <div th:if="${citizen != null}" class="text-xs text-slate-500 mt-0.5">
+                                <span th:text="${citizen.path('person').path('first_name').asText()}">John</span>
+                                <span th:text="${citizen.path('person').path('last_name').asText()}">Doe</span>
+                            </div>
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-slate-500 uppercase tracking-wider">Registering Office</dt>
+                        <dd class="mt-1 font-medium text-slate-900 text-sm">
+                            Office #<span th:text="${licence.path('office_id').asLong()}">1</span>
+                            <div th:if="${office != null}" class="text-xs text-slate-500 mt-0.5"
+                                 th:text="${office.path('office_name').asText()}">Koramangala RTO</div>
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-slate-500 uppercase tracking-wider">Application Link</dt>
+                        <dd class="mt-1 font-medium text-slate-900 text-sm">
+                            <a th:href="@{/applications/{id}(id=${licence.path('application_id').asLong()})}"
+                               class="text-blue-600 hover:underline font-mono">
+                                App #<span th:text="${licence.path('application_id').asLong()}">1</span>
+                            </a>
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-slate-500 uppercase tracking-wider">Learner Licence</dt>
+                        <dd class="mt-1 font-medium text-slate-900 text-sm">
+                            <span th:if="${licence.path('learner_licence_id').isNull()}">None / Direct Issue</span>
+                            <a th:unless="${licence.path('learner_licence_id').isNull()}"
+                               th:href="@{/learner-licences/{id}(id=${licence.path('learner_licence_id').asLong()})}"
+                               class="text-blue-600 hover:underline font-mono">
+                                LL #<span th:text="${licence.path('learner_licence_id').asLong()}">12</span>
+                            </a>
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-slate-500 uppercase tracking-wider">Issue Date</dt>
+                        <dd class="mt-1 font-medium text-slate-900 text-sm font-mono" th:text="${licence.path('issue_date').asText()}">2026-01-01</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-slate-500 uppercase tracking-wider">Expiry Date</dt>
+                        <dd class="mt-1 font-medium text-slate-900 text-sm font-mono" th:text="${licence.path('expiry_date').asText()}">2046-01-01</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <!-- Endorsement Classes Held -->
+            <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-base font-semibold text-slate-900">Authorised Vehicle Classes</h2>
+                    <span class="text-xs text-slate-500" th:text="|${licence.path('classes').size()} category(s) endorsed|">1 category</span>
+                </div>
+
+                <div class="overflow-hidden rounded-lg border border-slate-200">
+                    <table class="min-w-full divide-y divide-slate-200 text-xs">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+                            <tr>
+                                <th class="px-4 py-2.5 text-left">Class Code</th>
+                                <th class="px-4 py-2.5 text-left">Class ID</th>
+                                <th class="px-4 py-2.5 text-left">Date Granted</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
+                            <tr th:each="c : ${licence.path('classes')}">
+                                <td class="px-4 py-3 font-semibold text-blue-700">
+                                    <span class="inline-flex items-center rounded bg-blue-50 px-2.5 py-1 font-mono text-xs border border-blue-200"
+                                          th:text="${c.path('class_code').asText()}">MCWG</span>
+                                </td>
+                                <td class="px-4 py-3 font-mono text-slate-500" th:text="${c.path('licence_class_id').asLong()}">1</td>
+                                <td class="px-4 py-3 font-mono text-slate-600" th:text="${c.path('granted_on').asText()}">2026-01-01</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add Endorsement Class Inline Form -->
+                <div th:if="${licence.path('current_status').asText() == 'ACTIVE' and user.can('licence.issue')}"
+                     class="mt-5 rounded-lg border border-dashed border-slate-300 p-4 bg-slate-50">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-700 mb-2">+ Endorse Additional Class</h3>
+                    <form th:action="@{/licences/{id}/classes(id=${licence.path('driving_licence_id').asLong()})}" method="post" class="flex gap-3 items-center">
+                        <select name="licence_class_id" required class="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                            <option value="">-- Select Class to Endorse --</option>
+                            <option th:each="ac : ${allClasses}" th:value="${ac.path('licence_class_id').asLong()}"
+                                    th:text="|${ac.path('class_code').asText()} - ${ac.path('description').asText()}|"></option>
+                        </select>
+                        <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 whitespace-nowrap">
+                            Add Endorsement
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Col: Status History Timeline -->
+        <div class="space-y-6">
+
+            <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="mb-4 text-base font-semibold text-slate-900">Status History Audit</h2>
+                <div th:if="${history == null or history.isEmpty()}" class="text-xs text-slate-400">
+                    No status transitions recorded.
+                </div>
+                <div th:unless="${history == null or history.isEmpty()}" class="space-y-4">
+                    <div th:each="h : ${history}" class="relative pl-6 pb-2 border-l-2 border-slate-200 last:border-transparent">
+                        <span class="absolute -left-1.5 top-0 h-3 w-3 rounded-full bg-blue-500 ring-4 ring-white"></span>
+                        <div class="text-xs font-medium text-slate-900">
+                            <span th:text="${h.path('previous_status').asText('ISSUED')}">ACTIVE</span>
+                            &rarr;
+                            <span class="font-bold text-blue-600" th:text="${h.path('new_status').asText()}">SUSPENDED</span>
+                        </div>
+                        <div class="text-xs text-slate-500 mt-0.5">
+                            Reason: <span class="italic text-slate-700" th:text="${h.path('reason').asText('N/A')}">Compliance violation</span>
+                        </div>
+                        <div class="text-xxs text-slate-400 mt-1 font-mono">
+                            Changed at: <span th:text="${h.path('changed_at').asText()}">2026-10-20</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Modal: Suspend -->
+    <div id="modal-suspend" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <h3 class="text-base font-semibold text-slate-900 mb-2">Suspend Driving Licence</h3>
+            <p class="text-xs text-slate-500 mb-4">Temporarily invalidate driving privileges. The holder may be reinstated once requirements are met.</p>
+            <form th:action="@{/licences/{id}/suspend(id=${licence.path('driving_licence_id').asLong()})}" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Reason for Suspension <span class="text-red-500">*</span></label>
+                    <textarea name="reason" required minlength="3" rows="3" placeholder="Specify suspension rationale..."
+                              class="w-full rounded-lg border border-slate-300 p-2.5 text-xs focus:border-blue-500 focus:outline-none"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="document.getElementById('modal-suspend').classList.add('hidden')"
+                            class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="rounded-lg bg-amber-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-amber-700">Confirm Suspension</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Reinstate -->
+    <div id="modal-reinstate" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <h3 class="text-base font-semibold text-slate-900 mb-2">Reinstate Driving Licence</h3>
+            <p class="text-xs text-slate-500 mb-4">Return a suspended driving licence to ACTIVE status.</p>
+            <form th:action="@{/licences/{id}/reinstate(id=${licence.path('driving_licence_id').asLong()})}" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Reason for Reinstatement <span class="text-red-500">*</span></label>
+                    <textarea name="reason" required minlength="3" rows="3" placeholder="Specify reinstatement justification..."
+                              class="w-full rounded-lg border border-slate-300 p-2.5 text-xs focus:border-blue-500 focus:outline-none"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="document.getElementById('modal-reinstate').classList.add('hidden')"
+                            class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700">Confirm Reinstatement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Renew -->
+    <div id="modal-renew" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <h3 class="text-base font-semibold text-slate-900 mb-2">Renew Driving Licence</h3>
+            <p class="text-xs text-slate-500 mb-4">Extend licence validity date. If the licence is currently EXPIRED, it will transition back to ACTIVE.</p>
+            <form th:action="@{/licences/{id}/renew(id=${licence.path('driving_licence_id').asLong()})}" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">New Expiry Date <span class="text-red-500">*</span></label>
+                    <input type="date" name="new_expiry_date" required
+                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <p class="mt-1 text-xxs text-slate-400">Must be in the future and later than the current expiry date.</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Reason / Notes</label>
+                    <input type="text" name="reason" value="Standard renewal"
+                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="document.getElementById('modal-renew').classList.add('hidden')"
+                            class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-blue-700">Confirm Renewal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Revoke -->
+    <div id="modal-revoke" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl border border-rose-200">
+            <h3 class="text-base font-semibold text-rose-700 mb-2">Revoke Driving Licence Permanently</h3>
+            <p class="text-xs text-slate-500 mb-4">Warning: Revocation is a terminal state. The driving licence cannot be reactivated once revoked.</p>
+            <form th:action="@{/licences/{id}/revoke(id=${licence.path('driving_licence_id').asLong()})}" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Revocation Reason <span class="text-red-500">*</span></label>
+                    <textarea name="reason" required minlength="3" rows="3" placeholder="Provide formal legal grounds for revocation..."
+                              class="w-full rounded-lg border border-slate-300 p-2.5 text-xs focus:border-rose-500 focus:outline-none"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="document.getElementById('modal-revoke').classList.add('hidden')"
+                            class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="rounded-lg bg-rose-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-rose-700">Confirm Revocation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

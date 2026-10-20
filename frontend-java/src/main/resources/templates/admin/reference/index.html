@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Master Reference Data - RTO Management</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-slate-900">Master Reference Data</h1>
+        <p class="text-sm text-slate-500">Configure core taxonomy, service types, jurisdictions, and operational standards.</p>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div th:each="cfg : ${configs}" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm hover:border-blue-400 hover:shadow-md transition">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-800" th:text="${cfg.title()}">Title</h2>
+                    <p class="mt-1 text-xs text-slate-500" th:text="${cfg.description()}">Description</p>
+                </div>
+                <span class="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700"
+                      th:text="|${counts[cfg.key()]} records|">0 records</span>
+            </div>
+            <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+                <span class="text-xs font-mono text-slate-400" th:text="${cfg.endpoint()}">/endpoint</span>
+                <a th:href="@{/admin/reference/{type}(type=${cfg.key()})}"
+                   class="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800">
+                    Manage &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

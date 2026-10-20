@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Transport Routes - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Transport Routes</h1>
+            <p class="text-sm text-slate-500">Official designated bus and commercial carriage routes</p>
+        </div>
+        <div class="flex gap-2">
+            <a th:href="@{/permits}" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                &larr; Commercial Permits
+            </a>
+            <a th:href="@{/routes/new}"
+               class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700">
+                + New Route
+            </a>
+        </div>
+    </div>
+
+    <!-- Routes Table -->
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-xs uppercase font-medium text-slate-500">
+            <tr>
+                <th class="px-6 py-3">Route ID</th>
+                <th class="px-6 py-3">Route Name</th>
+                <th class="px-6 py-3">Origin</th>
+                <th class="px-6 py-3">Destination</th>
+                <th class="px-6 py-3 text-right">Action</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+            <tr th:if="${data.path('items').isEmpty()}">
+                <td colspan="5" class="px-6 py-8 text-center text-slate-400">No transport routes created yet.</td>
+            </tr>
+            <tr th:each="r : ${data.path('items')}" class="hover:bg-slate-50">
+                <td class="px-6 py-4 font-mono font-medium text-slate-900" th:text="|#${r.path('route_id').asLong()}|">#1</td>
+                <td class="px-6 py-4 font-semibold text-slate-900">
+                    <a th:href="@{/routes/{id}(id=${r.path('route_id').asLong()})}"
+                       class="text-blue-600 hover:underline" th:text="${r.path('route_name').asText()}">Route 101</a>
+                </td>
+                <td class="px-6 py-4 text-xs font-medium text-slate-700" th:text="${r.path('origin').asText()}">Origin City</td>
+                <td class="px-6 py-4 text-xs font-medium text-slate-700" th:text="${r.path('destination').asText()}">Dest City</td>
+                <td class="px-6 py-4 text-right">
+                    <a th:href="@{/routes/{id}(id=${r.path('route_id').asLong()})}"
+                       class="rounded border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50">View & Segments</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div th:replace="~{fragments/ui :: pager(${data}, '?')}"></div>
+    </div>
+
+</div>
+</body>
+</html>
