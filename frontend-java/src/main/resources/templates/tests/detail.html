@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="|Driving Test #${test.path('test_id').asLong()} - RTO Management|">Driving Test Details</title>
+</head>
+<body>
+<div th:fragment="content" class="max-w-4xl mx-auto">
+
+    <!-- Top Breadcrumb & Actions -->
+    <div class="mb-6">
+        <a th:href="@{/driving-tests}" class="text-sm font-medium text-blue-600 hover:underline">&larr; Back to Driving Tests</a>
+        <div class="mt-2 flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl font-bold font-mono text-slate-900">Test #<span th:text="${test.path('test_id').asLong()}">1</span></h1>
+                    <span th:if="${test.path('result').asText() == 'PENDING'}"
+                          class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">PENDING</span>
+                    <span th:if="${test.path('result').asText() == 'PASS'}"
+                          class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">PASS</span>
+                    <span th:if="${test.path('result').asText() == 'FAIL'}"
+                          class="rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-800">FAIL</span>
+                    <span th:if="${test.path('result').asText() == 'ABSENT'}"
+                          class="rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-800">ABSENT</span>
+                </div>
+                <p class="mt-1 text-sm text-slate-500">
+                    <span>Scheduled for: <strong class="text-slate-700 font-mono" th:text="${test.path('scheduled_at').asText()}">2026-10-21T10:00:00</strong></span>
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <!-- Record Result Button -->
+                <button th:if="${test.path('result').asText() == 'PENDING' and user.can('licence.test')}"
+                        onclick="document.getElementById('modal-result').classList.remove('hidden')"
+                        class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">
+                    Record Examination Result &rarr;
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+        <h2 class="text-base font-semibold text-slate-900">Examination Record</h2>
+        <dl class="grid grid-cols-2 gap-4 sm:grid-cols-3 text-xs">
+            <div>
+                <dt class="text-slate-500 uppercase tracking-wider">Candidate / Citizen</dt>
+                <dd class="mt-1 font-medium text-slate-900 text-sm">
+                    <a th:href="@{/citizens/{id}(id=${test.path('citizen_id').asLong()})}"
+                       class="text-blue-600 hover:underline">
+                        Citizen #<span th:text="${test.path('citizen_id').asLong()}">1</span>
+                    </a>
+                    <div th:if="${citizen != null}" class="text-xs text-slate-500 mt-0.5">
+                        <span th:text="${citizen.path('person').path('first_name').asText()}">Jane</span>
+                        <span th:text="${citizen.path('person').path('last_name').asText()}">Smith</span>
+                    </div>
+                </dd>
+            </div>
+
+            <div>
+                <dt class="text-slate-500 uppercase tracking-wider">Application Link</dt>
+                <dd class="mt-1 font-medium text-slate-900 text-sm">
+                    <a th:href="@{/applications/{id}(id=${test.path('application_id').asLong()})}"
+                       class="text-blue-600 hover:underline font-mono">
+                        App #<span th:text="${test.path('application_id').asLong()}">1</span>
+                    </a>
+                </dd>
+            </div>
+
+            <div>
+                <dt class="text-slate-500 uppercase tracking-wider">Test Centre</dt>
+                <dd class="mt-1 font-medium text-slate-900 text-sm">
+                    Centre #<span th:text="${test.path('test_centre_id').asLong()}">1</span>
+                    <div th:if="${centre != null}" class="text-xs text-slate-500 mt-0.5"
+                         th:text="${centre.path('centre_name').asText()}">Koramangala Automated Track</div>
+                </dd>
+            </div>
+
+            <div>
+                <dt class="text-slate-500 uppercase tracking-wider">Examiner Officer</dt>
+                <dd class="mt-1 font-medium text-slate-900 text-sm">
+                    Employee #<span th:text="${test.path('examiner_employee_id').asLong()}">1</span>
+                    <div th:if="${examiner != null}" class="text-xs text-slate-500 mt-0.5 font-mono"
+                         th:text="${examiner.path('employee_number').asText()}">EMP-001</div>
+                </dd>
+            </div>
+
+            <div>
+                <dt class="text-slate-500 uppercase tracking-wider">Test Result</dt>
+                <dd class="mt-1 font-medium text-slate-900 text-sm" th:text="${test.path('result').asText()}">PENDING</dd>
+            </div>
+
+            <div>
+                <dt class="text-slate-500 uppercase tracking-wider">Remarks / Track Notes</dt>
+                <dd class="mt-1 font-medium text-slate-900 text-sm"
+                    th:text="${test.path('remarks').asText('No remarks recorded.')}">-</dd>
+            </div>
+        </dl>
+    </div>
+
+    <!-- Modal: Record Result -->
+    <div id="modal-result" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <h3 class="text-base font-semibold text-slate-900 mb-2">Record Test Result</h3>
+            <p class="text-xs text-slate-500 mb-4">Official evaluation decision for driving competency.</p>
+            <form th:action="@{/driving-tests/{id}/result(id=${test.path('test_id').asLong()})}" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Result <span class="text-red-500">*</span></label>
+                    <select name="result" required class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                        <option value="PASS">PASS - Competency Verified</option>
+                        <option value="FAIL">FAIL - Re-test Required</option>
+                        <option value="ABSENT">ABSENT - Candidate Did Not Appear</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Remarks / Feedback</label>
+                    <textarea name="remarks" rows="3" placeholder="Score, track notes or remarks..."
+                              class="w-full rounded-lg border border-slate-300 p-2.5 text-xs focus:border-blue-500 focus:outline-none"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="document.getElementById('modal-result').classList.add('hidden')"
+                            class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-blue-700">Submit Result</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Employees Directory - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <!-- Page Header & Action Bar -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900">RTO Staff & Employees</h1>
+            <p class="mt-1 text-sm text-slate-500">Official personnel roster, department assignments, designations, and active posting directory.</p>
+        </div>
+        <div>
+            <a th:if="${user.can('employee.manage')}" th:href="@{/employees/new}"
+               class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">
+                + New Employee
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Bar Card -->
+    <div class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form method="get" th:action="@{/employees}" class="grid gap-4 sm:grid-cols-2 md:grid-cols-4 items-end">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">RTO Office</label>
+                <select name="office_id" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <option value="">All Offices</option>
+                    <option th:each="off : ${offices}" th:value="${off.path('office_id').asLong()}"
+                            th:text="|${off.path('office_code').asText()} - ${off.path('office_name').asText()}|"
+                            th:selected="${officeId != null && officeId == off.path('office_id').asLong()}"></option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Designation</label>
+                <select name="designation_id" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <option value="">All Designations</option>
+                    <option th:each="d : ${designations}" th:value="${d.path('designation_id').asLong()}"
+                            th:text="${d.path('title').asText()}"
+                            th:selected="${designationId != null && designationId == d.path('designation_id').asLong()}"></option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Active Status</label>
+                <select name="is_active" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <option value="">All</option>
+                    <option value="true" th:selected="${isActive != null && isActive == true}">Active Only</option>
+                    <option value="false" th:selected="${isActive != null && isActive == false}">Inactive Only</option>
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="w-full rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700">Filter</button>
+                <a th:href="@{/employees}" class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <table class="min-w-full divide-y divide-slate-200 text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold">
+                <tr>
+                    <th scope="col" class="px-5 py-3.5 text-left">Emp Code</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Employee Name</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Designation</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Current Posting</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Date Joined</th>
+                    <th scope="col" class="px-5 py-3.5 text-center">Status</th>
+                    <th scope="col" class="px-5 py-3.5 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                <tr th:if="${page == null || page.path('items').isEmpty()}">
+                    <td colspan="7" class="px-5 py-8 text-center text-slate-400">No employees found.</td>
+                </tr>
+                <tr th:each="e : ${page.path('items')}" class="hover:bg-slate-50/80 transition-colors">
+                    <td class="px-5 py-3.5 font-mono font-medium text-blue-600">
+                        <a th:href="@{'/employees/' + ${e.path('employee_id').asLong()}}" class="hover:underline"
+                           th:text="${e.path('employee_code').asText()}">EMP001</a>
+                    </td>
+                    <td class="px-5 py-3.5 font-semibold text-slate-900"
+                        th:text="|${e.path('first_name').asText()} ${e.path('last_name').asText()}|">Ramesh Kumar</td>
+                    <td class="px-5 py-3.5 text-slate-700" th:text="${e.path('designation_title').asText()}">Inspector</td>
+                    <td class="px-5 py-3.5 text-slate-600">
+                        <span th:if="${!e.path('current_posting').isNull()}"
+                              th:text="|Office #${e.path('current_posting').path('office_id').asLong()} (Dept #${e.path('current_posting').path('department_id').asLong()})|">Office #1</span>
+                        <span th:if="${e.path('current_posting').isNull()}" class="text-slate-400 italic">No Active Posting</span>
+                    </td>
+                    <td class="px-5 py-3.5 text-slate-500" th:text="${e.path('date_joined').asText()}">2022-01-15</td>
+                    <td class="px-5 py-3.5 text-center">
+                        <span th:if="${e.path('is_active').asBoolean()}" class="inline-flex rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200">ACTIVE</span>
+                        <span th:unless="${e.path('is_active').asBoolean()}" class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700 border border-slate-200">INACTIVE</span>
+                    </td>
+                    <td class="px-5 py-3.5 text-right">
+                        <a th:href="@{'/employees/' + ${e.path('employee_id').asLong()}}" class="font-medium text-blue-600 hover:text-blue-800">Profile &rarr;</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination Bar -->
+        <div th:if="${page != null && page.path('pages').asInt() > 1}" class="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-5 py-3 text-xs">
+            <span class="text-slate-600" th:text="|Page ${page.path('page').asInt()} of ${page.path('pages').asInt()} (${page.path('total').asLong()} total employees)|"></span>
+            <div class="flex gap-1">
+                <a th:if="${page.path('page').asInt() > 1}"
+                   th:href="@{/employees(page=${page.path('page').asInt() - 1}, office_id=${officeId}, designation_id=${designationId}, is_active=${isActive})}"
+                   class="rounded border border-slate-300 bg-white px-3 py-1 text-slate-700 hover:bg-slate-100">&larr; Previous</a>
+                <a th:if="${page.path('page').asInt() < page.path('pages').asInt()}"
+                   th:href="@{/employees(page=${page.path('page').asInt() + 1}, office_id=${officeId}, designation_id=${designationId}, is_active=${isActive})}"
+                   class="rounded border border-slate-300 bg-white px-3 py-1 text-slate-700 hover:bg-slate-100">Next &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Applications - RTO Management</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Citizen Applications</h1>
+            <p class="text-sm text-slate-500">Track and manage citizen service requests, status transitions, and SLAs.</p>
+        </div>
+        <a th:href="@{/applications/new}"
+           class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">
+            + Submit Application
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" th:action="@{/applications}" class="mb-4 flex flex-wrap gap-2">
+        <select name="status" class="rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+            <option value="">All Statuses</option>
+            <option th:each="st : ${ {'SUBMITTED','DOCS_PENDING','UNDER_VERIFICATION','APPOINTMENT_SCHEDULED','AWAITING_PAYMENT','APPROVED','REJECTED','COMPLETED','CANCELLED'} }"
+                    th:value="${st}" th:text="${st}" th:selected="${status == st}"></option>
+        </select>
+
+        <select name="office_id" class="rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+            <option value="">All Offices</option>
+            <option th:each="o : ${offices}" th:value="${o.path('office_id').asLong()}"
+                    th:text="|${o.path('office_name').asText()} (${o.path('office_code').asText()})|"
+                    th:selected="${office_id != null and office_id == o.path('office_id').asLong()}"></option>
+        </select>
+
+        <select name="service_type_id" class="rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+            <option value="">All Service Types</option>
+            <option th:each="s : ${serviceTypes}" th:value="${s.path('service_type_id').asLong()}"
+                    th:text="|${s.path('service_name').asText()} (${s.path('service_code').asText()})|"
+                    th:selected="${service_type_id != null and service_type_id == s.path('service_type_id').asLong()}"></option>
+        </select>
+
+        <button type="submit" class="rounded bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">Filter</button>
+        <a th:href="@{/applications}" class="px-3 py-2 text-sm text-slate-500 hover:underline">Reset</a>
+    </form>
+
+    <!-- Table -->
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table class="w-full text-left text-sm">
+            <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase font-semibold text-slate-600">
+            <tr>
+                <th class="px-4 py-3">App #</th>
+                <th class="px-4 py-3">Citizen</th>
+                <th class="px-4 py-3">Service</th>
+                <th class="px-4 py-3">Status</th>
+                <th class="px-4 py-3">Submitted</th>
+                <th class="px-4 py-3 text-right">Action</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+            <tr th:each="a : ${result.path('items')}" class="hover:bg-slate-50/75 transition">
+                <td class="px-4 py-3 font-mono font-medium text-blue-600">
+                    <a th:href="@{/applications/{id}(id=${a.path('application_id').asLong()})}" class="hover:underline"
+                       th:text="${a.path('application_number').asText()}">APP-001</a>
+                </td>
+                <td class="px-4 py-3">
+                    <div class="font-medium text-slate-900" th:text="${a.path('citizen_name').asText()}">Citizen Name</div>
+                    <div class="text-xs text-slate-400 font-mono" th:text="${a.path('citizen_code').asText()}">CIT-123</div>
+                </td>
+                <td class="px-4 py-3">
+                    <div class="text-slate-800" th:text="${a.path('service_name').asText()}">Service</div>
+                    <div class="text-xs text-slate-400 font-mono" th:text="${a.path('service_code').asText()}">CODE</div>
+                </td>
+                <td class="px-4 py-3">
+                    <span th:text="${a.path('current_status').asText()}"
+                          th:classappend="${a.path('current_status').asText() == 'APPROVED' or a.path('current_status').asText() == 'COMPLETED'} ? 'bg-emerald-100 text-emerald-800' : (${a.path('current_status').asText() == 'REJECTED' or a.path('current_status').asText() == 'CANCELLED'} ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800')"
+                          class="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold">STATUS</span>
+                </td>
+                <td class="px-4 py-3 text-slate-500 text-xs"
+                    th:text="${#strings.substringBefore(a.path('submitted_at').asText(''), 'T')}">2026-10-20</td>
+                <td class="px-4 py-3 text-right">
+                    <a th:href="@{/applications/{id}(id=${a.path('application_id').asLong()})}"
+                       class="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline">View Workflow &rarr;</a>
+                </td>
+            </tr>
+            <tr th:if="${result.path('items').size() == 0}">
+                <td colspan="6" class="px-4 py-8 text-center text-slate-500">
+                    No applications found matching the selected criteria.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pager -->
+    <div th:replace="~{fragments/ui :: pager(${result}, ${pagerBase})}"></div>
+</th:block>
+</body>
+</html>

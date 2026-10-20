@@ -14,7 +14,7 @@
         <form th:if="${d != null}" method="get" th:action="@{/}" class="text-sm">
             <label class="text-slate-600">Expiry window</label>
             <select name="days" onchange="this.form.submit()" class="ml-1 rounded border border-slate-300 bg-white px-2 py-1">
-                <option th:each="n : ${#arrays.asList(15, 30, 60, 90)}" th:value="${n}" th:text="|${n} days|" th:selected="${n == days}"></option>
+                <option th:each="n : ${ {15, 30, 60, 90} }" th:value="${n}" th:text="|${n} days|" th:selected="${n == days}"></option>
             </select>
         </form>
     </div>
@@ -51,11 +51,11 @@
         <div class="grid gap-4 lg:grid-cols-2">
             <div class="rounded-lg bg-white p-5 shadow-sm">
                 <h3 class="mb-3 font-semibold">Applications by status</h3>
-                <p th:if="${!d.path('applications_by_status').fields().hasNext()}" class="text-sm text-slate-500">No applications yet.</p>
-                <table class="w-full text-sm" th:if="${d.path('applications_by_status').fields().hasNext()}">
-                    <tr th:each="e : ${d.path('applications_by_status').fields()}" class="border-t border-slate-100">
-                        <td class="py-1.5" th:text="${e.key}"></td>
-                        <td class="py-1.5 text-right font-medium" th:text="${e.value.asLong()}"></td>
+                <p th:if="${d.path('applications_by_status').isEmpty()}" class="text-sm text-slate-500">No applications yet.</p>
+                <table class="w-full text-sm" th:unless="${d.path('applications_by_status').isEmpty()}">
+                    <tr th:each="k : ${d.path('applications_by_status').fieldNames()}" class="border-t border-slate-100">
+                        <td class="py-1.5" th:text="${k}"></td>
+                        <td class="py-1.5 text-right font-medium" th:text="${d.path('applications_by_status').path(k).asLong()}"></td>
                     </tr>
                 </table>
             </div>

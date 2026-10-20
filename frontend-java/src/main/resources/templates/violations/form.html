@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Log Traffic Violation - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content" class="max-w-3xl mx-auto">
+
+    <!-- Top Breadcrumb -->
+    <div class="mb-6">
+        <a th:href="@{/violations}" class="text-sm font-medium text-blue-600 hover:underline">&larr; Back to Violations</a>
+        <h1 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">Log Traffic Violation</h1>
+        <p class="mt-1 text-sm text-slate-500">Record a traffic infraction or compliance breach against a vehicle.</p>
+    </div>
+
+    <!-- Main Card -->
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <form th:action="@{/violations}" method="post" class="space-y-6">
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Vehicle ID <span class="text-red-500">*</span></label>
+                    <input type="number" name="vehicle_id" required th:value="${preVehicleId}" placeholder="e.g. 1"
+                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <p class="mt-1 text-xs text-slate-400">Target vehicle registered in system.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Driver Citizen ID (Optional)</label>
+                    <input type="number" name="driver_citizen_id" th:value="${preDriverCitizenId}" placeholder="e.g. 1"
+                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <p class="mt-1 text-xs text-slate-400">Leave blank if driver was unidentified (e.g. camera fine).</p>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Violation Type <span class="text-red-500">*</span></label>
+                    <select name="violation_type_id" required class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                        <option value="">-- Select Infraction Category --</option>
+                        <option th:each="vt : ${violationTypes}" th:value="${vt.path('violation_type_id').asLong()}"
+                                th:text="|${vt.path('description').asText()} (Base Fine: ₹${vt.path('base_fine_amount').asText()})|"></option>
+                    </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Location of Infraction <span class="text-red-500">*</span></label>
+                    <input type="text" name="location" required maxlength="200" placeholder="e.g. Outer Ring Road near Marathahalli flyover"
+                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Date & Time Occurred <span class="text-red-500">*</span></label>
+                    <input type="datetime-local" name="occurred_at" required
+                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <p class="mt-1 text-xs text-slate-400">Cannot be in the future.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Reporting Officer Employee ID</label>
+                    <input type="number" name="officer_employee_id" placeholder="Optional if logged as staff"
+                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <p class="mt-1 text-xs text-slate-400">Defaults to logged-in employee if left blank.</p>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                <a th:href="@{/violations}" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</a>
+                <button type="submit" class="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+                    Log Violation &rarr;
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

@@ -55,6 +55,55 @@ public class ApiClient {
         return call(HttpMethod.DELETE, path, Map.of(), null, true);
     }
 
+    public JsonNode uploadMultipart(String path, org.springframework.util.MultiValueMap<String, Object> parts) {
+        try {
+            return sendMultipart(path, parts, true);
+        } catch (ApiException e) {
+            if (e.status() == 401 && session.getRefreshToken() != null && refresh()) {
+                return sendMultipart(path, parts, true);
+            }
+            if (e.status() == 401) {
+                session.clear();
+            }
+            throw e;
+        }
+    }
+
+    public org.springframework.http.ResponseEntity<byte[]> getFile(String path) {
+        URI uri = UriComponentsBuilder.fromUriString(baseUrl + path).build().encode().toUri();
+        RestClient.RequestHeadersSpec<?> spec = http.get().uri(uri);
+        if (session.getAccessToken() != null) {
+            spec.headers(h -> h.setBearerAuth(session.getAccessToken()));
+        }
+        return spec.exchange((req, res) -> {
+            byte[] bytes = res.getBody().readAllBytes();
+            return org.springframework.http.ResponseEntity.status(res.getStatusCode())
+                    .headers(res.getHeaders())
+                    .body(bytes);
+        });
+    }
+
+    private JsonNode sendMultipart(String path, org.springframework.util.MultiValueMap<String, Object> parts, boolean auth) {
+        URI uri = UriComponentsBuilder.fromUriString(baseUrl + path).build().encode().toUri();
+        RestClient.RequestBodySpec spec = http.method(HttpMethod.POST).uri(uri)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.APPLICATION_JSON);
+        if (auth && session.getAccessToken() != null) {
+            spec.headers(h -> h.setBearerAuth(session.getAccessToken()));
+        }
+        spec.body(parts);
+        return spec.exchange((req, res) -> {
+            byte[] raw = res.getBody().readAllBytes();
+            JsonNode json = raw.length == 0 ? NullNode.getInstance() : mapper.readTree(raw);
+            if (res.getStatusCode().isError()) {
+                throw new ApiException(res.getStatusCode().value(), json.path("code").asText(null),
+                        json.path("detail").asText("Upload failed (" + res.getStatusCode().value() + ")"),
+                        json.get("errors"));
+            }
+            return json;
+        });
+    }
+
     /** Username/password login; stores tokens and the /auth/me profile in the session. */
     public void login(String username, String password) {
         Map<String, String> body = new LinkedHashMap<>();

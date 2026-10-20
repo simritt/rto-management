@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Complaint Details - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <a th:href="@{/complaints}" class="text-xs font-medium text-slate-500 hover:text-slate-800">&larr; Back to Complaints</a>
+            <div class="mt-2 flex items-center gap-3">
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900" th:text="|Complaint #${complaint.path('complaint_id').asLong()}|">Complaint #1</h1>
+                <span th:if="${complaint.path('status').asText() == 'OPEN'}" class="inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 border border-amber-200">OPEN</span>
+                <span th:if="${complaint.path('status').asText() == 'IN_PROGRESS'}" class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 border border-blue-200">IN_PROGRESS</span>
+                <span th:if="${complaint.path('status').asText() == 'RESOLVED'}" class="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">RESOLVED</span>
+                <span th:if="${complaint.path('status').asText() == 'CLOSED'}" class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 border border-slate-200">CLOSED</span>
+            </div>
+            <p class="mt-1 text-sm text-slate-600 font-medium" th:text="${complaint.path('subject').asText()}">Service delay at counter 3</p>
+        </div>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-3">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Details Card -->
+            <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4">Grievance Narrative</h2>
+                <div class="rounded-lg bg-slate-50 p-4 text-sm text-slate-800 whitespace-pre-line border border-slate-100 leading-relaxed"
+                     th:text="${complaint.path('description').asText()}">
+                    Description goes here...
+                </div>
+            </div>
+
+            <!-- Workflow Status Actions (Staff Only) -->
+            <div th:if="${user.can('complaint.manage')}" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Ticket Action & Status Management</h2>
+                <p class="text-xs text-slate-500 mb-4">Advance ticket state according to RTO grievance resolution guidelines.</p>
+
+                <!-- If OPEN -->
+                <div th:if="${complaint.path('status').asText() == 'OPEN'}" class="space-y-4">
+                    <form method="post" th:action="@{'/complaints/' + ${complaint.path('complaint_id').asLong()} + '/status'}" class="flex flex-wrap items-center gap-3">
+                        <input type="hidden" name="status" value="IN_PROGRESS">
+                        <input type="text" name="note" placeholder="Investigative note (e.g. Assigned to Officer Ramesh)"
+                               class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                        <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700">
+                            Mark IN_PROGRESS
+                        </button>
+                    </form>
+                    <form method="post" th:action="@{'/complaints/' + ${complaint.path('complaint_id').asLong()} + '/status'}" class="flex flex-wrap items-center gap-3">
+                        <input type="hidden" name="status" value="CLOSED">
+                        <input type="text" name="note" placeholder="Reason for direct closure"
+                               class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                        <button type="submit" class="rounded-lg bg-slate-700 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800">
+                            Close Complaint
+                        </button>
+                    </form>
+                </div>
+
+                <!-- If IN_PROGRESS -->
+                <div th:if="${complaint.path('status').asText() == 'IN_PROGRESS'}" class="space-y-4">
+                    <form method="post" th:action="@{'/complaints/' + ${complaint.path('complaint_id').asLong()} + '/status'}" class="flex flex-wrap items-center gap-3">
+                        <input type="hidden" name="status" value="RESOLVED">
+                        <input type="text" name="note" placeholder="Resolution note / action taken"
+                               class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                        <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700">
+                            Mark RESOLVED
+                        </button>
+                    </form>
+                    <form method="post" th:action="@{'/complaints/' + ${complaint.path('complaint_id').asLong()} + '/status'}" class="flex flex-wrap items-center gap-3">
+                        <input type="hidden" name="status" value="CLOSED">
+                        <input type="text" name="note" placeholder="Closure notes"
+                               class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                        <button type="submit" class="rounded-lg bg-slate-700 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800">
+                            Close Complaint
+                        </button>
+                    </form>
+                </div>
+
+                <!-- If RESOLVED -->
+                <div th:if="${complaint.path('status').asText() == 'RESOLVED'}" class="space-y-4">
+                    <form method="post" th:action="@{'/complaints/' + ${complaint.path('complaint_id').asLong()} + '/status'}" class="flex flex-wrap items-center gap-3">
+                        <input type="hidden" name="status" value="CLOSED">
+                        <input type="text" name="note" placeholder="Final closure remarks"
+                               class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                        <button type="submit" class="rounded-lg bg-slate-700 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800">
+                            Close Ticket
+                        </button>
+                    </form>
+                    <form method="post" th:action="@{'/complaints/' + ${complaint.path('complaint_id').asLong()} + '/status'}" class="flex flex-wrap items-center gap-3">
+                        <input type="hidden" name="status" value="IN_PROGRESS">
+                        <input type="text" name="note" placeholder="Reopening justification"
+                               class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                        <button type="submit" class="rounded-lg bg-amber-600 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-700">
+                            Reopen Complaint
+                        </button>
+                    </form>
+                </div>
+
+                <!-- If CLOSED -->
+                <div th:if="${complaint.path('status').asText() == 'CLOSED'}" class="rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
+                    This ticket has reached terminal state CLOSED.
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Meta -->
+        <div class="space-y-6">
+            <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm text-xs space-y-4">
+                <h3 class="font-semibold uppercase tracking-wider text-slate-500">Ticket Information</h3>
+
+                <div>
+                    <span class="block text-slate-400">Filed On</span>
+                    <span class="font-medium text-slate-800" th:text="${complaint.path('filed_at').asText()}">2026-10-20</span>
+                </div>
+
+                <div>
+                    <span class="block text-slate-400">RTO Office</span>
+                    <span th:if="${office != null}" class="font-medium text-slate-800"
+                          th:text="|${office.path('office_code').asText()} - ${office.path('office_name').asText()}|">KA01 - Central</span>
+                    <span th:unless="${office != null}" class="font-medium text-slate-800" th:text="|Office #${complaint.path('office_id').asLong()}|">1</span>
+                </div>
+
+                <div>
+                    <span class="block text-slate-400">Complainant</span>
+                    <div th:if="${citizen != null}" class="mt-1">
+                        <a th:href="@{'/citizens/' + ${citizen.path('citizen_id').asLong()}}" class="font-medium text-blue-600 hover:underline"
+                           th:text="|${citizen.path('first_name').asText()} ${citizen.path('last_name').asText()}|">John Doe</a>
+                        <div class="text-[11px] text-slate-500 font-mono" th:text="|ID: #${citizen.path('citizen_id').asLong()}|"></div>
+                    </div>
+                    <div th:unless="${citizen != null}" class="font-medium text-slate-800 font-mono"
+                         th:text="|Citizen #${complaint.path('citizen_id').asLong()}|">1</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

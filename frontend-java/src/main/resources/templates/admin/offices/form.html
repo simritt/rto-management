@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="${editing} ? 'Edit Office - RTO Management' : 'New Office - RTO Management'">Office</title>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="mb-4">
+        <a th:href="@{/admin/offices}" class="text-sm font-medium text-blue-600 hover:underline">&larr; All Offices</a>
+        <h1 class="mt-2 text-2xl font-bold text-slate-900" th:text="${editing} ? 'Edit RTO Office' : 'Register New RTO Office'">Office</h1>
+    </div>
+
+    <div th:if="${formError}" class="mb-4 max-w-2xl rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-800" th:text="${formError}"></div>
+
+    <form th:action="@{${action}}" method="post" class="max-w-2xl space-y-6">
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1" for="region_id">
+                    Region <span class="text-red-500">*</span>
+                </label>
+                <select id="region_id" name="region_id" required
+                        class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <option value="">Select Region...</option>
+                    <option th:each="r : ${regions}" th:value="${r.path('region_id').asLong()}"
+                            th:text="|${r.path('region_name').asText()} (${r.path('region_code').asText()})|"
+                            th:selected="${form['region_id'] != null and form['region_id'] == r.path('region_id').asText()}"></option>
+                </select>
+                <p th:if="${fieldErrors['region_id'] != null}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['region_id']}"></p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1" for="office_name">
+                    Office Name <span class="text-red-500">*</span>
+                </label>
+                <input id="office_name" name="office_name" type="text" required th:value="${form['office_name']}"
+                       placeholder="e.g. Central Bengaluru RTO"
+                       class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                <p th:if="${fieldErrors['office_name'] != null}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['office_name']}"></p>
+            </div>
+
+            <div th:unless="${editing}">
+                <label class="block text-sm font-medium text-slate-700 mb-1" for="office_code">
+                    Office Code <span class="text-red-500">*</span>
+                </label>
+                <input id="office_code" name="office_code" type="text" required th:value="${form['office_code']}"
+                       placeholder="e.g. KA-01 (2 to 15 characters, alphanumeric)"
+                       class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none uppercase font-mono">
+                <p th:if="${fieldErrors['office_code'] != null}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['office_code']}"></p>
+                <p class="mt-1 text-xs text-slate-500">The office code forms the prefix for vehicles and licences registered here (cannot be changed once created).</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1" for="address_line">
+                    Address <span class="text-red-500">*</span>
+                </label>
+                <textarea id="address_line" name="address_line" required rows="3" placeholder="Full postal address of the facility"
+                          class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                          th:text="${form['address_line']}"></textarea>
+                <p th:if="${fieldErrors['address_line'] != null}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['address_line']}"></p>
+            </div>
+
+            <div>
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700">
+                    <input type="checkbox" name="is_active" value="true"
+                           th:checked="${form['is_active'] == 'true' || form['is_active'] == null}"
+                           class="rounded text-blue-600">
+                    Operational (Active for new applications and appointments)
+                </label>
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <button type="submit" class="rounded bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700">Save Office</button>
+            <a th:href="@{/admin/offices}" class="rounded border border-slate-300 bg-white px-5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</a>
+        </div>
+    </form>
+</th:block>
+</body>
+</html>

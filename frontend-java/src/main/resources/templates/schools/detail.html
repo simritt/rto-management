@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="|${school.path('school_name').asText()} - RTO Management|">Driving School Details</title>
+</head>
+<body>
+<div th:fragment="content" class="max-w-4xl mx-auto">
+
+    <!-- Top Breadcrumb & Actions -->
+    <div class="mb-6">
+        <a th:href="@{/driving-schools}" class="text-sm font-medium text-blue-600 hover:underline">&larr; Back to Driving Schools</a>
+        <div class="mt-2 flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900" th:text="${school.path('school_name').asText()}">School Name</h1>
+                <p class="mt-1 text-sm text-slate-500">
+                    Licence: <span class="font-mono font-medium text-slate-700" th:text="${school.path('licence_number').asText()}">DS-001</span> &bull;
+                    Office #<span th:text="${school.path('office_id').asLong()}">1</span>
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <button th:if="${user.can('licence.manage_schools')}"
+                        onclick="document.getElementById('modal-instructor').classList.remove('hidden')"
+                        class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">
+                    + Add Instructor
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- School Overview Card -->
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm mb-6">
+        <h2 class="text-base font-semibold text-slate-900 mb-4">Institution Credentials</h2>
+        <dl class="grid grid-cols-2 gap-4 sm:grid-cols-3 text-xs">
+            <div>
+                <dt class="text-slate-500 uppercase tracking-wider">School ID</dt>
+                <dd class="mt-1 font-mono font-medium text-slate-900 text-sm" th:text="${school.path('school_id').asLong()}">1</dd>
+            </div>
+            <div>
+                <dt class="text-slate-500 uppercase tracking-wider">Commercial Licence #</dt>
+                <dd class="mt-1 font-mono font-medium text-slate-900 text-sm" th:text="${school.path('licence_number').asText()}">DS-001</dd>
+            </div>
+            <div>
+                <dt class="text-slate-500 uppercase tracking-wider">Supervising RTO</dt>
+                <dd class="mt-1 font-medium text-slate-900 text-sm">
+                    Office #<span th:text="${school.path('office_id').asLong()}">1</span>
+                    <div th:if="${office != null}" class="text-xs text-slate-500 mt-0.5"
+                         th:text="${office.path('office_name').asText()}">RTO Office</div>
+                </dd>
+            </div>
+        </dl>
+    </div>
+
+    <!-- Instructors List Card -->
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-base font-semibold text-slate-900">Certified Instructors</h2>
+            <span class="text-xs text-slate-500" th:text="|${instructors != null ? instructors.size() : 0} instructor(s)|">0 instructor(s)</span>
+        </div>
+
+        <div class="overflow-hidden rounded-lg border border-slate-200">
+            <table class="min-w-full divide-y divide-slate-200 text-xs">
+                <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+                    <tr>
+                        <th class="px-4 py-2.5 text-left">Instructor ID</th>
+                        <th class="px-4 py-2.5 text-left">Instructor Name</th>
+                        <th class="px-4 py-2.5 text-left">Person ID</th>
+                        <th class="px-4 py-2.5 text-right">Licence Class ID</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
+                    <tr th:each="inst : ${instructors}" class="hover:bg-slate-50/75">
+                        <td class="px-4 py-3 font-mono font-medium text-blue-600">
+                            #<span th:text="${inst.path('instructor_id').asLong()}">1</span>
+                        </td>
+                        <td class="px-4 py-3 font-semibold text-slate-900">
+                            <span th:text="${inst.path('first_name').asText()}">Jane</span>
+                            <span th:text="${inst.path('last_name').asText()}">Doe</span>
+                        </td>
+                        <td class="px-4 py-3 font-mono text-slate-500" th:text="${inst.path('person_id').asLong()}">10</td>
+                        <td class="px-4 py-3 text-right font-mono text-slate-600">
+                            Class #<span th:text="${inst.path('licence_class_id').asLong()}">1</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${instructors == null or instructors.isEmpty()}">
+                        <td colspan="4" class="px-4 py-8 text-center text-xs text-slate-400">
+                            No instructors registered under this school.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal: Add Instructor -->
+    <div id="modal-instructor" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div class="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+            <h3 class="text-base font-semibold text-slate-900 mb-2">Add Certified Instructor</h3>
+            <p class="text-xs text-slate-500 mb-4">Register an instructor for authorized vehicle classes.</p>
+            <form th:action="@{/driving-schools/{id}/instructors(id=${school.path('school_id').asLong()})}" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Licence Class Authorized <span class="text-red-500">*</span></label>
+                    <select name="licence_class_id" required class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                        <option value="">-- Select Licence Class --</option>
+                        <option th:each="lc : ${licenceClasses}" th:value="${lc.path('licence_class_id').asLong()}"
+                                th:text="|${lc.path('class_code').asText()} - ${lc.path('description').asText()}|"></option>
+                    </select>
+                </div>
+
+                <div class="border-t border-slate-200 pt-3">
+                    <div class="text-xs font-semibold text-slate-700 mb-2">Option A: Link Existing Person ID</div>
+                    <input type="number" name="person_id" placeholder="Existing Person ID (optional)"
+                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                </div>
+
+                <div class="border-t border-slate-200 pt-3">
+                    <div class="text-xs font-semibold text-slate-700 mb-2">Option B: Or Enter New Person Details</div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-0.5">First Name</label>
+                            <input type="text" name="first_name" placeholder="First name"
+                                   class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs focus:border-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-0.5">Last Name</label>
+                            <input type="text" name="last_name" placeholder="Last name"
+                                   class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs focus:border-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-0.5">Date of Birth</label>
+                            <input type="date" name="date_of_birth"
+                                   class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs focus:border-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-0.5">Gender</label>
+                            <select name="gender" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs focus:border-blue-500 focus:outline-none">
+                                <option value="MALE">Male</option>
+                                <option value="FEMALE">Female</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-0.5">National ID #</label>
+                            <input type="text" name="national_id_number" placeholder="AADHAAR-1234"
+                                   class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-mono focus:border-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-0.5">Phone Number</label>
+                            <input type="tel" name="phone_primary" placeholder="9876543210"
+                                   class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs focus:border-blue-500 focus:outline-none">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xxs text-slate-500 mb-0.5">Email</label>
+                            <input type="email" name="email" placeholder="instructor@example.com"
+                                   class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs focus:border-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+                    <button type="button" onclick="document.getElementById('modal-instructor').classList.add('hidden')"
+                            class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-blue-700">Add Instructor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

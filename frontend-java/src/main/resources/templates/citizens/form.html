@@ -17,7 +17,7 @@
                 <div th:replace="~{fragments/ui :: input('First name', 'first_name', 'text', true)}"></div>
                 <div th:replace="~{fragments/ui :: input('Last name', 'last_name', 'text', true)}"></div>
                 <div th:replace="~{fragments/ui :: input('Date of birth', 'date_of_birth', 'date', true)}"></div>
-                <div th:replace="~{fragments/ui :: select('Gender', 'gender', ${#arrays.asList('MALE','FEMALE','OTHER')}, true)}"></div>
+                <div th:replace="~{fragments/ui :: select('Gender', 'gender', ${ {'MALE','FEMALE','OTHER'} }, true)}"></div>
                 <div th:replace="~{fragments/ui :: input('National ID number', 'national_id_number', 'text', true)}"></div>
                 <div th:unless="${editing}" th:replace="~{fragments/ui :: input('Citizen code (optional, auto if blank)', 'citizen_code', 'text', false)}"></div>
                 <div th:replace="~{fragments/ui :: input('Primary phone', 'phone_primary', 'text', true)}"></div>
@@ -35,7 +35,7 @@
                 <div th:replace="~{fragments/ui :: input('City', 'address.city', 'text', false)}"></div>
                 <div th:replace="~{fragments/ui :: input('State', 'address.state', 'text', false)}"></div>
                 <div th:replace="~{fragments/ui :: input('Pincode', 'address.pincode', 'text', false)}"></div>
-                <div th:replace="~{fragments/ui :: select('Address type', 'address.address_type', ${#arrays.asList('CURRENT','PERMANENT','OFFICE')}, false)}"></div>
+                <div th:replace="~{fragments/ui :: select('Address type', 'address.address_type', ${ {'CURRENT','PERMANENT','OFFICE'} }, false)}"></div>
             </div>
         </div>
 

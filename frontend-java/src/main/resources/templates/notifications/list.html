@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Citizen Notifications - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <!-- Page Header & Action Bar -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Notifications & Alerts</h1>
+            <p class="mt-1 text-sm text-slate-500">Outbound multi-channel SMS and email delivery log for applications, challans, licences, and automated expiry alerts.</p>
+        </div>
+        <div th:if="${user.can('licence.issue') || user.can('notification.view')}" class="flex items-center gap-2">
+            <form method="post" th:action="@{/notifications/expiry-reminders}" class="flex items-center gap-2">
+                <select name="days" class="rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500">
+                    <option value="15">Expiring in 15 days</option>
+                    <option value="30" selected>Expiring in 30 days</option>
+                    <option value="60">Expiring in 60 days</option>
+                    <option value="90">Expiring in 90 days</option>
+                </select>
+                <button type="submit" class="inline-flex items-center rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700">
+                    Run Expiry Sweep
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filter Bar Card -->
+    <div class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form method="get" th:action="@{/notifications}" class="grid gap-4 sm:grid-cols-2 md:grid-cols-4 items-end">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Status</label>
+                <select name="status" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <option value="">All Statuses</option>
+                    <option value="QUEUED" th:selected="${status == 'QUEUED'}">QUEUED</option>
+                    <option value="SENT" th:selected="${status == 'SENT'}">SENT</option>
+                    <option value="FAILED" th:selected="${status == 'FAILED'}">FAILED</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Person ID</label>
+                <input type="number" name="person_id" th:value="${personId}" placeholder="Filter by Person ID"
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+            </div>
+            <div></div>
+            <div class="flex gap-2">
+                <button type="submit" class="w-full rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700">Filter</button>
+                <a th:href="@{/notifications}" class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <table class="min-w-full divide-y divide-slate-200 text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold">
+                <tr>
+                    <th scope="col" class="px-5 py-3.5 text-left">ID</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Person ID</th>
+                    <th scope="col" class="px-5 py-3.5 text-center">Channel</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Subject</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Message</th>
+                    <th scope="col" class="px-5 py-3.5 text-center">Status</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Sent At</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                <tr th:if="${page == null || page.path('items').isEmpty()}">
+                    <td colspan="7" class="px-5 py-8 text-center text-slate-400">No notifications found.</td>
+                </tr>
+                <tr th:each="n : ${page.path('items')}" class="hover:bg-slate-50/80 transition-colors">
+                    <td class="px-5 py-3.5 font-mono text-slate-700" th:text="|#${n.path('notification_id').asLong()}|">#1</td>
+                    <td class="px-5 py-3.5 font-mono text-slate-600" th:text="|Person #${n.path('person_id').asLong()}|">1</td>
+                    <td class="px-5 py-3.5 text-center">
+                        <span th:if="${n.path('channel').asText() == 'SMS'}" class="inline-flex rounded bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-200">SMS</span>
+                        <span th:if="${n.path('channel').asText() == 'EMAIL'}" class="inline-flex rounded bg-purple-50 px-2 py-0.5 text-[10px] font-bold text-purple-700 border border-purple-200">EMAIL</span>
+                    </td>
+                    <td class="px-5 py-3.5 font-medium text-slate-900" th:text="${n.path('subject').asText()}">Challan issued</td>
+                    <td class="px-5 py-3.5 text-slate-600 max-w-md truncate" th:text="${n.path('message').asText()}">Your challan has been issued...</td>
+                    <td class="px-5 py-3.5 text-center">
+                        <span th:if="${n.path('status').asText() == 'SENT'}" class="inline-flex rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200">SENT</span>
+                        <span th:if="${n.path('status').asText() == 'QUEUED'}" class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700 border border-slate-200">QUEUED</span>
+                        <span th:if="${n.path('status').asText() == 'FAILED'}" class="inline-flex rounded-full bg-rose-50 px-2.5 py-0.5 text-[11px] font-semibold text-rose-700 border border-rose-200">FAILED</span>
+                    </td>
+                    <td class="px-5 py-3.5 text-slate-500" th:text="${n.path('sent_at').asText()}">2026-10-20</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination Bar -->
+        <div th:if="${page != null && page.path('pages').asInt() > 1}" class="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-5 py-3 text-xs">
+            <span class="text-slate-600" th:text="|Page ${page.path('page').asInt()} of ${page.path('pages').asInt()} (${page.path('total').asLong()} total notifications)|"></span>
+            <div class="flex gap-1">
+                <a th:if="${page.path('page').asInt() > 1}"
+                   th:href="@{/notifications(page=${page.path('page').asInt() - 1}, status=${status}, person_id=${personId})}"
+                   class="rounded border border-slate-300 bg-white px-3 py-1 text-slate-700 hover:bg-slate-100">&larr; Previous</a>
+                <a th:if="${page.path('page').asInt() < page.path('pages').asInt()}"
+                   th:href="@{/notifications(page=${page.path('page').asInt() + 1}, status=${status}, person_id=${personId})}"
+                   class="rounded border border-slate-300 bg-white px-3 py-1 text-slate-700 hover:bg-slate-100">Next &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

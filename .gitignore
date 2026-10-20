@@ -19,6 +19,9 @@ venv/
 # Node
 node_modules/
 
+# Java / Maven
+target/
+
 # Editor / OS
 .vscode/
 .idea/
@@ -29,3 +32,8 @@ Thumbs.db
 *.log
 *.sql.bak
 dump.sql
+
+# Storage and scratch scripts
+storage/
+**/scratch/
+

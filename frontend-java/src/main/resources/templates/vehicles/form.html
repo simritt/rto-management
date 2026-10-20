@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Register Vehicle - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content" class="max-w-3xl">
+
+    <div class="mb-6">
+        <a th:href="@{/vehicles}" class="text-sm font-medium text-blue-600 hover:underline">&larr; Back to Vehicles</a>
+        <h1 class="mt-2 text-2xl font-bold text-slate-900">Register New Vehicle</h1>
+        <p class="text-sm text-slate-500">Record vehicle technical specifications, manufacturing details, and initial owner assignment.</p>
+    </div>
+
+    <div th:if="${formError}" class="mb-4 rounded bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-800" th:text="${formError}"></div>
+
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <form th:action="@{/vehicles}" method="post" class="space-y-6">
+
+            <!-- Section 1: Identification -->
+            <div>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3">Vehicle Identification</h2>
+                <div class="grid gap-4 sm:grid-cols-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Registration # <span class="text-red-500">*</span></label>
+                        <input name="registration_number" type="text" required placeholder="e.g. KA-01-AB-1234"
+                               th:value="${form['registration_number']}"
+                               class="w-full rounded border border-slate-300 px-3 py-2 text-sm font-mono uppercase focus:border-blue-500 focus:outline-none">
+                        <div th:if="${fieldErrors != null and fieldErrors.containsKey('registration_number')}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['registration_number']}"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Chassis # (VIN) <span class="text-red-500">*</span></label>
+                        <input name="chassis_number" type="text" required placeholder="17-char VIN"
+                               th:value="${form['chassis_number']}"
+                               class="w-full rounded border border-slate-300 px-3 py-2 text-sm font-mono uppercase focus:border-blue-500 focus:outline-none">
+                        <div th:if="${fieldErrors != null and fieldErrors.containsKey('chassis_number')}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['chassis_number']}"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Engine Number <span class="text-red-500">*</span></label>
+                        <input name="engine_number" type="text" required placeholder="e.g. ENG987654"
+                               th:value="${form['engine_number']}"
+                               class="w-full rounded border border-slate-300 px-3 py-2 text-sm font-mono uppercase focus:border-blue-500 focus:outline-none">
+                        <div th:if="${fieldErrors != null and fieldErrors.containsKey('engine_number')}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['engine_number']}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Technical Specifications -->
+            <div class="border-t border-slate-200 pt-5">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3">Make, Model & Classification</h2>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Manufacturer <span class="text-red-500">*</span></label>
+                        <select name="manufacturer_id" required class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                            <option value="">Select Manufacturer...</option>
+                            <option th:each="m : ${manufacturers}"
+                                    th:value="${m.path('manufacturer_id').asLong()}"
+                                    th:text="${m.path('name').asText()}"
+                                    th:selected="${form['manufacturer_id'] != null and form['manufacturer_id'].toString() == m.path('manufacturer_id').asText()}"></option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Vehicle Model <span class="text-red-500">*</span></label>
+                        <select name="model_id" required class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                            <option value="">Select Model...</option>
+                            <option th:each="mdl : ${models}"
+                                    th:value="${mdl.path('model_id').asLong()}"
+                                    th:text="|${mdl.path('model_name').asText()}|"
+                                    th:selected="${form['model_id'] != null and form['model_id'].toString() == mdl.path('model_id').asText()}"></option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Vehicle Type <span class="text-red-500">*</span></label>
+                        <select name="vehicle_type_id" required class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                            <option value="">Select Vehicle Type...</option>
+                            <option th:each="vt : ${vehicleTypes}"
+                                    th:value="${vt.path('vehicle_type_id').asLong()}"
+                                    th:text="${vt.path('type_name').asText()}"
+                                    th:selected="${form['vehicle_type_id'] != null and form['vehicle_type_id'].toString() == vt.path('vehicle_type_id').asText()}"></option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Fuel Type <span class="text-red-500">*</span></label>
+                        <select name="fuel_type_id" required class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                            <option value="">Select Fuel Type...</option>
+                            <option th:each="ft : ${fuelTypes}"
+                                    th:value="${ft.path('fuel_type_id').asLong()}"
+                                    th:text="${ft.path('fuel_name').asText()}"
+                                    th:selected="${form['fuel_type_id'] != null and form['fuel_type_id'].toString() == ft.path('fuel_type_id').asText()}"></option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Manufacture Year <span class="text-red-500">*</span></label>
+                        <input name="manufacture_year" type="number" min="1900" max="2100" required
+                               th:value="${form['manufacture_year']}"
+                               class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Vehicle Color</label>
+                        <input name="color" type="text" placeholder="e.g. Pearl White"
+                               th:value="${form['color']}"
+                               class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Office & Initial Owner -->
+            <div class="border-t border-slate-200 pt-5">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3">Registration & Owner Assignment</h2>
+                <div class="grid gap-4 sm:grid-cols-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Registering RTO Office <span class="text-red-500">*</span></label>
+                        <select name="registering_office_id" required class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                            <option value="">Select RTO Office...</option>
+                            <option th:each="o : ${offices}"
+                                    th:value="${o.path('office_id').asLong()}"
+                                    th:text="|${o.path('office_code').asText()} - ${o.path('office_name').asText()}|"
+                                    th:selected="${form['registering_office_id'] != null and form['registering_office_id'].toString() == o.path('office_id').asText()}"></option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Registration Date</label>
+                        <input name="registration_date" type="date"
+                               th:value="${form['registration_date']}"
+                               class="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Initial Owner (Citizen)</label>
+                        <select name="owner_citizen_id" class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                            <option value="">None (Ownerless vehicle)</option>
+                            <option th:each="c : ${citizens}"
+                                    th:value="${c.path('citizen_id').asLong()}"
+                                    th:text="|${c.path('name').asText()} (${c.path('citizen_code').asText()})|"
+                                    th:selected="${form['owner_citizen_id'] != null and form['owner_citizen_id'].toString() == c.path('citizen_id').asText()}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 border-t border-slate-200 pt-5">
+                <a th:href="@{/vehicles}" class="rounded border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</a>
+                <button type="submit" class="rounded bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 shadow">
+                    Register Vehicle
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

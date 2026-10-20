@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="|Route ${route.path('route_name').asText()} - RTO Management|">Route Details</title>
+</head>
+<body>
+<div th:fragment="content" class="max-w-3xl">
+
+    <div class="mb-6">
+        <a th:href="@{/routes}" class="text-sm font-medium text-blue-600 hover:underline">&larr; Back to Routes</a>
+        <div class="mt-2 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900" th:text="${route.path('route_name').asText()}">Route 101</h1>
+                <p class="text-sm text-slate-500">
+                    <span class="font-medium text-slate-700" th:text="${route.path('origin').asText()}">Origin</span> &rarr;
+                    <span class="font-medium text-slate-700" th:text="${route.path('destination').asText()}">Destination</span>
+                </p>
+            </div>
+            <a th:href="@{/permits/new(route_id=${route.path('route_id').asLong()})}"
+               class="rounded-lg bg-slate-800 px-3 py-2 text-xs font-medium text-white hover:bg-slate-700">
+                + Issue Permit for Route
+            </a>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+
+        <!-- Add Segment Card -->
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 class="text-base font-semibold text-slate-900 mb-3">Add Route Segment / Stop</h2>
+            <form th:action="@{/routes/{id}/segments(id=${route.path('route_id').asLong()})}" method="post" class="flex gap-3">
+                <input name="segment_name" type="text" required placeholder="Segment / Waypoint Name (e.g. Mandya Transit Point)"
+                       class="flex-1 rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                <input name="sequence_no" type="number" min="1" max="65535" placeholder="Seq # (auto)"
+                       class="w-32 rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+                    Add Segment
+                </button>
+            </form>
+        </div>
+
+        <!-- Segments Table -->
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 class="text-base font-semibold text-slate-900 mb-4">Ordered Route Segments</h2>
+            <div class="overflow-hidden rounded-lg border border-slate-200">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 uppercase text-xs text-slate-500 font-medium">
+                    <tr>
+                        <th class="px-4 py-2.5 w-20">Seq #</th>
+                        <th class="px-4 py-2.5">Segment Name</th>
+                        <th class="px-4 py-2.5">Segment ID</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-xs">
+                    <tr th:if="${route.path('segments').isEmpty()}">
+                        <td colspan="3" class="px-4 py-6 text-center text-slate-400">No segments added to this route yet. Add waypoints above.</td>
+                    </tr>
+                    <tr th:each="s : ${route.path('segments')}" class="hover:bg-slate-50">
+                        <td class="px-4 py-3 font-bold font-mono text-slate-800" th:text="${s.path('sequence_no').asInt()}">1</td>
+                        <td class="px-4 py-3 font-medium text-slate-900" th:text="${s.path('segment_name').asText()}">Segment Name</td>
+                        <td class="px-4 py-3 font-mono text-slate-400" th:text="|#${s.path('segment_id').asLong()}|">#1</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

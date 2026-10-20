@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Initiate Ownership Transfer - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content" class="max-w-2xl">
+
+    <div class="mb-6">
+        <a th:href="@{/transfers}" class="text-sm font-medium text-blue-600 hover:underline">&larr; Back to Transfers</a>
+        <h1 class="mt-2 text-2xl font-bold text-slate-900">Initiate Vehicle Ownership Transfer</h1>
+        <p class="text-sm text-slate-500">Record a request to transfer vehicle title from existing owner to a new buyer.</p>
+    </div>
+
+    <div th:if="${formError}" class="mb-4 rounded bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-800" th:text="${formError}"></div>
+
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <form th:action="@{/transfers}" method="post" class="space-y-4">
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Vehicle <span class="text-red-500">*</span></label>
+                <select name="vehicle_id" required class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <option value="">Select Vehicle...</option>
+                    <option th:each="v : ${vehicles}"
+                            th:value="${v.path('vehicle_id').asLong()}"
+                            th:text="|${v.path('registration_number').asText()} (${v.path('manufacturer_name').asText()} ${v.path('model_name').asText()})|"
+                            th:selected="${form['vehicle_id'] != null and form['vehicle_id'].toString() == v.path('vehicle_id').asText()}"></option>
+                </select>
+                <div th:if="${fieldErrors != null and fieldErrors.containsKey('vehicle_id')}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['vehicle_id']}"></div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Current Owner (From Citizen)</label>
+                    <select name="from_citizen_id" class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                        <option value="">Auto-detected from current ownership</option>
+                        <option th:each="c : ${citizens}"
+                                th:value="${c.path('citizen_id').asLong()}"
+                                th:text="|${c.path('name').asText()} (${c.path('citizen_code').asText()})|"
+                                th:selected="${form['from_citizen_id'] != null and form['from_citizen_id'].toString() == c.path('citizen_id').asText()}"></option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">New Owner (To Citizen) <span class="text-red-500">*</span></label>
+                    <select name="to_citizen_id" required class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                        <option value="">Select Buyer...</option>
+                        <option th:each="c : ${citizens}"
+                                th:value="${c.path('citizen_id').asLong()}"
+                                th:text="|${c.path('name').asText()} (${c.path('citizen_code').asText()})|"
+                                th:selected="${form['to_citizen_id'] != null and form['to_citizen_id'].toString() == c.path('citizen_id').asText()}"></option>
+                    </select>
+                    <div th:if="${fieldErrors != null and fieldErrors.containsKey('to_citizen_id')}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['to_citizen_id']}"></div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Linked Application <span class="text-red-500">*</span></label>
+                <select name="application_id" required class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <option value="">Select Application...</option>
+                    <option th:each="a : ${applications}"
+                            th:value="${a.path('application_id').asLong()}"
+                            th:text="|${a.path('application_number').asText()} - ${a.path('service_name').asText()} (${a.path('current_status').asText()})|"
+                            th:selected="${form['application_id'] != null and form['application_id'].toString() == a.path('application_id').asText()}"></option>
+                </select>
+                <p class="mt-1 text-xs text-slate-400">Ownership transfers require an active RTO application (e.g. OWNERSHIP_TRANSFER).</p>
+                <div th:if="${fieldErrors != null and fieldErrors.containsKey('application_id')}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['application_id']}"></div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 border-t border-slate-200 pt-4">
+                <a th:href="@{/transfers}" class="rounded border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</a>
+                <button type="submit" class="rounded bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 shadow">
+                    Submit Transfer Request
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

@@ -22,6 +22,81 @@
             <a th:if="${user.can('citizen.view')}" th:href="@{/citizens}"
                th:classappend="${#strings.startsWith(currentPath, '/citizens')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
                class="block rounded px-3 py-2">Citizens</a>
+            <a th:if="${user.can('application.create') or user.can('application.create_own')}" th:href="@{/applications}"
+               th:classappend="${#strings.startsWith(currentPath, '/applications')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Applications</a>
+            <a th:if="${user.can('vehicle.view')}" th:href="@{/vehicles}"
+               th:classappend="${#strings.startsWith(currentPath, '/vehicles')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Vehicles</a>
+            <a th:if="${user.can('vehicle.view')}" th:href="@{/transfers}"
+               th:classappend="${#strings.startsWith(currentPath, '/transfers')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Ownership Transfers</a>
+            <a th:if="${user.can('compliance.view')}" th:href="@{/compliance}"
+               th:classappend="${#strings.startsWith(currentPath, '/compliance')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Compliance & Fitness</a>
+            <a th:if="${user.can('licence.view')}" th:href="@{/licences}"
+               th:classappend="${#strings.startsWith(currentPath, '/licences')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Driving Licences</a>
+            <a th:if="${user.can('licence.view')}" th:href="@{/learner-licences}"
+               th:classappend="${#strings.startsWith(currentPath, '/learner-licences')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Learner Licences</a>
+            <a th:if="${user.can('licence.view')}" th:href="@{/driving-tests}"
+               th:classappend="${#strings.startsWith(currentPath, '/driving-tests')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Driving Tests</a>
+            <a th:if="${user.can('licence.view')}" th:href="@{/driving-schools}"
+               th:classappend="${#strings.startsWith(currentPath, '/driving-schools')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Driving Schools</a>
+            <a th:if="${user.can('permit.view')}" th:href="@{/permits}"
+               th:classappend="${#strings.startsWith(currentPath, '/permits')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Commercial Permits</a>
+            <a th:if="${user.can('permit.view')}" th:href="@{/routes}"
+               th:classappend="${#strings.startsWith(currentPath, '/routes')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Transport Routes</a>
+            <a th:if="${user.can('violation.view')}" th:href="@{/violations}"
+               th:classappend="${#strings.startsWith(currentPath, '/violations')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Traffic Violations</a>
+            <a th:if="${user.can('challan.view')}" th:href="@{/challans}"
+               th:classappend="${#strings.startsWith(currentPath, '/challans')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">E-Challans</a>
+            <a th:if="${user.can('payment.view')}" th:href="@{/payments}"
+               th:classappend="${#strings.startsWith(currentPath, '/payments')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Payments & Receipts</a>
+            <a th:if="${user.can('payment.view')}" th:href="@{/refunds}"
+               th:classappend="${#strings.startsWith(currentPath, '/refunds')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Refunds</a>
+            <a th:if="${user.can('reference.manage')}" th:href="@{/fees}"
+               th:classappend="${#strings.startsWith(currentPath, '/fees')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Fee Structures</a>
+            <a th:if="${user.can('complaint.view_own') || user.can('complaint.manage')}" th:href="@{/complaints}"
+               th:classappend="${#strings.startsWith(currentPath, '/complaints')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Citizen Complaints</a>
+            <a th:if="${user.can('appeal.view_own') || user.can('appeal.review')}" th:href="@{/appeals}"
+               th:classappend="${#strings.startsWith(currentPath, '/appeals')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Legal Appeals</a>
+            <a th:if="${user.can('notification.view') || user.can('notification.view_own')}" th:href="@{/notifications}"
+               th:classappend="${#strings.startsWith(currentPath, '/notifications')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Notifications</a>
+            <a th:if="${user.can('audit.view')}" th:href="@{/audit-logs}"
+               th:classappend="${#strings.startsWith(currentPath, '/audit-logs')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">System Audit Trail</a>
+            <a th:if="${user.can('employee.view')}" th:href="@{/employees}"
+               th:classappend="${#strings.startsWith(currentPath, '/employees')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Staff & Employees</a>
+            <a th:if="${user.can('user.view')}" th:href="@{/admin/users}"
+               th:classappend="${#strings.startsWith(currentPath, '/admin/users')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">User Accounts</a>
+            <a th:if="${user.can('rbac.manage')}" th:href="@{/admin/roles}"
+               th:classappend="${#strings.startsWith(currentPath, '/admin/roles')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Security Roles & Permissions</a>
+            <a th:if="${user.can('office.manage')}" th:href="@{/admin/offices}"
+               th:classappend="${#strings.startsWith(currentPath, '/admin/offices')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Offices & Counters</a>
+            <a th:if="${user.can('appointment.manage')}" th:href="@{/admin/slots}"
+               th:classappend="${#strings.startsWith(currentPath, '/admin/slots')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Appointment Slots</a>
+            <a th:if="${user.can('reference.manage')}" th:href="@{/admin/reference}"
+               th:classappend="${#strings.startsWith(currentPath, '/admin/reference')} ? 'bg-slate-700 text-white' : 'hover:bg-slate-800'"
+               class="block rounded px-3 py-2">Master Reference Data</a>
         </nav>
         <div class="px-5 py-4 border-t border-slate-700 text-xs">
             <div class="text-white font-medium" th:text="${user.username}">user</div>

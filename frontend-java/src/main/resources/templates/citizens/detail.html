@@ -16,8 +16,12 @@
                 <span th:unless="${c.path('blacklisted').asBoolean()}" th:replace="~{fragments/ui :: badge('Active', 'green')}"></span>
             </div>
         </div>
-        <a th:if="${user.can('citizen.update')}" th:href="@{/citizens/{id}/edit(id=${c.path('citizen_id').asLong()})}"
-           class="rounded border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50">Edit</a>
+        <div class="flex gap-2">
+            <a th:unless="${c.path('blacklisted').asBoolean()}" th:href="@{/applications/new(citizen_id=${c.path('citizen_id').asLong()})}"
+               class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">+ New Application</a>
+            <a th:if="${user.can('citizen.update')}" th:href="@{/citizens/{id}/edit(id=${c.path('citizen_id').asLong()})}"
+               class="rounded border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50">Edit</a>
+        </div>
     </div>
 
     <div th:if="${c.path('blacklisted').asBoolean()}" class="mb-4 rounded bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-800">

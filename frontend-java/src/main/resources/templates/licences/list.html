@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Driving Licences - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <!-- Page Header & Action Bar -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Driving Licences</h1>
+            <p class="mt-1 text-sm text-slate-500">Registry of permanent driving licences, endorsement classes, and validity status.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <form th:if="${user.can('licence.revoke')}" th:action="@{/licences/expire-overdue}" method="post"
+                  onsubmit="return confirm('Sweep and mark all lapsed driving & learner licences as EXPIRED?');">
+                <button type="submit" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
+                    Sweep Overdue Licences
+                </button>
+            </form>
+            <a th:if="${user.can('licence.issue')}" th:href="@{/licences/new}"
+               class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700">
+                + Issue Driving Licence
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Bar Card -->
+    <div class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form method="get" th:action="@{/licences}" class="grid gap-4 sm:grid-cols-2 md:grid-cols-6 items-end">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Search</label>
+                <input type="text" name="search" th:value="${paramSearch}" placeholder="Licence # or Name..."
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Status</label>
+                <select name="status" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <option value="">All Statuses</option>
+                    <option value="ACTIVE" th:selected="${paramStatus == 'ACTIVE'}">ACTIVE</option>
+                    <option value="SUSPENDED" th:selected="${paramStatus == 'SUSPENDED'}">SUSPENDED</option>
+                    <option value="EXPIRED" th:selected="${paramStatus == 'EXPIRED'}">EXPIRED</option>
+                    <option value="REVOKED" th:selected="${paramStatus == 'REVOKED'}">REVOKED</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Office</label>
+                <select name="office_id" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <option value="">All Offices</option>
+                    <option th:each="off : ${offices}" th:value="${off.path('office_id').asLong()}"
+                            th:text="${off.path('office_name').asText()}"
+                            th:selected="${paramOfficeId != null && paramOfficeId == off.path('office_id').asLong()}"></option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Class</label>
+                <select name="class_id" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <option value="">All Classes</option>
+                    <option th:each="cls : ${licenceClasses}" th:value="${cls.path('licence_class_id').asLong()}"
+                            th:text="|${cls.path('class_code').asText()} - ${cls.path('description').asText()}|"
+                            th:selected="${paramClassId != null && paramClassId == cls.path('licence_class_id').asLong()}"></option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Expiring In</label>
+                <select name="expiring_within_days" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+                    <option value="">Any Expiry</option>
+                    <option value="30" th:selected="${paramExpiring != null && paramExpiring == 30}">30 Days</option>
+                    <option value="60" th:selected="${paramExpiring != null && paramExpiring == 60}">60 Days</option>
+                    <option value="90" th:selected="${paramExpiring != null && paramExpiring == 90}">90 Days</option>
+                    <option value="180" th:selected="${paramExpiring != null && paramExpiring == 180}">180 Days</option>
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="w-full rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700">Filter</button>
+                <a th:href="@{/licences}" class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <table class="min-w-full divide-y divide-slate-200 text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold">
+                <tr>
+                    <th scope="col" class="px-5 py-3.5 text-left">Licence Number</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Citizen / Holder</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Office</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Endorsement Classes</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Issue Date</th>
+                    <th scope="col" class="px-5 py-3.5 text-left">Expiry Date</th>
+                    <th scope="col" class="px-5 py-3.5 text-center">Status</th>
+                    <th scope="col" class="px-5 py-3.5 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
+                <tr th:each="row : ${data.path('items')}" class="hover:bg-slate-50/75 transition-colors">
+                    <td class="px-5 py-4 whitespace-nowrap font-mono font-semibold text-blue-600">
+                        <a th:href="@{/licences/{id}(id=${row.path('driving_licence_id').asLong()})}"
+                           class="hover:underline" th:text="${row.path('licence_number').asText()}">DL-123456</a>
+                    </td>
+                    <td class="px-5 py-4 whitespace-nowrap">
+                        <a th:href="@{/citizens/{id}(id=${row.path('citizen_id').asLong()})}"
+                           class="font-medium text-slate-900 hover:text-blue-600">
+                            Citizen #<span th:text="${row.path('citizen_id').asLong()}">1</span>
+                        </a>
+                    </td>
+                    <td class="px-5 py-4 whitespace-nowrap text-slate-600">
+                        Office #<span th:text="${row.path('office_id').asLong()}">1</span>
+                    </td>
+                    <td class="px-5 py-4 whitespace-nowrap">
+                        <div class="flex flex-wrap gap-1">
+                            <span th:each="cls : ${row.path('classes')}"
+                                  class="inline-flex items-center rounded bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200"
+                                  th:text="${cls.path('class_code').asText()}">MCWG</span>
+                        </div>
+                    </td>
+                    <td class="px-5 py-4 whitespace-nowrap text-slate-600 font-mono"
+                        th:text="${row.path('issue_date').asText()}">2026-01-01</td>
+                    <td class="px-5 py-4 whitespace-nowrap text-slate-600 font-mono"
+                        th:text="${row.path('expiry_date').asText()}">2046-01-01</td>
+                    <td class="px-5 py-4 whitespace-nowrap text-center">
+                        <span th:if="${row.path('current_status').asText() == 'ACTIVE'}"
+                              class="inline-block rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">ACTIVE</span>
+                        <span th:if="${row.path('current_status').asText() == 'SUSPENDED'}"
+                              class="inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">SUSPENDED</span>
+                        <span th:if="${row.path('current_status').asText() == 'EXPIRED'}"
+                              class="inline-block rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-semibold text-slate-800">EXPIRED</span>
+                        <span th:if="${row.path('current_status').asText() == 'REVOKED'}"
+                              class="inline-block rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-semibold text-rose-800">REVOKED</span>
+                    </td>
+                    <td class="px-5 py-4 whitespace-nowrap text-right">
+                        <a th:href="@{/licences/{id}(id=${row.path('driving_licence_id').asLong()})}"
+                           class="rounded border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50">
+                            Details &rarr;
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${data.path('items').isEmpty()}">
+                    <td colspan="8" class="px-6 py-12 text-center text-sm text-slate-400">
+                        No driving licences match the filter criteria.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div th:replace="~{fragments/ui :: pager(${data}, '?')}"></div>
+
+</div>
+</body>
+</html>

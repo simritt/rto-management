@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Issue E-Challan - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content" class="max-w-4xl mx-auto">
+
+    <!-- Top Breadcrumb -->
+    <div class="mb-6">
+        <a th:href="@{/challans}" class="text-sm font-medium text-blue-600 hover:underline">&larr; Back to E-Challans</a>
+        <h1 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">Issue E-Challan</h1>
+        <p class="mt-1 text-sm text-slate-500">Bundle unchallaned traffic violations for a vehicle into an official demand notice.</p>
+    </div>
+
+    <!-- Vehicle Filter Helper -->
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm mb-6">
+        <form method="get" th:action="@{/challans/new}" class="flex flex-wrap items-end gap-3">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Filter Unchallaned Violations by Vehicle ID</label>
+                <input type="number" name="vehicle_id" th:value="${selectedVehicleId}" placeholder="Enter Vehicle ID (e.g. 1)"
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+            </div>
+            <button type="submit" class="rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700">Filter Violations</button>
+            <a th:href="@{/challans/new}" class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100">Show All</a>
+        </form>
+    </div>
+
+    <!-- Main Form Card -->
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <form th:action="@{/challans}" method="post" class="space-y-6">
+
+            <!-- Optional Challan Number -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Challan Number (Optional)</label>
+                <input type="text" name="challan_number" placeholder="Leave blank to auto-generate (CHN-...)"
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:outline-none">
+                <p class="mt-1 text-xs text-slate-400">Must be unique if specified.</p>
+            </div>
+
+            <!-- Available Violations Checklist -->
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-700">Select Violations to Bundle <span class="text-red-500">*</span></h2>
+                    <span class="text-xs text-slate-500">Note: All bundled violations must belong to the same vehicle.</span>
+                </div>
+
+                <div class="space-y-2 max-h-96 overflow-y-auto border border-slate-200 rounded-lg p-3 bg-slate-50/50">
+                    <label th:each="v : ${availableViolations}"
+                           class="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-3 hover:bg-slate-50 cursor-pointer shadow-2xs">
+                        <input type="checkbox" name="violation_ids" th:value="${v.path('violation_id').asLong()}"
+                               class="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                        <div class="flex-1 text-xs">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="font-bold text-slate-900" th:text="${v.path('violation_description').asText()}">Infraction</span>
+                                    <span class="text-slate-400 ml-1 font-mono">#<span th:text="${v.path('violation_id').asLong()}">1</span></span>
+                                </div>
+                                <span class="font-mono font-bold text-rose-600">₹<span th:text="${v.path('fine_amount').asText()}">500.00</span></span>
+                            </div>
+                            <div class="text-slate-500 mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
+                                <span>Vehicle: <strong class="text-slate-700 font-mono" th:text="${v.path('registration_number').asText()}">KA-01-AB-1234</strong> (ID: <span th:text="${v.path('vehicle_id').asLong()}">1</span>)</span>
+                                <span>Location: <span th:text="${v.path('location').asText()}">Location</span></span>
+                                <span>Date: <span class="font-mono" th:text="${v.path('occurred_at').asText()}">2026-10-20</span></span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <div th:if="${availableViolations == null or availableViolations.isEmpty()}"
+                         class="py-8 text-center text-xs text-slate-400">
+                        No unchallaned violations found. <a th:href="@{/violations/new}" class="text-blue-600 hover:underline">Log a new violation first &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                <a th:href="@{/challans}" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</a>
+                <button type="submit" class="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+                    Issue E-Challan &rarr;
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

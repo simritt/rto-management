@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Issue Commercial Permit - RTO Management</title>
+</head>
+<body>
+<div th:fragment="content" class="max-w-2xl">
+
+    <div class="mb-6">
+        <a th:href="@{/permits}" class="text-sm font-medium text-blue-600 hover:underline">&larr; Back to Permits</a>
+        <h1 class="mt-2 text-2xl font-bold text-slate-900">Issue Commercial Transport Permit</h1>
+        <p class="text-sm text-slate-500">Authorize a commercial vehicle to operate along state routes or nationwide.</p>
+    </div>
+
+    <div th:if="${formError}" class="mb-4 rounded bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-800" th:text="${formError}"></div>
+
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <form th:action="@{/permits}" method="post" class="space-y-4">
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Commercial Vehicle <span class="text-red-500">*</span></label>
+                    <select name="vehicle_id" required class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                        <option value="">Select Vehicle...</option>
+                        <option th:each="v : ${vehicles}"
+                                th:value="${v.path('vehicle_id').asLong()}"
+                                th:text="|${v.path('registration_number').asText()} (${v.path('vehicle_type_name').asText()})|"
+                                th:selected="${form['vehicle_id'] != null and form['vehicle_id'].toString() == v.path('vehicle_id').asText()}"></option>
+                    </select>
+                    <div th:if="${fieldErrors != null and fieldErrors.containsKey('vehicle_id')}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['vehicle_id']}"></div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Permit Holder (Citizen) <span class="text-red-500">*</span></label>
+                    <select name="citizen_id" required class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                        <option value="">Select Citizen...</option>
+                        <option th:each="c : ${citizens}"
+                                th:value="${c.path('citizen_id').asLong()}"
+                                th:text="|${c.path('name').asText()} (${c.path('citizen_code').asText()})|"
+                                th:selected="${form['citizen_id'] != null and form['citizen_id'].toString() == c.path('citizen_id').asText()}"></option>
+                    </select>
+                    <div th:if="${fieldErrors != null and fieldErrors.containsKey('citizen_id')}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['citizen_id']}"></div>
+                </div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Permit Classification <span class="text-red-500">*</span></label>
+                    <select name="permit_type_id" required class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                        <option value="">Select Permit Type...</option>
+                        <option th:each="pt : ${permitTypes}"
+                                th:value="${pt.path('permit_type_id').asLong()}"
+                                th:text="|${pt.path('type_name').asText()} (${pt.path('validity_months').asInt()} mo)|"
+                                th:selected="${form['permit_type_id'] != null and form['permit_type_id'].toString() == pt.path('permit_type_id').asText()}"></option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Route (Optional)</label>
+                    <select name="route_id" class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                        <option value="">None / Open Area Permit</option>
+                        <option th:each="r : ${routes}"
+                                th:value="${r.path('route_id').asLong()}"
+                                th:text="|${r.path('route_name').asText()} (${r.path('origin').asText()} - ${r.path('destination').asText()})|"
+                                th:selected="${form['route_id'] != null and form['route_id'].toString() == r.path('route_id').asText()}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Approved Application <span class="text-red-500">*</span></label>
+                <select name="application_id" required class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <option value="">Select Application...</option>
+                    <option th:each="a : ${applications}"
+                            th:value="${a.path('application_id').asLong()}"
+                            th:text="|${a.path('application_number').asText()} - ${a.path('service_name').asText()} (${a.path('current_status').asText()})|"
+                            th:selected="${form['application_id'] != null and form['application_id'].toString() == a.path('application_id').asText()}"></option>
+                </select>
+                <div th:if="${fieldErrors != null and fieldErrors.containsKey('application_id')}" class="mt-1 text-xs text-red-600" th:text="${fieldErrors['application_id']}"></div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Permit Number (Optional, auto-generated if blank)</label>
+                <input name="permit_number" type="text" placeholder="e.g. PMT-KA-BLR-00123"
+                       th:value="${form['permit_number']}"
+                       class="w-full rounded border border-slate-300 px-3 py-2 text-sm font-mono uppercase focus:border-blue-500 focus:outline-none">
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Issue Date</label>
+                    <input name="issue_date" type="date"
+                           th:value="${form['issue_date'] != null ? form['issue_date'] : #temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                           class="w-full rounded border border-slate-300 px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Expiry Date</label>
+                    <input name="expiry_date" type="date"
+                           th:value="${form['expiry_date']}"
+                           class="w-full rounded border border-slate-300 px-3 py-2 text-sm">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 border-t border-slate-200 pt-4">
+                <a th:href="@{/permits}" class="rounded border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</a>
+                <button type="submit" class="rounded bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 shadow">
+                    Issue Permit
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>
