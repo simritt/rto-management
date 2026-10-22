@@ -232,23 +232,23 @@ VALUES
 -- SECTION 5: RBAC
 -- ============================================================
 
--- Users (one per person, first 15)
+-- Users (one per person, first 15). Demo login for every seeded user: password Passw0rd!123 (BCrypt hash below)
 INSERT INTO users (user_id, person_id, username, password_hash, is_active, last_login_at) VALUES
-    (1,  1,  'aarav.mehta',    '$2a$12$citizenhashAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', TRUE, '2026-10-01 08:30:00'),
-    (2,  2,  'priya.sharma',   '$2a$12$citizenhashBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', TRUE, '2026-10-02 09:00:00'),
-    (3,  3,  'rohan.patel',    '$2a$12$citizenhashCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC', TRUE, '2026-10-03 10:00:00'),
-    (4,  4,  'sunita.desai',   '$2a$12$citizenhashDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD', TRUE, '2026-09-25 11:00:00'),
-    (5,  5,  'kiran.joshi',    '$2a$12$citizenhashEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE', TRUE, '2026-10-07 07:45:00'),
-    (6,  6,  'pooja.singh',    '$2a$12$citizenhashFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', TRUE, NULL),
-    (7,  7,  'amit.verma',     '$2a$12$citizenhashGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG', TRUE, '2026-08-20 14:00:00'),
-    (8,  8,  'neha.gupta',     '$2a$12$citizenhashHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH', TRUE, '2026-10-06 16:00:00'),
-    (9,  9,  'vijay.shah',     '$2a$12$citizenhashIIIIIIIIIIIIIIIIIIIIIIIIIIIIII', TRUE, '2026-10-05 08:00:00'),
-    (10, 10, 'meera.nair',     '$2a$12$citizenhashJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ', TRUE, NULL),
-    (11, 11, 'dinesh.rao',     '$2a$12$employeehashKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK', TRUE, '2026-10-08 08:00:00'),
-    (12, 12, 'kavita.iyer',    '$2a$12$employeehashLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL', TRUE, '2026-10-08 08:05:00'),
-    (13, 13, 'suresh.pillai',  '$2a$12$employeehashMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM', TRUE, '2026-10-08 08:10:00'),
-    (14, 14, 'anita.bose',     '$2a$12$employeehashNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN', TRUE, '2026-10-07 17:00:00'),
-    (15, 15, 'rajan.kulkarni', '$2a$12$employeehashOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO', TRUE, '2026-10-08 07:55:00');
+    (1,  1,  'aarav.mehta',    '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-10-01 08:30:00'),
+    (2,  2,  'priya.sharma',   '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-10-02 09:00:00'),
+    (3,  3,  'rohan.patel',    '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-10-03 10:00:00'),
+    (4,  4,  'sunita.desai',   '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-09-25 11:00:00'),
+    (5,  5,  'kiran.joshi',    '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-10-07 07:45:00'),
+    (6,  6,  'pooja.singh',    '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, NULL),
+    (7,  7,  'amit.verma',     '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-08-20 14:00:00'),
+    (8,  8,  'neha.gupta',     '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-10-06 16:00:00'),
+    (9,  9,  'vijay.shah',     '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-10-05 08:00:00'),
+    (10, 10, 'meera.nair',     '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, NULL),
+    (11, 11, 'dinesh.rao',     '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-10-08 08:00:00'),
+    (12, 12, 'kavita.iyer',    '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-10-08 08:05:00'),
+    (13, 13, 'suresh.pillai',  '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-10-08 08:10:00'),
+    (14, 14, 'anita.bose',     '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-10-07 17:00:00'),
+    (15, 15, 'rajan.kulkarni', '$2a$12$Zv6jPuh6LsB6TMjXu1sadORrlnNtPzpAzbYdhCkmgzMVym6AzUwGS', TRUE, '2026-10-08 07:55:00');
 
 -- Roles
 INSERT INTO roles (role_id, role_name) VALUES
@@ -650,7 +650,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- Quick sanity check: count rows in key tables.
 -- Run after loading seed data to confirm success.
 -- ============================================================
-SELECT 'persons'                AS tbl, COUNT(*) AS rows FROM persons
+SELECT 'persons'                AS tbl, COUNT(*) AS row_count FROM persons
 UNION ALL SELECT 'citizens',      COUNT(*) FROM citizens
 UNION ALL SELECT 'employees',     COUNT(*) FROM employees
 UNION ALL SELECT 'applications',  COUNT(*) FROM applications

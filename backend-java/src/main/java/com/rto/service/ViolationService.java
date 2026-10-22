@@ -109,6 +109,13 @@ public class ViolationService {
         return Fees.money(t == null ? BigDecimal.ZERO : t);
     }
 
+    /** Same derivation as {@link #total(Long)}, but for violations that are not linked to a challan yet. */
+    private BigDecimal totalFor(List<Long> violationIds) {
+        BigDecimal t = db.first(BigDecimal.class, "select coalesce(sum(vt.baseFineAmount), 0) from Violation v "
+                + "join ViolationType vt on vt.violationTypeId = v.violationTypeId where v.violationId in :ids", "ids", violationIds);
+        return Fees.money(t == null ? BigDecimal.ZERO : t);
+    }
+
     private List<Violation> loadViolations(List<Long> ids, Long sameVehicleAs) {
         List<Long> unique = ids.stream().distinct().sorted().toList();
         if (unique.size() != ids.size()) throw ApiException.badRequest("DUPLICATE_VIOLATION", "violation_ids contains duplicates");
@@ -143,7 +150,7 @@ public class ViolationService {
         if (db.exists("select c.challanId from Challan c where c.challanNumber = :n", "n", number)) throw ApiException.conflict("DUPLICATE", "Challan number already exists");
         Challan c = new Challan();
         c.setChallanNumber(number);
-        c.setTotalAmount(Fees.ZERO);
+        c.setTotalAmount(totalFor(d.violationIds()));   // the database requires total_amount > 0 on INSERT
         c.setStatus("ISSUED");
         c.setIssuedAt(Clock.now());
         db.save(c);
