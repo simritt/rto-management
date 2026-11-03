@@ -62,7 +62,6 @@
             <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold">
                 <tr>
                     <th scope="col" class="px-5 py-3.5 text-left">Challan Number</th>
-                    <th scope="col" class="px-5 py-3.5 text-left">Vehicle ID</th>
                     <th scope="col" class="px-5 py-3.5 text-right">Total Fine Amount</th>
                     <th scope="col" class="px-5 py-3.5 text-left">Issued At</th>
                     <th scope="col" class="px-5 py-3.5 text-center">Status</th>
@@ -74,12 +73,6 @@
                     <td class="px-5 py-4 whitespace-nowrap font-mono font-semibold text-blue-600">
                         <a th:href="@{/challans/{id}(id=${row.path('challan_id').asLong()})}"
                            class="hover:underline" th:text="${row.path('challan_number').asText()}">CHN-123456</a>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap">
-                        <a th:href="@{/vehicles/{id}(id=${row.path('vehicle_id').asLong()})}"
-                           class="font-mono font-bold text-slate-900 hover:text-blue-600">
-                            Vehicle #<span th:text="${row.path('vehicle_id').asLong()}">1</span>
-                        </a>
                     </td>
                     <td class="px-5 py-4 whitespace-nowrap text-right font-mono font-bold text-slate-900 text-sm">
                         ₹<span th:text="${row.path('total_amount').asText()}">1500.00</span>
@@ -104,7 +97,7 @@
                     </td>
                 </tr>
                 <tr th:if="${data.path('items').isEmpty()}">
-                    <td colspan="6" class="px-6 py-12 text-center text-sm text-slate-400">
+                    <td colspan="5" class="px-6 py-12 text-center text-sm text-slate-400">
                         No e-challans found matching criteria.
                     </td>
                 </tr>

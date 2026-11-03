@@ -155,11 +155,26 @@ public class ApiClient {
         }
     }
 
+    /** The API rejects page < 1 and search > 100 chars with a 422; a hand-edited URL should degrade, not error. */
+    private static String normalize(String key, String value) {
+        if (key.equals("page")) {
+            try {
+                return String.valueOf(Math.min(Integer.MAX_VALUE, Math.max(1, Long.parseLong(value.trim()))));
+            } catch (NumberFormatException e) {
+                return "1";
+            }
+        }
+        if (key.equals("search") && value.length() > 100) {
+            return value.substring(0, 100);
+        }
+        return value;
+    }
+
     private JsonNode send(HttpMethod method, String path, Map<String, ?> query, Object body, boolean auth) {
         UriComponentsBuilder ub = UriComponentsBuilder.fromUriString(baseUrl + path);
         query.forEach((k, v) -> {
             if (v != null && !v.toString().isBlank()) {
-                ub.queryParam(k, v);
+                ub.queryParam(k, normalize(k, v.toString()));
             }
         });
         URI uri = ub.build().encode().toUri();
