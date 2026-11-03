@@ -50,6 +50,9 @@ SOURCE procedures/20_procedures.sql;
 
 -- ── Sample / seed data (optional — for testing only) ──────
 -- SOURCE seed/22_sample_data.sql;               -- Uncomment to load
+-- SOURCE seed/23_comprehensive_demo_seed.sql;   -- Alternative to 22: WIPES every table and reloads a fuller demo
+--                                               -- dataset (every status/filter, edge cases, dates relative to today).
+--                                               -- Regenerate with: python seed/generate_seed.py
 
 -- ── Verification ──────────────────────────────────────────
 SOURCE 99_verify.sql;
