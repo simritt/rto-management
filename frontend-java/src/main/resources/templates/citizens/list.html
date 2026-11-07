@@ -44,8 +44,8 @@
                 <td class="px-4 py-3" th:text="|${c.path('first_name').asText()} ${c.path('last_name').asText()}|"></td>
                 <td class="px-4 py-3" th:text="${c.path('phone_primary').asText()}"></td>
                 <td class="px-4 py-3">
-                    <span th:if="${c.path('blacklisted').asBoolean()}" th:replace="~{fragments/ui :: badge('Blacklisted', 'red')}"></span>
-                    <span th:unless="${c.path('blacklisted').asBoolean()}" th:replace="~{fragments/ui :: badge('Active', 'green')}"></span>
+                    <th:block th:if="${c.path('blacklisted').asBoolean()}"><span th:replace="~{fragments/ui :: badge('Blacklisted', 'red')}"></span></th:block>
+                    <th:block th:unless="${c.path('blacklisted').asBoolean()}"><span th:replace="~{fragments/ui :: badge('Active', 'green')}"></span></th:block>
                 </td>
                 <td class="px-4 py-3 text-slate-500" th:text="${#strings.substringBefore(c.path('registered_at').asText(), 'T')}"></td>
             </tr>

@@ -12,8 +12,8 @@
             <h1 class="mt-1 text-2xl font-semibold" th:text="|${c.path('first_name').asText()} ${c.path('last_name').asText()}|"></h1>
             <div class="mt-1 flex items-center gap-2 text-sm text-slate-500">
                 <span th:text="${c.path('citizen_code').asText()}"></span>
-                <span th:if="${c.path('blacklisted').asBoolean()}" th:replace="~{fragments/ui :: badge('Blacklisted', 'red')}"></span>
-                <span th:unless="${c.path('blacklisted').asBoolean()}" th:replace="~{fragments/ui :: badge('Active', 'green')}"></span>
+                <th:block th:if="${c.path('blacklisted').asBoolean()}"><span th:replace="~{fragments/ui :: badge('Blacklisted', 'red')}"></span></th:block>
+                <th:block th:unless="${c.path('blacklisted').asBoolean()}"><span th:replace="~{fragments/ui :: badge('Active', 'green')}"></span></th:block>
             </div>
         </div>
         <div class="flex gap-2">
@@ -50,8 +50,8 @@
                 <li th:each="a : ${addresses}" class="py-2">
                     <div class="flex items-center gap-2">
                         <span class="font-medium" th:text="${a.path('address_type').asText()}"></span>
-                        <span th:if="${a.path('is_current').asBoolean()}" th:replace="~{fragments/ui :: badge('Current', 'green')}"></span>
-                        <span th:unless="${a.path('is_current').asBoolean()}" th:replace="~{fragments/ui :: badge('Past', 'slate')}"></span>
+                        <th:block th:if="${a.path('is_current').asBoolean()}"><span th:replace="~{fragments/ui :: badge('Current', 'green')}"></span></th:block>
+                        <th:block th:unless="${a.path('is_current').asBoolean()}"><span th:replace="~{fragments/ui :: badge('Past', 'slate')}"></span></th:block>
                     </div>
                     <div th:text="|${a.path('line1').asText()}${a.path('line2').isNull() ? '' : ', ' + a.path('line2').asText()}|"></div>
                     <div class="text-slate-500" th:text="|${a.path('city').asText()}, ${a.path('state').asText()} - ${a.path('pincode').asText()}|"></div>

@@ -1,0 +1,120 @@
+\chapter{Subject-Wise Engineering Concepts}\label{ch:subjects}
+This project was meant to bring five courses of the programme to bear on a single
+system. This chapter shows, course by course, which concepts were used, where in the
+project they appear and what evidence there is. Concepts are listed only where we can point
+to the code, the schema or a test; a course topic that the project does not use is not
+claimed.
+
+\section{CE102: Problem Solving using Object Oriented Programming (Lab)}\label{sec:oop}
+The backend and the portal are Java 21 programs of about 16\,000 lines (backend 11\,300, portal
+4\,900), written around the object-oriented ideas of the lab course.
+
+\begin{table}[H]
+\centering\small
+\caption{Object-oriented concepts in the project}\label{tab:oop}
+\begin{tabularx}{\linewidth}{@{}p{3.3cm}p{5.2cm}X@{}}
+\toprule \textbf{Concept} & \textbf{Where it appears} & \textbf{Why it matters here}\\ \midrule
+Encapsulation & Each service hides its queries and rules behind public methods; entities have private fields with accessors; controllers never touch the database & Rules live in one place, so a rule is changed once\\
+Abstraction and interfaces & \cd{NotificationProvider} interface with the implementation \cd{MockNotificationProvider} & A real SMS or e-mail provider can replace the mock without changing any caller\\
+Inheritance and polymorphism & \cd{ReferenceControllers.Base<E, C>} is an abstract base class with ten subclasses for the reference resources; \cd{ApiException} extends \cd{RuntimeException} & One class provides list, get, create, update and delete for ten resources\\
+Generics & \cd{Base<E, C>}, \cd{PageResponse<T>}, \cd{Db.list(Class<T>, ...)}, \cd{Db.page(...)} & Type-safe reuse without casting\\
+Records & Request and response DTOs, \cd{PageParams}, \cd{PageResponse} & Immutable data carriers with built-in equality and accessors\\
+Custom annotations and reflection & \cd{@Public}, \cd{@Requires}, \cd{@RequiresAny}, \cd{@ValidPassword}; \cd{AuthInterceptor} reads them at run time & Access rules are declared next to the code they protect\\
+Exceptions & \cd{ApiException} with status and code; \cd{GlobalExceptionHandler}; database error translation & A runtime exception rolls the transaction back; the client gets a uniform error\\
+Collections, streams, lambdas & Maps of sets for transitions; streams for filtering and mapping; lambdas in the after-commit hook & Compact, readable data handling\\
+Value types & \cd{BigDecimal} for all money; \cd{java.time} for dates and times & No rounding error; clear handling of time zones (UTC)\\
+Dependency injection & Constructor injection of services into services and controllers & Loose coupling and easy replacement in tests\\
+Design patterns & Strategy (notification provider); Template Method (reference base class); Fluent builder (\cd{QB}); Chain of responsibility (JWT filter, then interceptor, then controller); Utility class with a private constructor (\cd{Perms}, \cd{Fees}) & Familiar structures that make the code easier to read\\
+Concurrency & \cd{ConcurrentHashMap} for revoked tokens; transactions and row locks; tests that start threads together using a \cd{CountDownLatch} & Safe behaviour with many simultaneous users\\
+\bottomrule
+\end{tabularx}
+\end{table}
+\textbf{A design choice, stated plainly.} Statuses such as \texttt{ACTIVE} or
+\texttt{APPROVED} are Java strings in the code and \texttt{ENUM} columns in the database,
+not Java enums. This keeps the code close to the schema, and the transition tables catch
+wrong values, but Java enums would add compile-time safety. We note this as a possible
+improvement.
+
+\section{CE204: Database Management}\label{sec:dbms}
+This is the course the project leans on most.
+
+\begin{table}[H]
+\centering\small
+\caption{Database concepts in the project}\label{tab:dbms}
+\begin{tabularx}{\linewidth}{@{}p{3.4cm}p{6.1cm}X@{}}
+\toprule \textbf{Concept} & \textbf{How it is used} & \textbf{Evidence}\\ \midrule
+ER modelling & 12 ER diagrams covering 63 tables, generated from the live schema & Section 4.6\\
+Relational schema and keys & 59 surrogate keys, 4 composite keys, 43 unique keys, 91 foreign keys & Schema dump\\
+Generalisation & \cd{persons} is the parent; \cd{citizens} and \cd{employees} extend it; \cd{applicants} refer to a citizen & ER figures\\
+Many-to-many & Four junction tables: user\_roles, role\_permissions, licence\_class\_assignments, challan\_violations & Table~\ref{tab:fkrules}\\
+Normalisation & Third normal form with three documented exceptions & Section 4.6\\
+Referential actions & 52 RESTRICT, 29 CASCADE, 10 SET NULL chosen per relationship & Table~\ref{tab:fkrules}\\
+Domain integrity & 25 ENUM columns, exact \texttt{DECIMAL(10,2)} money, 26 enforced CHECK rules (7 in the base schema, 19 of the 21 in the constraints script; MySQL rejects two) & Section~\ref{sec:defects}\\
+Generated columns & Three stored generated columns enforce one current row & Table~\ref{tab:gen}\\
+SQL DDL and DML & 13 module scripts, the constraint, index, view, trigger and procedure scripts, and the seed scripts & \cd{database/}\\
+Joins, grouping, subqueries & Inner, left and self joins; \texttt{GROUP BY ... HAVING} (queries Q1 to Q4) & Section~\ref{sec:sqltests}\\
+CTEs and window functions & \texttt{WITH} queries (Q5, Q6); \texttt{RANK}, \texttt{DENSE\_RANK}, \texttt{ROW\_NUMBER}, \texttt{LAG} over partitions (Q7 to Q10) & Section~\ref{sec:sqltests}\\
+Views & 6 views & Table~\ref{tab:views}\\
+Indexes and query plans & 25 added indexes; \texttt{EXPLAIN} shows a scan turning into an index lookup & Section~\ref{sec:indexres}\\
+Triggers & 5 triggers (history, delete guards, auto-overdue) & Table~\ref{tab:triggers}\\
+Stored procedures & 3 procedures with transactions and error handlers & Table~\ref{tab:procs}\\
+Transactions and ACID & Every service method is one transaction; rollback test; concurrency tests & Chapter~\ref{ch:test}\\
+Locking and isolation & \cmd{SELECT ... FOR UPDATE} through \cd{Db.lock}; connections use \texttt{READ COMMITTED}; the server default is \texttt{REPEATABLE READ} & Chapter~\ref{ch:algo}\\
+JSON data type & Old and new values of the audit log & Section 4.6\\
+Security of the database & The application connects as a dedicated account that has rights only on the project's databases & Section~\ref{sec:envsetup}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{CE302: Software Engineering}\label{sec:se}
+\begin{table}[H]
+\centering\small
+\caption{Software engineering practices in the project}\label{tab:se}
+\begin{tabularx}{\linewidth}{@{}p{3.6cm}X@{}}
+\toprule \textbf{Practice} & \textbf{How it was applied}\\ \midrule
+Process model & Incremental development in dependency order: schema, backend, portal, database hardening, final validation (Section~\ref{sec:timeline})\\
+Requirements & Numbered functional and non-functional requirements with acceptance criteria and a test that verifies each (Chapter~\ref{ch:srs})\\
+Modelling (UML) & Use case, class, sequence, activity, state, component and deployment diagrams, plus data flow diagrams at three levels (Chapter~\ref{ch:design})\\
+Architecture and design principles & Layered client--server design; separation of concerns; one responsibility per class; programming to an interface where a replacement is likely\\
+Coding standards & Consistent package structure and naming; Bean Validation instead of ad hoc checks; conventional commit messages\\
+Version control & Git with a feature branch for the portal merged into the main branch; small single-purpose commits for the database layer; secrets kept out of the repository by \texttt{.gitignore}\\
+Configuration management & Environment-specific values in a git-ignored \texttt{.env} file; an example file with blank values is committed\\
+Testing & Unit-level schema audit, 185 integration tests, a SQL test script, a UI crawl and a load test (Chapter~\ref{ch:test})\\
+Traceability & Requirements map to tests in Table~\ref{tab:fr}; defects map to fixes in Section~\ref{sec:defects}\\
+Documentation & README with set-up steps; Swagger/OpenAPI for the API; this report\\
+Defect management & Defects were recorded with cause, fix and re-test (Section~\ref{sec:defects})\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{CE202: Data Structures}
+Chapter~\ref{ch:algo} gives the data structures in Table~\ref{tab:ds}. In summary:
+hash maps and sets for transition tables and permissions; a sorted set to fix the order of
+locks; a concurrent hash map for revoked tokens; a tree for the region hierarchy; a
+directed acyclic graph for foreign-key dependencies; B$^+$-tree indexes in the database
+for every key; and a table used as a durable queue for notifications. Each choice has a
+stated reason and a stated cost.
+
+\section{CE207: Design and Analysis of Algorithms}
+The algorithm chapter applies the course in four ways.
+\begin{itemize}
+\item \textbf{Asymptotic analysis} of every critical operation (Table~\ref{tab:time}), with the assumptions stated.
+\item \textbf{A correctness argument} for ordered locking: if all transactions take locks in one global order, no cycle of waiting transactions can form, so deadlock cannot occur among them.
+\item \textbf{Graph algorithms.} The creation order of the 63 tables is a topological order of the foreign-key graph, computed and verified in $O(V+E)$ time; the region cycle check walks a parent chain in $O(d)$.
+\item \textbf{Empirical growth.} Lookup time was measured on tables of 10\,000, 100\,000 and 500\,000 rows with and without an index (Section~\ref{sec:indexres}). The scan grows roughly in proportion to the table size and the indexed lookup stays almost flat, which agrees with $O(n)$ versus $O(\log n)$.
+\end{itemize}
+
+\section{Mapping of the Courses to the Report}
+\begin{table}[H]
+\centering\small
+\caption{Where each course appears in the project and in this report}\label{tab:map}
+\begin{tabularx}{\linewidth}{@{}p{3.3cm}p{4.6cm}X@{}}
+\toprule \textbf{Course} & \textbf{Main artefacts in the project} & \textbf{Report sections}\\ \midrule
+CE102 Object Oriented Programming & Backend and portal Java code; DTO records; services; annotations; interfaces & 6.1, 7.4, 7.5\\
+CE204 Database Management & \cd{database/} scripts; JPA mapping; SQL tests and queries & 4.6, 5.2, 6.2, 9.7, 8.4\\
+CE302 Software Engineering & SRS; UML models; Git history; test suites; defect log & 3, 4, 6.3, 7.8, 9\\
+CE202 Data Structures & Maps, sets, trees, graphs, indexes, queue table & 5.4, 6.4\\
+CE207 Design and Analysis of Algorithms & Locking order, topological ordering, complexity tables, index experiment & 5, 6.5, 8.4\\
+\bottomrule
+\end{tabularx}
+\end{table}

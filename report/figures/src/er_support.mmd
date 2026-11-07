@@ -1,0 +1,45 @@
+---
+title: Support and audit
+---
+erDiagram
+  notifications {
+    bigint notification_id PK
+    bigint person_id FK
+    enum channel
+    varchar subject
+    varchar message
+  }
+  complaints {
+    bigint complaint_id PK
+    bigint citizen_id FK
+    bigint office_id FK
+    varchar subject
+    enum status
+    datetime filed_at
+  }
+  appeals {
+    bigint appeal_id PK
+    bigint citizen_id FK
+    enum against_type
+    bigint against_id
+    varchar grounds
+  }
+  audit_logs {
+    bigint audit_id PK
+    varchar table_name
+    bigint record_id
+    enum action
+  }
+  citizens {
+    bigint citizen_id PK
+  }
+  persons {
+    bigint person_id PK
+  }
+  rto_offices {
+    bigint office_id PK
+  }
+  citizens ||--o{ appeals : "citizen_id"
+  citizens ||--o{ complaints : "citizen_id"
+  rto_offices ||--o{ complaints : "office_id"
+  persons ||--o{ notifications : "person_id"

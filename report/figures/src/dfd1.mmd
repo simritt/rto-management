@@ -1,0 +1,46 @@
+flowchart TB
+  citizen["Citizen"]
+  staff["RTO staff"]
+  admin["Administrator"]
+  P1(("1.0<br/>Authentication and<br/>access control"))
+  P2(("2.0<br/>Citizen and<br/>application management"))
+  P3(("3.0<br/>Licensing"))
+  P4(("4.0<br/>Vehicles, ownership<br/>and compliance"))
+  P5(("5.0<br/>Permits, violations<br/>and challans"))
+  P6(("6.0<br/>Payments<br/>and refunds"))
+  P7(("7.0<br/>Complaints, appeals,<br/>notifications and audit"))
+  D1[("D1 users, roles,<br/>permissions")]
+  D2[("D2 persons, citizens,<br/>employees, offices")]
+  D3[("D3 applications, documents,<br/>appointments")]
+  D4[("D4 licences,<br/>tests")]
+  D5[("D5 vehicles, ownership,<br/>compliance records")]
+  D6[("D6 permits, routes,<br/>violations, challans")]
+  D7[("D7 payments, attempts,<br/>refunds, fees")]
+  D8[("D8 complaints, appeals,<br/>notifications, audit_logs")]
+  citizen --> P1
+  staff --> P1
+  admin --> P1
+  P1 <--> D1
+  citizen -- "registration, application" --> P2
+  staff -- "verification, status change" --> P2
+  P2 <--> D2
+  P2 <--> D3
+  staff -- "tests, issue, suspend, renew" --> P3
+  P3 <--> D4
+  P3 -- "linked application" --> D3
+  staff -- "registration, transfer, inspection" --> P4
+  P4 <--> D5
+  staff -- "violation, challan, permit" --> P5
+  P5 <--> D6
+  P5 -- "vehicle lookup" --> D5
+  citizen -- "pay fee or fine" --> P6
+  staff -- "refund" --> P6
+  P6 <--> D7
+  P6 -- "settle challan, road tax" --> D6
+  citizen -- "complaint, appeal" --> P7
+  staff -- "review, resolve" --> P7
+  P7 <--> D8
+  admin -- "reference data, fees" --> D7
+  P2 --> P7
+  P6 --> P7
+  P4 --> P7

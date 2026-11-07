@@ -1,0 +1,65 @@
+---
+title: Learner and driving licences
+---
+erDiagram
+  licence_classes {
+    bigint licence_class_id PK
+    varchar class_code UK
+  }
+  learner_licences {
+    bigint learner_licence_id PK
+    varchar licence_number UK
+    bigint citizen_id FK
+    bigint application_id FK
+    bigint office_id FK
+    date issue_date
+    date expiry_date
+    enum status
+  }
+  driving_licences {
+    bigint driving_licence_id PK
+    varchar licence_number UK
+    bigint citizen_id FK
+    bigint learner_licence_id FK
+    bigint application_id FK
+    bigint office_id FK
+    date issue_date
+    date expiry_date
+    enum current_status
+  }
+  licence_class_assignments {
+    bigint driving_licence_id PK, FK
+    bigint licence_class_id PK, FK
+    date granted_on
+  }
+  licence_status_history {
+    bigint history_id PK
+    bigint driving_licence_id FK
+    varchar previous_status
+    varchar new_status
+    bigint changed_by_user_id FK
+    timestamp changed_at
+  }
+  applications {
+    bigint application_id PK
+  }
+  citizens {
+    bigint citizen_id PK
+  }
+  rto_offices {
+    bigint office_id PK
+  }
+  users {
+    bigint user_id PK
+  }
+  applications ||--o{ driving_licences : "application_id"
+  citizens ||--o{ driving_licences : "citizen_id"
+  learner_licences |o--o{ driving_licences : "learner_licence_id"
+  rto_offices ||--o{ driving_licences : "office_id"
+  applications ||--o{ learner_licences : "application_id"
+  citizens ||--o{ learner_licences : "citizen_id"
+  rto_offices ||--o{ learner_licences : "office_id"
+  licence_classes ||--o{ licence_class_assignments : "licence_class_id"
+  driving_licences ||--o{ licence_class_assignments : "driving_licence_id"
+  driving_licences ||--o{ licence_status_history : "driving_licence_id"
+  users |o--o{ licence_status_history : "changed_by_user_id"

@@ -1,0 +1,53 @@
+---
+title: Violations and challans
+---
+erDiagram
+  violation_types {
+    bigint violation_type_id PK
+    varchar description UK
+    decimal base_fine_amount
+    tinyint is_cognizable
+  }
+  violations {
+    bigint violation_id PK
+    bigint vehicle_id FK
+    bigint driver_citizen_id FK
+    bigint violation_type_id FK
+    bigint officer_employee_id FK
+    varchar location
+    datetime occurred_at
+  }
+  challans {
+    bigint challan_id PK
+    varchar challan_number UK
+    decimal total_amount
+    enum status
+    datetime issued_at
+  }
+  challan_violations {
+    bigint challan_id PK, FK
+    bigint violation_id PK, FK
+  }
+  challan_status_history {
+    bigint history_id PK
+    bigint challan_id FK
+    varchar previous_status
+    varchar new_status
+    timestamp changed_at
+  }
+  citizens {
+    bigint citizen_id PK
+  }
+  employees {
+    bigint employee_id PK
+  }
+  vehicles {
+    bigint vehicle_id PK
+  }
+  challans ||--o{ challan_status_history : "challan_id"
+  challans ||--o{ challan_violations : "challan_id"
+  violations ||--o{ challan_violations : "violation_id"
+  citizens |o--o{ violations : "driver_citizen_id"
+  employees ||--o{ violations : "officer_employee_id"
+  violation_types ||--o{ violations : "violation_type_id"
+  vehicles ||--o{ violations : "vehicle_id"

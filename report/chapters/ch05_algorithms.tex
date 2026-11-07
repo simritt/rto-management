@@ -1,0 +1,280 @@
+\chapter{Algorithm Design and Data Structures}\label{ch:algo}
+
+\section{Identification of Critical Operations}
+Most of the system is straightforward reading and writing of rows. A few operations,
+however, decide whether the system is \emph{correct}, and they are where algorithm design
+matters. Table~\ref{tab:critical} lists them.
+
+\begin{table}[H]
+\centering\small
+\caption{Critical operations and what makes them critical}\label{tab:critical}
+\begin{tabularx}{\linewidth}{@{}p{0.9cm}p{4.2cm}X@{}}
+\toprule \textbf{ID} & \textbf{Operation} & \textbf{Why it is critical}\\ \midrule
+A1 & Resolve and check permissions on every request & Security decision made hundreds of times per minute; must be cheap and always current\\
+A2 & Book an appointment slot & Two users may compete for the last seat; overbooking is a visible failure\\
+A3 & Approve an ownership transfer & A vehicle must have exactly one current owner before and after\\
+A4 & Record a payment attempt & A retried request must not charge twice or lose a failed attempt\\
+A5 & Validate a status transition & Wrong moves (for example reopening a completed application) corrupt history\\
+A6 & Build a filtered, sorted, paged list & Used by every list screen; must be safe against injection and bounded in size\\
+A7 & Prevent a cycle in the region hierarchy & A region that is its own ancestor would break tree traversal\\
+A8 & Order the creation of 63 tables & A table cannot be created before the tables it references\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Algorithm Design}
+The algorithms are given in pseudocode that follows the structure of the implementation.
+Lines that start with \textsf{LOCK} correspond to \cmd{SELECT ... FOR UPDATE}.
+
+\subsection{A1: permission resolution and check}
+\begin{lstlisting}[language={},mathescape=false]
+resolveUser(userId):
+    user  <- select user by id; if none or inactive: 401
+    roles <- select role names via user_roles
+    perms <- SET of distinct permission keys via
+             user_roles JOIN role_permissions JOIN permissions
+    emp   <- active employee of user's person (if any)
+    return CurrentUser(user, roles, perms, emp, ...)
+
+check(handler, user):
+    if handler is @Public: allow
+    if user is none: 401
+    for key in @Requires(handler): if key not in user.perms: 403
+    if @RequiresAny(handler) and none of its keys in user.perms: 403
+    allow
+\end{lstlisting}
+The permission set is a hash set, so each membership test is $O(1)$. Loading it costs a
+few indexed joins per request; because it is read each time, a change to a role takes
+effect immediately.
+
+\subsection{A2: booking a slot}
+\begin{lstlisting}[language={},mathescape=false]
+book(application, slot):
+    LOCK application
+    LOCK slots in ascending id order        // TreeSet of ids
+    require slot.office == application.office
+    require slot start is in the future
+    n <- UPDATE slot SET booked = booked + 1
+         WHERE id = slot AND booked < capacity   // guarded update
+    if n == 0: 409 SLOT_FULL
+    token <- "S{slot}-{ (highest suffix among slot tokens) + 1 }"
+    insert appointment(BOOKED, token); insert audit row
+    queue notification (delivered after commit)
+\end{lstlisting}
+Three layers prevent overbooking. The lock serialises competing bookers; the guarded
+\cmd{UPDATE ... WHERE booked_count < capacity} is an atomic compare-and-set that refuses
+to increment past the capacity even if the lock were somehow missed; and the table's
+CHECK constraint (\cd{booked_count <= capacity}) is the last line of defence. The token
+is computed while the slot is locked, so two callers can never receive the same number.
+Figure~\ref{fig:flowbook} shows the flow.
+
+\fig{flow_booking.png}{Flowchart of slot booking}{fig:flowbook}{0.72}
+
+\subsection{A3: approving an ownership transfer}
+\begin{lstlisting}[language={},mathescape=false]
+approve(transferId, date):
+    LOCK transfer;  require status == PENDING
+    LOCK vehicle;   require status == ACTIVE
+    LOCK current ownership row (effective_to IS NULL)
+    require ownership.citizen == transfer.from_citizen
+    require transferee not blacklisted
+    require ownership.effective_from <= date <= today
+    ownership.effective_to <- date       // close the old row
+    FLUSH                                 // old row must reach the DB first
+    insert ownership(vehicle, to_citizen, effective_from = date)
+    transfer.status <- APPROVED; transfer.approved_at <- now
+    insert audit rows; queue notifications
+    COMMIT   (any failure above: ROLLBACK everything)
+\end{lstlisting}
+The explicit flush matters. The unique key on the generated column
+\cd{vehicle_ownerships.current_flag} allows one open row per vehicle, so the old row must be
+closed in the database \emph{before} the new open row is inserted; otherwise the insert would
+violate the key. A dedicated test (\texttt{aFailureMidApprovalRollsEverythingBack}) forces
+a failure after the first changes and checks that nothing remains. Figure~\ref{fig:flowtransfer}
+shows the flow.
+
+\fig{flow_transfer.png}{Flowchart of ownership-transfer approval}{fig:flowtransfer}{0.75}
+
+\subsection{A4: idempotent payment}
+\begin{lstlisting}[language={},mathescape=false]
+payTarget(type, id, reference, outcome):
+    prior <- attempt with this gateway reference          // indexed lookup
+    if prior exists:
+        if prior.payment is for the same (type, id): return it   // replay
+        else: 409 GATEWAY_REFERENCE_REUSED
+    LOCK target;  if a SUCCESS payment exists: 409 ALREADY_PAID
+    payment <- reuse open PENDING/FAILED payment or create one
+               (amount = amount due, never taken on trust)
+    LOCK payment
+    insert attempt(number = max + 1, reference, outcome)
+    SUCCESS -> payment SUCCESS, settle target (challan PAID ...)
+    FAILED  -> payment FAILED (retry allowed)
+    TIMEOUT -> payment stays PENDING (result unknown)
+\end{lstlisting}
+The gateway reference acts as an \emph{idempotency key}: the same reference always yields
+the same result, and the replay is answered \emph{before} the target is validated, because
+the item may legitimately be paid by now. The \cd{idx_attempt_gateway_ref} index keeps this
+lookup fast (Chapter~\ref{ch:perf}). A timeout deliberately does not mark the payment failed:
+the gateway outcome is unknown, so the payment stays pending and can be reconciled.
+Figure~\ref{fig:flowpay} shows the flow.
+
+\fig{flow_payment.png}{Flowchart of an idempotent payment}{fig:flowpay}{0.75}
+
+\subsection{A5: status transition validation}
+Each workflow has a table of legal moves, a map from a status to the set of statuses
+that may follow it. A move is accepted only if the target is in the set of the current
+status, and some targets additionally require a permission and a reason.
+\begin{lstlisting}[language={},mathescape=false]
+TRANSITIONS = { SUBMITTED: {DOCS_PENDING, UNDER_VERIFICATION, REJECTED, CANCELLED},
+                ... , APPROVED: {COMPLETED}, REJECTED: {}, COMPLETED: {}, CANCELLED: {} }
+
+applyStatus(app, next, reason):
+    if next not in TRANSITIONS[app.status]: 409 INVALID_TRANSITION
+    if next in {REJECTED, CANCELLED, DOCS_PENDING} and reason is empty: reject (validation error)
+    require permission PERMISSION_FOR_TARGET[next]
+    append history row(prev, next, user, reason); app.status <- next
+\end{lstlisting}
+
+\subsection{A6: filtered, sorted, paged lists}
+A small query builder appends a condition only when its value is present, binds every value
+as a parameter, escapes the characters \texttt{\%} and \texttt{\_} in search text, and
+accepts a sort key only if it is in a whitelist. A list request runs a \texttt{COUNT} over
+the filtered query and then one bounded page (at most 100 rows), and returns the items with
+the page number, page size, total and page count.
+
+\subsection{A7: region hierarchy}
+Regions form a tree through \cd{parent_region_id}. Before a parent is assigned, the
+service walks up the parent chain from the proposed parent; if it meets the region
+itself, the change is refused with \cd{REGION_CYCLE}. The region tree for display is built in
+one pass: every region becomes a node in a hash map by id, and each node with a parent is
+appended to its parent's list of children.
+
+\subsection{A8: dependency-ordered schema creation}
+Treat the 63 tables as vertices and each foreign key as a directed edge from the
+referencing table to the referenced table. A table can be created only after all the tables
+it points to, so a valid creation order is a topological order of this directed acyclic
+graph. We computed the longest-path level of every table and checked that the order used
+by the scripts respects every edge. There are $V=63$ vertices and $E=90$ edges once the
+single self-reference (\cd{regions}) is set aside, and the levels run from 0 to 6
+(Table~\ref{tab:levels}). Topological ordering and level computation take $O(V+E)$ time,
+which here is 153 elementary steps; the check found no edge pointing backwards.
+
+\begin{table}[H]
+\centering\small
+\caption{Dependency depth of the 63 tables}\label{tab:levels}
+\begin{tabularx}{\linewidth}{@{}cp{1.6cm}X@{}}
+\toprule \textbf{Level} & \textbf{Tables} & \textbf{Examples}\\ \midrule
+0 & 18 & document\_types, fuel\_types, departments, designations, challans, audit\_logs\\
+1 & 12 & citizens, employees, addresses, fee\_structures, notifications\\
+2 & 11 & applicants, appeals, complaints, counters, driving\_schools, employee\_postings\\
+3 & 9 & applications, appointment\_slots, driving\_instructors, insurance\_policies\\
+4 & 9 & documents, appointments, driving\_tests, fitness\_certificates, challan\_violations\\
+5 & 2 & driving\_licences, permit\_status\_history\\
+6 & 2 & licence\_class\_assignments, licence\_status\_history\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Flowcharts}
+The flowcharts of the three transactional algorithms are Figures~\ref{fig:flowbook},
+\ref{fig:flowtransfer} and~\ref{fig:flowpay}; the permission decision is
+Figure~\ref{fig:perm}; the request life cycle is Figure~\ref{fig:request}.
+
+\section{Data Structure Selection}
+Table~\ref{tab:ds} lists the data structures that matter and why each was chosen.
+
+\begin{table}[H]
+\centering\small
+\caption{Data structures and where they are used}\label{tab:ds}
+\begin{tabularx}{\linewidth}{@{}p{3.1cm}p{4.3cm}X@{}}
+\toprule \textbf{Structure} & \textbf{Used for} & \textbf{Reason}\\ \midrule
+Hash map of sets & Status transition tables for applications, licences, permits, vehicles, challans, complaints and appeals & Constant-time lookup of the allowed next states\\
+Hash set & A user's permission keys; redacted audit keys; allowed file extensions & Constant-time membership tests\\
+Sorted set (tree set) & Slot ids to lock, so that locks are always taken in ascending order & Gives a canonical order and removes duplicates in $O(s\log s)$\\
+Concurrent hash map & Revoked token ids with their expiry times & Safe for many threads; expired entries are purged when a new one is added\\
+Insertion-ordered map & Audit values and JSON bodies & Keeps field order stable in the log\\
+Tree (adjacency by parent id) & Region hierarchy & Natural for ``belongs to'' with unlimited depth\\
+Directed acyclic graph & Foreign-key dependencies & Defines a valid table creation order\\
+B$^+$-tree index (InnoDB) & Every primary, unique and secondary key & $O(\log n)$ point and range lookups\\
+Table used as a queue & Notifications: QUEUED then SENT or FAILED & Durable before delivery is attempted; survives a restart\\
+List & Result pages, sorted permission lists, collected rows & Simple ordered collections\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Algorithm Selection and Justification}
+\paragraph{Pessimistic locking over optimistic versioning.} The contested rows (the last
+seat of a slot, the single current owner, the payment of one challan) are exactly the
+rows where conflicts are likely. Optimistic locking would let both writers do the work
+and make one of them retry, which is wasteful for hot rows. A short row lock is cheaper
+and keeps the code simple. The cost is that competing writers wait, which is acceptable
+for office-scale traffic.
+
+\paragraph{Ordered locking against deadlock.} A deadlock needs a cycle in the
+``waits-for'' relation between transactions. If every transaction acquires locks of the
+same kind in a single global order, such a cycle is impossible, because a transaction
+waiting for a lock of higher rank can never be waited for by the holder of that lock
+unless it also held a lock of higher rank. The implementation fixes the order inside each
+operation family: application, then appointment, then slots in ascending id; transfer,
+then vehicle, then ownership row; target, then payment. When two slots are involved, as in
+a reschedule, the ids are sorted first. The database can still detect a rare deadlock and
+abort one victim; the error mapper turns that into a ``please retry'' response.
+
+\paragraph{Guarded update over read-modify-write.} Reading \texttt{booked\_count},
+adding one in Java and writing it back is a race. Putting the condition in the
+\texttt{WHERE} clause makes the check and the change a single atomic statement.
+
+\paragraph{Idempotency key over de-duplication by time.} Rejecting a ``similar payment a few
+seconds ago'' would be a guess. A unique reference supplied by the caller gives an exact
+rule.
+
+\paragraph{Offset paging.} Lists use \texttt{LIMIT}/\texttt{OFFSET} because office lists are
+short and users jump to arbitrary pages. For very large tables, key-set paging would be
+faster; this is discussed in Section~\ref{sec:opt}.
+
+\section{Time Complexity Analysis}
+Let $n$ be the number of rows in a table, $k$ the number of rows matched by a query, $p$
+the page size, $s$ the number of slots locked together, $b$ the number of bookings in one
+slot and $d$ the depth of the region tree.
+
+\begin{table}[H]
+\centering\small
+\caption{Time complexity of the critical operations}\label{tab:time}
+\begin{tabularx}{\linewidth}{@{}p{4.3cm}p{2.9cm}X@{}}
+\toprule \textbf{Operation} & \textbf{Cost} & \textbf{Explanation}\\ \midrule
+Permission membership test & $O(1)$ expected & Hash set lookup\\
+Load a user's permissions & $O(\log n + k)$ per query & Indexed joins over the user's role and permission rows\\
+Status transition check & $O(1)$ expected & Map lookup, then set membership\\
+Lock one row by key & $O(\log n)$ & Primary-key index descent\\
+Slot booking & $O(s\log s + s\log n + b)$ & Sort ids, lock $s$ rows, guarded update, scan the slot's $b$ tokens for the next number\\
+Ownership approval & $O(\log n)$ & A constant number of indexed lookups and writes\\
+Payment replay lookup & $O(\log n)$ with the index; $O(n)$ without & Lookup by gateway reference\\
+Paged list & $O(\log n + p)$ to return a page; offset adds $O(\text{offset})$ & Count plus bounded page\\
+Region cycle check & $O(d)$ queries & Walk up the chain\\
+Region tree build & $O(n)$ & One pass with a hash map\\
+Schema ordering and check & $O(V+E)$ & Topological order of the foreign-key graph\\
+\bottomrule
+\end{tabularx}
+\end{table}
+The difference between $O(n)$ and $O(\log n)$ for the payment lookup is not only
+theoretical: on 500\,000 rows, the lookup took 405.9~ms as a full scan and 1.4~ms through
+the index (Section~\ref{sec:indexres}).
+
+\section{Space Complexity Analysis}
+The algorithms need little extra memory. A permission set holds at most 62 strings per
+request. Locking $s$ slots keeps $s$ entities in memory, $O(s)$. A page holds at most $p\le
+100$ rows. The region tree holds $O(n)$ nodes for $n$ regions. The revoked-token map holds one
+entry per revoked token until its expiry, so its size is proportional to the number of
+sign-outs and refreshes within one token lifetime. The topological check needs $O(V+E)$
+space for the adjacency data. Persistent storage grows with the number of records and is
+governed by the database.
+
+\section{Optimization Opportunities}\label{sec:opt}
+\begin{itemize}
+\item \textbf{Key-set paging.} For tables with millions of rows, replace the offset by a ``rows after this key'' condition so that deep pages cost $O(\log n + p)$.
+\item \textbf{Cache permissions briefly.} A per-user cache with a short lifetime would remove the two permission queries per request, at the price of a small delay before a role change takes effect; we chose freshness over speed.
+\item \textbf{Token sequence per slot.} The next token number is found by scanning the slot's tokens; a counter column on the slot would make it $O(1)$.
+\item \textbf{Shared revocation store.} Replace the in-memory revoked-token map by a shared store before running several backend instances.
+\item \textbf{Batch notification delivery.} Deliver queued messages in batches by a scheduled job instead of one transaction per message when volume grows.
+\item \textbf{Measure first.} Each of these should be justified by a measurement; the performance chapter shows where the time actually goes.
+\end{itemize}

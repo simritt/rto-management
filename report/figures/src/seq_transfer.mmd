@@ -1,0 +1,23 @@
+sequenceDiagram
+  autonumber
+  actor O as RTO officer
+  participant P as Portal
+  participant S as OwnershipService
+  participant DB as MySQL (1 transaction)
+  participant N as Notifications
+  O->>P: approve transfer
+  P->>S: POST /ownership-transfers/{id}/approve
+  Note over S: AuthInterceptor requires<br/>vehicle.transfer_approve
+  S->>DB: lock transfer row (FOR UPDATE)
+  S->>DB: lock vehicle row (FOR UPDATE)
+  S->>DB: lock current ownership row (FOR UPDATE)
+  Note over S: transfer PENDING, vehicle ACTIVE,<br/>from-citizen is still owner,<br/>transferee not blacklisted, date valid
+  S->>DB: close old ownership (effective_to)
+  S->>DB: flush (frees unique slot)
+  S->>DB: insert new ownership
+  S->>DB: transfer status = APPROVED
+  S->>DB: insert 2 audit_logs rows
+  S->>N: queue 2 notifications
+  DB-->>S: COMMIT
+  N->>DB: after commit: QUEUED rows,<br/>then SENT or FAILED
+  S-->>P: 200 JSON

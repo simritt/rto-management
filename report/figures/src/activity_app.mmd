@@ -1,0 +1,26 @@
+flowchart TD
+  s(["Start"]) --> a1["Clerk registers citizen or applicant<br/>(or citizen signs in)"]
+  a1 --> a2["Create application:<br/>service, office, fee computed"]
+  a2 --> st1["Status SUBMITTED"]
+  st1 --> a3{"Required documents<br/>uploaded and valid?"}
+  a3 -- no --> st2["DOCS_PENDING<br/>(reason mandatory)"]
+  st2 --> a4["Citizen uploads or re-uploads document"]
+  a4 --> a3
+  a3 -- yes --> st3["UNDER_VERIFICATION"]
+  st3 --> a5{"Documents verified<br/>by staff?"}
+  a5 -- rejected --> st2
+  a5 -- yes --> a6{"Appointment<br/>needed?"}
+  a6 -- yes --> st4["APPOINTMENT_SCHEDULED<br/>(slot row locked, seat taken)"]
+  a6 -- no --> st5
+  st4 --> st5["AWAITING_PAYMENT"]
+  st5 --> a7{"Payment recorded<br/>as SUCCESS?"}
+  a7 -- no --> st5
+  a7 -- yes --> a8{"Officer decision"}
+  a8 -- approve --> st6["APPROVED"]
+  a8 -- reject --> r["REJECTED<br/>(reason mandatory)"]
+  st6 --> st7["COMPLETED<br/>(licence, certificate or transfer issued)"]
+  st1 -. "cancel" .-> c["CANCELLED"]
+  st3 -. "cancel" .-> c
+  st7 --> e(["End"])
+  r --> e
+  c --> e

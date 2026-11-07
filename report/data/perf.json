@@ -1,0 +1,76 @@
+{
+ "login_avg_ms": 445.3,
+ "login_max_ms": 482.6,
+ "levels": [
+  {
+   "users": 1,
+   "requests": 60,
+   "errors": 0,
+   "wall_s": 1.36,
+   "throughput_rps": 44.2,
+   "avg_ms": 22.6,
+   "p50_ms": 18.9,
+   "p95_ms": 49.9,
+   "max_ms": 72.7
+  },
+  {
+   "users": 5,
+   "requests": 300,
+   "errors": 0,
+   "wall_s": 1.62,
+   "throughput_rps": 185.5,
+   "avg_ms": 26.6,
+   "p50_ms": 20.4,
+   "p95_ms": 55.9,
+   "max_ms": 142.2
+  },
+  {
+   "users": 10,
+   "requests": 600,
+   "errors": 0,
+   "wall_s": 1.81,
+   "throughput_rps": 331.3,
+   "avg_ms": 28.5,
+   "p50_ms": 22.2,
+   "p95_ms": 62.0,
+   "max_ms": 132.4
+  },
+  {
+   "users": 20,
+   "requests": 1200,
+   "errors": 0,
+   "wall_s": 3.16,
+   "throughput_rps": 380.3,
+   "avg_ms": 46.2,
+   "p50_ms": 26.6,
+   "p95_ms": 158.0,
+   "max_ms": 590.9
+  }
+ ],
+ "endpoints": {
+  "/api/v1/dashboard/summary": {
+   "avg_ms": 21.5,
+   "p95_ms": 24.6
+  },
+  "/api/v1/citizens?page_size=15": {
+   "avg_ms": 12.4,
+   "p95_ms": 18.7
+  },
+  "/api/v1/vehicles?page_size=15": {
+   "avg_ms": 33.4,
+   "p95_ms": 37.4
+  },
+  "/api/v1/applications?page_size=15": {
+   "avg_ms": 10.3,
+   "p95_ms": 12.7
+  },
+  "/api/v1/challans?page_size=15": {
+   "avg_ms": 9.9,
+   "p95_ms": 11.8
+  },
+  "/api/v1/payments?page_size=15": {
+   "avg_ms": 21.8,
+   "p95_ms": 28.0
+  }
+ }
+}

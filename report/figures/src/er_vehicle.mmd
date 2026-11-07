@@ -1,0 +1,75 @@
+---
+title: Vehicles and ownership
+---
+erDiagram
+  vehicle_manufacturers {
+    bigint manufacturer_id PK
+    varchar name UK
+  }
+  vehicle_models {
+    bigint model_id PK
+    bigint manufacturer_id FK
+    varchar model_name
+  }
+  vehicle_types {
+    bigint vehicle_type_id PK
+    varchar type_name UK
+    tinyint is_commercial
+  }
+  fuel_types {
+    bigint fuel_type_id PK
+    varchar fuel_name UK
+  }
+  vehicles {
+    bigint vehicle_id PK
+    varchar registration_number UK
+    varchar chassis_number UK
+    varchar engine_number UK
+    bigint manufacturer_id FK
+    bigint model_id FK
+    bigint vehicle_type_id FK
+    bigint fuel_type_id FK
+    year manufacture_year
+    varchar color
+    bigint registering_office_id FK
+    date registration_date
+  }
+  vehicle_ownerships {
+    bigint ownership_id PK
+    bigint vehicle_id FK
+    bigint citizen_id FK
+    date effective_from
+    date effective_to
+    tinyint current_flag
+  }
+  ownership_transfers {
+    bigint transfer_id PK
+    bigint vehicle_id FK
+    bigint from_citizen_id FK
+    bigint to_citizen_id FK
+    bigint application_id FK
+    datetime requested_at
+    datetime approved_at
+    enum status
+  }
+  applications {
+    bigint application_id PK
+  }
+  citizens {
+    bigint citizen_id PK
+  }
+  rto_offices {
+    bigint office_id PK
+  }
+  applications ||--o{ ownership_transfers : "application_id"
+  citizens ||--o{ ownership_transfers : "from_citizen_id"
+  citizens ||--o{ ownership_transfers : "to_citizen_id"
+  vehicles ||--o{ ownership_transfers : "vehicle_id"
+  vehicle_manufacturers ||--o{ vehicle_models : "manufacturer_id"
+  citizens ||--o{ vehicle_ownerships : "citizen_id"
+  vehicles ||--o{ vehicle_ownerships : "vehicle_id"
+  fuel_types ||--o{ vehicles : "fuel_type_id"
+  vehicle_manufacturers ||--o{ vehicles : "manufacturer_id"
+  vehicle_models ||--o{ vehicles : "model_id"
+  rto_offices ||--o{ vehicles : "registering_office_id"
+  vehicle_types ||--o{ vehicles : "vehicle_type_id"

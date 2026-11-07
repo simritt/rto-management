@@ -1,0 +1,298 @@
+\chapter{Testing and Validation}\label{ch:test}
+
+\section{Testing Strategy}
+Testing was planned at five levels, from the smallest unit to the whole system.
+\begin{enumerate}
+\item \textbf{Schema audit.} Checks that the Java mapping and the SQL scripts describe the same database.
+\item \textbf{Integration tests} (185 tests in 15 classes). Each test starts the real backend against a real MySQL database and calls the API over HTTP.
+\item \textbf{Concurrency tests.} A subset of the integration tests starts several threads together and checks the data afterwards.
+\item \textbf{SQL tests.} A script that checks the database enhancements (views, triggers, procedures, indexes, constraints) and the analytical queries.
+\item \textbf{System-level checks.} A crawl of the web portal as two different users, a load test and the index experiment.
+\end{enumerate}
+We deliberately tested against a \emph{real} MySQL server and not an in-memory substitute, because
+the rules we care about (generated columns, unique keys, CHECK constraints, locking)
+behave exactly as the real engine does, not as a stand-in does. All results in this
+chapter come from runs on 3 November 2026 on the machine of Table~\ref{tab:env}.
+
+\section{Unit and Integration Testing}\label{sec:unit}
+The integration suite creates a test database from the unmodified schema scripts before
+the first test, so any mismatch between a script and the Java mapping fails the build.
+The suite ran with \textbf{185 tests, 0 failures, 0 errors and 0 skipped, in 4 minutes and
+45 seconds}. The error messages printed in its log (duplicate keys, a failed check
+constraint, a foreign-key refusal) are the database rejecting the invalid data that the
+tests send on purpose. Table~\ref{tab:testclasses} lists the classes.
+
+\begin{table}[H]
+\centering\small
+\caption{Integration tests by class (all passed)}\label{tab:testclasses}
+\begin{tabularx}{\linewidth}{@{}p{4.2cm}cX@{}}
+\toprule \textbf{Test class} & \textbf{Tests} & \textbf{What it covers}\\ \midrule
+Application\allowbreak{}Tests & 17 & Creation, validation, own-records rule, legal and illegal transitions, reasons, permissions per target status, verified-document and payment gates, concurrent status changes\\
+Auth\allowbreak{}Tests & 13 & Login, indistinguishable failures, inactive users, tampered and expired tokens, refresh rotation, logout revocation, hashing, health and CORS\\
+Citizen\allowbreak{}Tests & 9 & Creation with address, duplicates, validation, hidden national ID, search and paging, address history, blacklist with reason\\
+Compliance\allowbreak{}Permit\allowbreak{}Tests & 15 & Inspections, fitness, pollution, insurance, road tax, expiry queries, routes, permits and their workflow\\
+Document\allowbreak{}Appointment\allowbreak{}Tests & 18 & Upload validation, verify and reject, expiry, slot rules, booking, full slots, concurrent bookings, cancel and reschedule\\
+Licence\allowbreak{}Tests & 14 & Learner licences, driving licences with classes, suspend, revoke, reinstate, renew, tests, schools\\
+Office\allowbreak{}Employee\allowbreak{}Tests & 8 & Offices, counters, employees, postings and their history\\
+Ownership\allowbreak{}Rollback\allowbreak{}Tests & 1 & Failure in the middle of a transfer approval rolls everything back\\
+Payment\allowbreak{}Tests & 22 & Payments, replay, reference reuse, retries, refunds, fees, concurrent success and concurrent refunds\\
+Rbac\allowbreak{}Tests & 11 & 401 against 403, multi-role permissions, role and user administration, immediate effect of role changes\\
+Reference\allowbreak{}Tests & 7 & Region tree and cycles, unique codes, exact decimals, permissions on lookups\\
+Schema\allowbreak{}Audit\allowbreak{}Tests & 6 & Schema against mapping (Section~\ref{sec:schemaaudit})\\
+Support\allowbreak{}Tests & 17 & Complaints, appeals and their effects, notifications, audit log, dashboard\\
+Vehicle\allowbreak{}Tests & 18 & Vehicle creation and rules, status, ownership, transfers, concurrent approvals\\
+Violation\allowbreak{}Challan\allowbreak{}Tests & 9 & Violations, exact challan totals, workflow, cancellation\\
+\midrule
+\textbf{Total} & \textbf{185} & \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Schema audit}\label{sec:schemaaudit}
+\texttt{SchemaAuditTests} compares the schema scripts with the live database and the Java
+mapping: there are exactly 63 entities and 63 tables; every table and column is mapped;
+the nullability of non-key columns matches; every foreign key written in the SQL files
+exists in the database; the named CHECK constraints and the three generated-column guards
+exist; and every entity carries a table annotation.
+
+\subsection{Referential integrity of the demonstration data}
+Separately from the Java suite, we audited the data loaded in the demonstration database. For
+each of the 91 foreign keys we counted child rows whose parent does not exist. The first
+run found two foreign keys with orphans (four rows); after the correction described in
+Section~\ref{sec:defects} the count is \textbf{zero for all 91}.
+
+\subsection{Role-based access tests}\label{sec:rbactest}
+\texttt{RbacTests} check that a missing token gives 401 and a missing permission gives 403;
+that permissions combine across several roles; that the administrator role holds every
+seeded permission; that role and user administration is audited without leaking a
+password; that weak passwords and duplicates are refused; and that assigning a role
+changes the user's effective permissions immediately.
+
+\section{Integration Testing}
+Integration is exercised throughout, because the tests call the real HTTP API, which in
+turn uses the real services, entities and database. Examples of cross-module behaviour
+that is covered: approving an application requires verified documents and, when a fee is
+due, a successful payment; paying a challan marks it paid and appends its history; an
+upheld appeal cancels a challan, reopens an application or reinstates a licence; a
+cancelled challan releases its violations; and a failing notification provider never
+breaks the business operation.
+
+\section{Functional Testing}
+Table~\ref{tab:fr} maps each functional requirement to the test class that verifies it.
+All 24 are covered; FR-22 and FR-23 are additionally covered by the portal crawl, and
+FR-24 (the set-up commands) was verified by running them, as described in
+Section~\ref{sec:envsetup}.
+
+\section{Non-Functional Testing}
+\textbf{Performance} is reported in Chapter~\ref{ch:perf}. \textbf{Security} was checked by the
+authentication and permission tests, by the token tests (tampered, expired, wrong type,
+trailing junk), by the portal crawl (anonymous access, a citizen account on administrator
+pages) and by an injection probe (Section~\ref{sec:crawl}). \textbf{Usability} was checked by
+reading every page for clear messages and by checking that form errors appear next to the
+field; we did not run a user study.
+
+\section{Boundary and Invalid-Input Testing}\label{sec:crawl}
+\subsection{Method}
+We wrote a crawler that signs in through the portal's login form and then follows every
+link reachable from the dashboard. For every list page it also requests a set of awkward
+addresses, and it posts invalid forms. It treats a response as a failure if the status is
+not one of the expected ones or if the page contains the text of an exception or a Spring
+or Thymeleaf class name. It was run twice, once as the administrator and once as a citizen
+account (\texttt{aarav.mehta}) that holds only nine permissions.
+
+\textbf{Edge cases tried on each list page:} page number 0, $-3$, \texttt{abc},
+99\,999 and 2\,147\,483\,648; a 300-character search; searches containing quotes, \texttt{\%}
+and a script tag; an unknown status filter; and identifiers that do not exist, are zero,
+negative or non-numeric. \textbf{Forms posted:} every create form with no data; a citizen
+form with an impossible date of birth, a too-short national ID and a letter in the phone
+number; a duplicate national ID; and a first name containing HTML, to see whether the page
+echoes it back unescaped. \textbf{Access:} the same pages with no session, and a citizen
+on administrator pages.
+
+\subsection{Results}
+\begin{table}[H]
+\centering\small
+\caption{Portal crawl results}\label{tab:crawl}
+\begin{tabularx}{\linewidth}{@{}p{4.3cm}cccX@{}}
+\toprule \textbf{Run} & \textbf{Pages} & \textbf{Requests} & \textbf{Problems} & \textbf{Notes}\\ \midrule
+Administrator, before fixes & 338 & 819 & 125 & 121 server errors from one defect; missing-record, bad-page and over-long-search cases returned 500\\
+Administrator, after fixes & 335 & 816 & 4 & All four are 405 responses for pages that accept only a form post (correct); no server errors\\
+Citizen, after fixes & 15 & 496 & 4 & The same four 405 responses; administrator pages show a 403 page\\
+\bottomrule
+\end{tabularx}
+\end{table}
+After the fixes there were no 5xx responses in either run, no exception text in any page,
+and no echo of the HTML first name (the injection probe was escaped by Thymeleaf). A
+signed-out browser was redirected to the sign-in page for every address tried. A
+citizen opening an administrator address received a clear 403 page and no data. The
+citizen's sidebar had five entries against 27 for the administrator
+(Figure~\ref{fig:citizenmenu}).
+
+\section{Concurrency and Stress Testing}\label{sec:conc}
+Five integration tests start several threads at the same instant (a latch releases them
+together) and check the database afterwards. Table~\ref{tab:conc} lists them; all passed.
+
+\begin{table}[H]
+\centering\small
+\caption{Concurrency tests}\label{tab:conc}
+\begin{tabularx}{\linewidth}{@{}p{4.9cm}XX@{}}
+\toprule \textbf{Test} & \textbf{Competing action} & \textbf{Checked afterwards}\\ \midrule
+concurrent\allowbreak{}Bookings\allowbreak{}Never\allowbreak{}Overbook & Several users book the same slot at once & The booked count never exceeds the capacity\\
+concurrent\allowbreak{}Approvals\allowbreak{}Leave\allowbreak{}Exactly\allowbreak{}One\allowbreak{}Current\allowbreak{}Owner & Several approvals of the same ownership transfer & Exactly one current owner row for the vehicle\\
+concurrent\allowbreak{}Success\allowbreak{}Attempts\allowbreak{}Settle\allowbreak{}Exactly\allowbreak{}Once & Several success attempts for one payment & The payment and its target are settled once\\
+concurrent\allowbreak{}Refunds\allowbreak{}Never\allowbreak{}Exceed\allowbreak{}The\allowbreak{}Payment & Several refunds of one payment & Total refunded never exceeds the amount paid\\
+concurrent\allowbreak{}Status\allowbreak{}Changes\allowbreak{}Only\allowbreak{}One\allowbreak{}Wins & Several status changes of one application at once & One change succeeds; the others get a conflict\\
+\bottomrule
+\end{tabularx}
+\end{table}
+One further test, \texttt{aFailureMidApprovalRollsEverythingBack}, forces a failure part way
+through an ownership approval and verifies that the old ownership row, the new row and the
+transfer status are all unchanged.
+
+A stress test beyond 20 concurrent users was not run, and the database-level locking
+examples in the SQL folder were reviewed but not run against a live second session.
+
+\section{SQL Test Suite}\label{sec:sqltests}
+The repository contains a SQL script of 444 lines that checks the database enhancements.
+We built a scratch database from the scripts in the documented order, loaded the small seed
+and ran the script. Because the script contains deliberate error cases, it only runs to
+the end when fed to the client in ``continue on error'' mode.
+
+It recorded \textbf{42 checks: 39 passed and 3 failed}. Table~\ref{tab:sqlsuite} shows
+the breakdown, and the notes explain the three ``failures'' honestly.
+
+\begin{table}[H]
+\centering\small
+\caption{SQL test suite results (scratch database, small seed)}\label{tab:sqlsuite}
+\begin{tabularx}{\linewidth}{@{}p{3.3cm}ccX@{}}
+\toprule \textbf{Category} & \textbf{Checks} & \textbf{Passed} & \textbf{What was checked}\\ \midrule
+Views exist and return rows & 11 & 11 & All six views exist; five return rows with the seed\\
+Triggers exist & 6 & 6 & All five triggers by name\\
+Triggers fire & 3 & 3 & Licence history row added on status change; active vehicle cannot be deleted; road tax becomes OVERDUE\\
+Procedures exist and run & 8 & 8 & Three procedures exist; the overdue sweep runs; an ownership transfer inserts the new owner, closes the old row and marks the transfer approved\\
+Indexes & 3 & 3 & Gateway-reference, licence-expiry and road-tax indexes exist\\
+Seed counts & 5 & 5 & 10 citizens, 10 applications, 5 vehicles, 4 challans, 5 payments\\
+Advanced SQL & 3 & 3 & CTE, window RANK and LAG run (SLA-breached applications: 4)\\
+Schema & 1 & 0 & Expects 33 base tables\\
+Constraints & 2 & 0 & Bad phone and negative challan amount\\
+\midrule
+\textbf{Total} & \textbf{42} & \textbf{39} & \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{The three failures.}
+(1) The schema check expects \emph{33} base tables, a number from an earlier version; the
+database now has 63, so this check is stale and the schema itself is correct. (2) and (3)
+The two constraint checks insert invalid data and then set a flag if the insert
+succeeds. In continue-on-error mode the flag-setting statement still runs after the failed
+insert, so the check reports a failure \emph{even though the server rejected the insert}:
+the client's error output shows \texttt{Check constraint 'chk\_person\_phone\_format' is
+violated} and \texttt{Check constraint 'chk\_challan\_amount\_positive' is violated}. In
+other words the database behaved correctly and the test script is what needs repair
+(Section~\ref{sec:defects}).
+
+\paragraph{Advanced queries.} The ten analytical queries (joins, a self-join, grouping
+with a condition, two CTEs, and window functions \texttt{RANK}, \texttt{DENSE\_RANK},
+\texttt{ROW\_NUMBER} and \texttt{LAG}) all ran and returned sensible results. For
+example, the CTE query listed four applications that had exceeded their service-level
+days, the longest by 37 days, and the \texttt{LAG} query reported the hours each
+application had spent in its previous status.
+
+\section{Test Case Specification}
+Table~\ref{tab:tc} lists representative test cases with the real test that implements each
+and its result. Every case passed.
+
+\begingroup\footnotesize
+\begin{longtable}{@{}p{1.0cm}p{1.2cm}p{4.9cm}p{5.6cm}p{1.1cm}@{}}
+\caption{Representative test cases and their results}\label{tab:tc}\\
+\toprule \textbf{ID} & \textbf{Req.} & \textbf{Scenario} & \textbf{Implemented by} & \textbf{Result}\\ \midrule \endfirsthead
+\toprule \textbf{ID} & \textbf{Req.} & \textbf{Scenario} & \textbf{Implemented by} & \textbf{Result}\\ \midrule \endhead
+\bottomrule \endlastfoot
+TC-01 & FR-01 & Valid sign-in returns tokens and records the last login & Auth\allowbreak{}Tests.login\allowbreak{}Returns\allowbreak{}Tokens\allowbreak{}And\allowbreak{}Records\allowbreak{}Last\allowbreak{}Login & Pass\\
+TC-02 & FR-01 & Unknown user and wrong password give the same answer & Auth\allowbreak{}Tests.invalid\allowbreak{}Password\allowbreak{}And\allowbreak{}Unknown\allowbreak{}User\allowbreak{}Are\allowbreak{}Indistinguishable & Pass\\
+TC-03 & FR-01 & Tampered and expired tokens are rejected & Auth\allowbreak{}Tests.tampered\allowbreak{}And\allowbreak{}Expired\allowbreak{}Tokens\allowbreak{}Are\allowbreak{}Rejected & Pass\\
+TC-04 & FR-01 & A refresh token cannot be used as an access token & Auth\allowbreak{}Tests.refresh\allowbreak{}Token\allowbreak{}Cannot\allowbreak{}Be\allowbreak{}Used\allowbreak{}As\allowbreak{}An\allowbreak{}Access\allowbreak{}Token & Pass\\
+TC-05 & FR-02 & No token gives 401; no permission gives 403 & Rbac\allowbreak{}Tests.unauthenticated\allowbreak{}Is401\allowbreak{}And\allowbreak{}Unauthorised\allowbreak{}Is403 & Pass\\
+TC-06 & FR-02 & Role change takes effect immediately & Rbac\allowbreak{}Tests.assigning\allowbreak{}Roles\allowbreak{}Changes\allowbreak{}Effective\allowbreak{}Permissions\allowbreak{}Immediately & Pass\\
+TC-07 & FR-04 & Duplicate national ID is refused & Citizen\allowbreak{}Tests.duplicate\allowbreak{}National\allowbreak{}Id\allowbreak{}And\allowbreak{}Code\allowbreak{}Conflict & Pass\\
+TC-08 & FR-04 & National ID hidden from lists and unprivileged users & Citizen\allowbreak{}Tests.national\allowbreak{}Id\allowbreak{}Hidden\allowbreak{}From\allowbreak{}Lists\allowbreak{}And\allowbreak{}Unprivileged\allowbreak{}Users & Pass\\
+TC-09 & FR-06 & Database rejects a second current posting & Office\allowbreak{}Employee\allowbreak{}Tests.database\allowbreak{}Rejects\allowbreak{}ASecond\allowbreak{}Current\allowbreak{}Posting & Pass\\
+TC-10 & FR-07 & A region cannot become its own ancestor & Reference\allowbreak{}Tests.regions\allowbreak{}Hierarchy\allowbreak{}Any\allowbreak{}Depth\allowbreak{}And\allowbreak{}Cycle\allowbreak{}Prevention & Pass\\
+TC-11 & FR-08 & Illegal status moves return 409 and change nothing & Application\allowbreak{}Tests.invalid\allowbreak{}Transitions\allowbreak{}Are409\allowbreak{}And\allowbreak{}Change\allowbreak{}Nothing & Pass\\
+TC-12 & FR-08 & Approval needs verified documents and payment & Application\allowbreak{}Tests.verification\allowbreak{}Requires\allowbreak{}Verified\allowbreak{}Documents and approvalRequiresPaymentWhenFeeDue & Pass\\
+TC-13 & FR-09 & Upload validation by type, content and size & Document\allowbreak{}Appointment\allowbreak{}Tests.upload\allowbreak{}Validation & Pass\\
+TC-14 & FR-10 & A full slot returns 409 and the count never exceeds capacity & Document\allowbreak{}Appointment\allowbreak{}Tests.full\allowbreak{}Slot\allowbreak{}Returns409\allowbreak{}And\allowbreak{}Booked\allowbreak{}Count\allowbreak{}Never\allowbreak{}Exceeds\allowbreak{}Capacity & Pass\\
+TC-15 & FR-10 & The database CHECK is the last defence & Document\allowbreak{}Appointment\allowbreak{}Tests.database\allowbreak{}Check\allowbreak{}Constraint\allowbreak{}Is\allowbreak{}The\allowbreak{}Last\allowbreak{}Defence & Pass\\
+TC-16 & FR-11 & Only one active learner licence per citizen & Licence\allowbreak{}Tests.only\allowbreak{}One\allowbreak{}Active\allowbreak{}Learner\allowbreak{}Per\allowbreak{}Citizen & Pass\\
+TC-17 & FR-13 & Database rejects two current owners & Vehicle\allowbreak{}Tests.database\allowbreak{}Rejects\allowbreak{}Two\allowbreak{}Current\allowbreak{}Owners & Pass\\
+TC-18 & FR-13 & Approval closes the old row, opens the new and keeps history & Vehicle\allowbreak{}Tests.transfer\allowbreak{}Approval\allowbreak{}Closes\allowbreak{}Old\allowbreak{}Opens\allowbreak{}New\allowbreak{}And\allowbreak{}Keeps\allowbreak{}History & Pass\\
+TC-19 & FR-13 & A mid-approval failure rolls everything back & Ownership\allowbreak{}Rollback\allowbreak{}Tests.a\allowbreak{}Failure\allowbreak{}Mid\allowbreak{}Approval\allowbreak{}Rolls\allowbreak{}Everything\allowbreak{}Back & Pass\\
+TC-20 & FR-16 & Challan total is the exact decimal sum & Violation\allowbreak{}Challan\allowbreak{}Tests.challan\allowbreak{}Total\allowbreak{}Is\allowbreak{}The\allowbreak{}Exact\allowbreak{}Sum\allowbreak{}In\allowbreak{}Decimal & Pass\\
+TC-21 & FR-17 & Replaying a gateway reference is idempotent & Payment\allowbreak{}Tests.gateway\allowbreak{}Reference\allowbreak{}Replay\allowbreak{}Is\allowbreak{}Idempotent & Pass\\
+TC-22 & FR-17 & A success cannot be processed twice & Payment\allowbreak{}Tests.a\allowbreak{}Success\allowbreak{}Cannot\allowbreak{}Be\allowbreak{}Processed\allowbreak{}Twice\allowbreak{}And\allowbreak{}New\allowbreak{}Payments\allowbreak{}Are\allowbreak{}Blocked & Pass\\
+TC-23 & FR-18 & An upheld challan appeal cancels the challan & Support\allowbreak{}Tests.challan\allowbreak{}Appeal\allowbreak{}Upheld\allowbreak{}Cancels\allowbreak{}The\allowbreak{}Challan & Pass\\
+TC-24 & FR-19 & A notification failure never breaks the operation & Support\allowbreak{}Tests.notification\allowbreak{}Failure\allowbreak{}Never\allowbreak{}Breaks\allowbreak{}The\allowbreak{}Business\allowbreak{}Operation & Pass\\
+TC-25 & FR-20 & The audit log never contains secrets or national IDs & Support\allowbreak{}Tests.audit\allowbreak{}Never\allowbreak{}Contains\allowbreak{}Secrets\allowbreak{}Or\allowbreak{}National\allowbreak{}Ids & Pass\\
+TC-26 & FR-21 & Dashboard figures equal the database counts & Support\allowbreak{}Tests.dashboard\allowbreak{}Matches\allowbreak{}The\allowbreak{}Database & Pass\\
+TC-27 & FR-23 & Portal pages return friendly errors and no stack traces & Portal crawl (Table~\ref{tab:crawl}) & Pass\\
+TC-28 & FR-02 & A citizen cannot open administrator pages & Portal crawl as \texttt{aarav.mehta} & Pass\\
+TC-29 & NFR-01 & Index turns a scan into a lookup & Index experiment (Table~\ref{tab:index}) & Pass\\
+TC-30 & NFR-02 & Schema and mapping agree (63 tables, 91 foreign keys) & Schema\allowbreak{}Audit\allowbreak{}Tests, orphan audit & Pass\\
+\end{longtable}
+\endgroup
+
+\section{Defect Identification and Resolution}\label{sec:defects}
+Table~\ref{tab:defects} lists the defects found during the final validation, with their
+cause and status. Items D-01 to D-07 and D-10 were corrected and re-tested. Items D-08 and D-09 were
+found in the supplied database scripts and are recorded with a proposed correction.
+
+\begingroup\footnotesize
+\begin{longtable}{@{}p{0.9cm}p{3.4cm}p{3.7cm}p{3.7cm}p{1.3cm}@{}}
+\caption{Defects found, causes and status}\label{tab:defects}\\
+\toprule \textbf{ID} & \textbf{Description and impact} & \textbf{Cause} & \textbf{Fix and re-test} & \textbf{Status}\\ \midrule \endfirsthead
+\toprule \textbf{ID} & \textbf{Description and impact} & \textbf{Cause} & \textbf{Fix and re-test} & \textbf{Status}\\ \midrule \endhead
+\bottomrule \endlastfoot
+D-01 & Every handled error (404, 403, validation) produced an HTTP 500; 121 server errors in the first crawl & The error page needs the signed-in user for its sidebar, but data added by the controller advice is not applied to exception-handler views & The handler now adds the user and path itself and sets the real status; crawl re-run: no 5xx & Fixed\\
+D-02 & A hand-edited page number (0, negative) or a search over 100 characters returned 500 & The API rejects such values with a 422, which the portal did not expect & The client clamps the page to the valid range and truncates long searches; re-tested & Fixed\\
+D-03 & Opening a post-only address in the browser returned 500 instead of 405 & No handler for an unsupported method & Added a 405 handler; re-tested & Fixed\\
+D-04 & The challan list showed a ``Vehicle ID'' column that always linked to vehicle~0 & The list API returns challans without a vehicle (the link is through violations) & Removed the column; the vehicle remains on the challan detail page & Fixed\\
+D-05 & Four seed rows pointed to citizens that do not exist (appeals 5 and 6, violations 9 and 10) & The seed used person ids 27 and 28 instead of citizen ids 18 and 19; foreign-key checks were off while loading & Corrected in the generator; audit of all 91 foreign keys now finds 0 orphans & Fixed\\
+D-06 & ``Expiring soon'' and ``appointments'' views were already stale & Seed dates were fixed calendar dates & Dates are generated as offsets from the current date & Fixed\\
+D-07 & Seven ENUM values had no demonstration data (for example address type PERMANENT, document status EXPIRED, test result ABSENT) & The first comprehensive seed did not cover every value & Added rows; comparison of all 25 ENUM columns now finds no gap & Fixed\\
+D-08 & \texttt{15\_constraints.sql} fails on MySQL 8.0.44: error 3814, ``contains disallowed function'' for \cd{chk_vehicle_manufacture_year} (uses \texttt{CURDATE()}) and \cd{chk_payment_paid_at_not_future} (uses \texttt{NOW()}); run strictly, the later scripts (indexes, views, triggers, procedures) are not applied & MySQL does not allow non-deterministic functions in CHECK \cite{mysql-check} & Proposed: use a fixed upper bound for the year, and enforce the payment-date rule in the service or a trigger. The other 19 constraints apply & Reported\\
+D-09 & The SQL test script expects 33 tables and small-seed counts, and its two constraint checks report false failures in continue-on-error mode & Script not updated after the schema grew; negative tests depend on aborting the batch & Proposed: update the expected values and use an error handler in the negative tests & Reported\\
+D-10 & On the citizen form, values already typed disappeared and no field error appeared after a rejected save; the edit form opened empty & The shared form fragment looked values up as 	exttt{form[name]}; in the expression language a bare name inside a map index is read as the literal key ``name'', not as the fragment parameter & The fragment now uses 	exttt{form.get(name)} and 	exttt{fieldErrors.get(name)}; re-tested: entered values are kept, invalid fields are outlined with their message, and the edit form shows the stored values & Fixed\\
+\end{longtable}
+\endgroup
+D-08 and D-09 are the most instructive findings. D-08 shows why a rule that must hold
+should be tested against the real engine, and D-09 shows that a test can be wrong as easily
+as the code it tests.
+
+\section{Validation Against the KPIs}
+\begin{table}[H]
+\centering\small
+\caption{Result against each KPI of Table~\ref{tab:kpi}}\label{tab:kpires}
+\begin{tabularx}{\linewidth}{@{}p{3.5cm}p{4.3cm}Xc@{}}
+\toprule \textbf{KPI} & \textbf{Measured result} & \textbf{Comment} & \textbf{Met}\\ \midrule
+Functional correctness & 185 of 185 integration tests pass & Real MySQL, real HTTP & Yes\\
+Rules under concurrency & 5 of 5 concurrency tests pass; mid-approval rollback test passes & Parallel threads released together & Yes\\
+Schema integrity & 63 entities = 63 tables; 0 orphans in 91 foreign keys & After seed correction D-05 & Yes\\
+UI robustness & 0 server errors in 816 (administrator) and 496 (citizen) requests & After fixes D-01 to D-04; 125 failures before & Yes\\
+Response time & Mean 22.6~ms (1 user), 46.2~ms (20 users); no errors & Local, read operations & Yes\\
+Index effectiveness & 405.9~ms to 1.4~ms at 500\,000 rows & Plan changes ALL to ref & Yes\\
+Access control & Citizen: 5 menu entries and 403 on admin pages; 11 RBAC tests pass & & Yes\\
+Database enhancement script & 2 of 21 added CHECK rules rejected; SQL suite 39/42 & D-08, D-09 & Partly\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Limitations and Untested Scenarios}
+\begin{itemize}
+\item The load test used one machine, read operations and up to 20 users; no stress test to failure was run.
+\item No real SMS, e-mail or payment gateway was tested; both are simulated.
+\item Security testing covered authentication, authorisation, token handling and an injection probe; it was not a penetration test.
+\item The browser tests were run with a crawler over HTTP, not with a person using several browsers; layout on small screens was not tested.
+\item No usability study with real users was carried out.
+\item Database-level locking examples that need two live sessions were reviewed but not run.
+\end{itemize}

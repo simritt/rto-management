@@ -1,0 +1,29 @@
+sequenceDiagram
+  autonumber
+  actor U as User
+  participant P as Portal
+  participant A as Auth API
+  participant J as JwtService
+  participant DB as MySQL
+  U->>P: username, password
+  P->>A: POST /auth/login
+  A->>DB: select user by username
+  DB-->>A: user row or none
+  Note over A: BCrypt verify (dummy hash<br/>if the user is unknown)
+  alt invalid credentials
+    A-->>P: 401 INVALID_CREDENTIALS
+    P-->>U: login page with message
+  else inactive account
+    A-->>P: 403 USER_INACTIVE
+  else valid
+    A->>DB: update last_login_at
+    A->>J: access and refresh tokens
+    J-->>A: HS256 tokens (jti, exp)
+    A-->>P: access_token, refresh_token
+    P->>A: GET /auth/me (Bearer)
+    A->>DB: roles, permissions
+    DB-->>A: permission keys
+    A-->>P: profile, roles, permissions
+    Note over P: kept in server-side session
+    P-->>U: dashboard, menu filtered<br/>by permissions
+  end

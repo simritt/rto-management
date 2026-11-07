@@ -1,0 +1,10 @@
+flowchart TB
+  subgraph PC["Development machine: Windows 11 laptop (Intel i5-1335U, 16 GB RAM)"]
+    br["Web browser<br/>(Chrome or Edge)"]
+    fe["JVM 21 process: rto-management-frontend-1.0.0.jar<br/>Spring MVC + Thymeleaf, port 8080"]
+    be["JVM 21 process: rto-management-backend-1.0.0.jar<br/>Spring Boot REST API, port 8000, Swagger UI at /docs<br/>HikariCP pool (max 20); reads .env at start-up (DB credentials, JWT secret);<br/>writes uploaded documents to the storage/ directory"]
+    db[("MySQL Server 8.0 service, port 3306<br/>rto_management (InnoDB, utf8mb4)<br/>rto_management_test (used by the test suite)")]
+    br -- "HTTP :8080" --> fe
+    fe -- "HTTP/JSON :8000, Bearer JWT" --> be
+    be -- "JDBC :3306" --> db
+  end

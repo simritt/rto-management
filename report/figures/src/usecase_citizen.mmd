@@ -1,0 +1,21 @@
+flowchart LR
+  cit(["Citizen"])
+  clerk(["Counter clerk"])
+  subgraph S1["Citizen self-service"]
+    u1(["Log in and log out"])
+    u2(["Submit application"])
+    u3(["Upload documents"])
+    u4(["Book or cancel appointment"])
+    u5(["Pay fee or fine"])
+    u6(["File complaint or appeal"])
+    u7(["View own notifications"])
+  end
+  subgraph S2["Counter work"]
+    u8(["Register citizen and address"])
+    u9(["Create application for a citizen"])
+    u10(["Verify documents and<br/>change application status"])
+    u11(["Manage appointment slots"])
+    u12(["Record payment"])
+  end
+  cit --> u1 & u2 & u3 & u4 & u5 & u6 & u7
+  clerk --> u8 & u9 & u10 & u11 & u12

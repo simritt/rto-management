@@ -75,6 +75,9 @@ dump.sql
 *.dump
 mysql-error.log
 
+# Reference material for the project report (other teams' reports, large PDFs)
+refrences/
+
 # Temporary / scratch files
 *.tmp
 *.temp

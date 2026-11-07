@@ -1,0 +1,17 @@
+flowchart TD
+  s(["book(application, slot)"]) --> l1["Lock the application row (FOR UPDATE)"]
+  l1 --> l2["Lock the slot row (FOR UPDATE)<br/>slots always locked in ascending id order"]
+  l2 --> c1{"Slot belongs to the same<br/>office as the application?"}
+  c1 -- no --> x1["409 SLOT_OFFICE_MISMATCH"]
+  c1 -- yes --> c2{"Slot start still<br/>in the future?"}
+  c2 -- no --> x2["409 SLOT_IN_PAST"]
+  c2 -- yes --> u["UPDATE slot SET booked_count = booked_count + 1<br/>WHERE slot_id = ? AND booked_count < capacity"]
+  u --> c3{"rows updated = 1?"}
+  c3 -- no --> x3["409 SLOT_FULL"]
+  c3 -- yes --> t["Token = S{slot}-{highest + 1}<br/>(safe: slot lock is held)"]
+  t --> i["INSERT appointment BOOKED<br/>and audit_logs row"]
+  i --> n["Queue notification (after commit)"]
+  n --> ok(["COMMIT"])
+  x1 --> rb(["ROLLBACK"])
+  x2 --> rb
+  x3 --> rb

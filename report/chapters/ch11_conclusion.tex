@@ -1,0 +1,79 @@
+\chapter{Conclusion and Future Scope}\label{ch:conclusion}
+
+\section{Conclusion}
+We set out to build a system that treats the daily work of a Regional Transport Office as
+a set of connected records and rules rather than as separate forms. The result is a
+three-part application: a normalised MySQL database of 63 tables, a Java REST backend
+that guards every rule inside a transaction, and a browser portal that gives staff and
+citizens the same data in screens suited to their role.
+
+Three ideas ran through the whole project. The first is that a rule worth having should be
+enforced as close to the data as possible: unique keys, generated columns, CHECK rules and
+triggers hold even if a program has a bug. The second is that concurrent use is the normal
+case, so every operation that shares a scarce resource, such as an appointment slot, a
+payment or a vehicle's current owner, takes its locks in a fixed order and writes
+conditionally. The third is that a claim about quality should come with a measurement.
+Accordingly the report gives the number of tests that pass (185 of 185), the load that was
+sustained (about 380 requests per second with no errors at 20 users), and the effect of
+an index (405.9~ms down to 1.4~ms on 500\,000 rows), together with the defects that the
+testing exposed.
+
+Along the way the work applied the content of five subjects of the course: object-oriented
+programming in the layered Java code, database management in the schema and its
+enhancements, software engineering in the requirements, design and testing process, data
+structures in the maps, sets and trees used for transitions and regions, and the design and
+analysis of algorithms in the ordering of locks, the cycle check and the complexity analysis
+(Chapter~\ref{ch:subjects}).
+
+\section{Objectives Revisited}
+Chapter~\ref{ch:results} compared each objective with its evidence. In short, the schema,
+the rule enforcement, the concurrency behaviour, the access control, the portal and the
+measurements all reached the targets we set. The one objective with a qualification is
+database-level enforcement: of the 21 CHECK rules defined, 19 are accepted by MySQL 8.0.44
+and two (year of manufacture and payment time) are rejected because they use the current
+date or time, which MySQL does not allow in such rules (defect D-08). That finding is
+useful in its own right, and the correction is proposed in Chapter~\ref{ch:test}.
+
+\section{Contributions}
+\begin{itemize}
+\item A complete relational design for an RTO, grouped into 13 modules, with ER diagrams, a data dictionary and a documented set of 25 indexes, 6 views, 5 triggers and 3 stored procedures.
+\item A backend with 225 operations, permission checks loaded from the database, an audit trail written in the same transaction as the change, and notifications that are sent only after a commit.
+\item A server-rendered portal of 70 templates with a menu that adapts to the permissions of the signed-in user, and friendly handling of errors and bad input.
+\item An evidence set that other students can repeat: an integration-test suite, a schema audit, a crawl script, a load test and an index experiment.
+\item A written record of ten real defects and their repair or proposed repair, which we hope is more useful to a reader than a list of passing results.
+\end{itemize}
+
+\section{Limitations}
+\begin{itemize}
+\item \textbf{External services are simulated.} Payments are recorded by gateway reference but no real gateway is connected; notifications are queued and marked sent without a real SMS or e-mail provider.
+\item \textbf{Single-node design.} Revoked tokens are held in the memory of one backend process, and the portal keeps sessions in one process. Running several copies would need a shared store.
+\item \textbf{Scale.} Load testing used one laptop and read-only requests; tables were tested up to 500\,000 rows, which is far below a national register.
+\item \textbf{Two database scripts need correction.} The constraints script (D-08) and the SQL test script (D-09) are reported with proposed fixes but are not yet changed in the repository.
+\item \textbf{Scope of the portal tests.} The portal was validated by a crawl of its pages and by manual walk-throughs rather than by automated browser tests.
+\item \textbf{Paging.} Offset paging becomes slower for very deep pages on large tables.
+\item \textbf{No documents are verified externally.} Uploaded files are checked for type and size only; they are not matched with any government record.
+\end{itemize}
+
+\section{Future Scope}
+\begin{enumerate}
+\item \textbf{Real integrations.} Connect a payment gateway with signed callbacks, an SMS and e-mail provider, and, where permitted, identity and vehicle registers.
+\item \textbf{Shared infrastructure.} Move token revocation and sessions to a shared cache, so that the backend and the portal can run as several instances behind a load balancer.
+\item \textbf{Automated browser tests.} Turn the crawl and the manual walk-throughs into repeatable end-to-end tests that run in continuous integration.
+\item \textbf{Fix the database scripts.} Replace the two non-deterministic CHECK rules with a fixed bound and a trigger, update the SQL test script, and add the whole database build to the automated pipeline.
+\item \textbf{Keyset paging and caching.} Use keyset paging for large lists and cache reference data that rarely changes.
+\item \textbf{Mobile and public interfaces.} Because the portal and the backend are separate, a mobile application or a public status-tracking page can reuse the same API.
+\item \textbf{Analytics.} Use the audit trail and the views for reports such as processing time per office, challan recovery rate and expiry forecasts.
+\item \textbf{Accessibility and languages.} Add regional-language labels and an accessibility review of the portal.
+\item \textbf{Document workflow.} Add scanned-document storage with virus scanning and a reviewer queue.
+\end{enumerate}
+
+\section{Lessons Learnt}
+Building the system taught us that most of the effort in a data-heavy application sits in the
+edges: what happens when two people click at once, when a date is in the future, when a
+list page is requested with page number zero, or when a seed row points to a record that
+is not there. Testing against a real database, and not a mock, found problems that no
+amount of reading the code would have shown. We also learnt that a clear layering, with
+validation, rules and storage each in their own place, makes defects easier to find, because
+the layer at which a symptom appears usually points to the layer that must change. Finally,
+writing the report forced us to check every figure against a run, and in several cases
+that check corrected a number we had believed.

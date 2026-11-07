@@ -1,0 +1,20 @@
+flowchart TD
+  s(["payTarget(type, id, gateway_reference, outcome)"]) --> r["replayOf(reference):<br/>find an attempt with this reference"]
+  r --> q{"Attempt found?"}
+  q -- yes --> q2{"Same payable<br/>target?"}
+  q2 -- yes --> rep(["Return the original result<br/>idempotentReplay = true<br/>nothing written"])
+  q2 -- no --> e1["409 GATEWAY_REFERENCE_REUSED"]
+  q -- no --> t["Lock the target row (challan, road tax, ...)"]
+  t --> p{"A SUCCESS payment<br/>already exists?"}
+  p -- yes --> e2["409 ALREADY_PAID"]
+  p -- no --> o["Reuse the open PENDING / FAILED payment<br/>or create a new one (amount = amount due)"]
+  o --> l["Lock the payment row"]
+  l --> a["INSERT payment_attempt (attempt_number + 1)"]
+  a --> k{"outcome"}
+  k -- SUCCESS --> ok1["payment = SUCCESS, paid_at = now<br/>settle target (challan PAID, road tax PAID)"]
+  k -- FAILED --> ok2["payment = FAILED (can be retried)"]
+  k -- TIMEOUT --> ok3["payment stays PENDING (result unknown)"]
+  ok1 --> au["Audit rows, notify after commit"]
+  ok2 --> au
+  ok3 --> au
+  au --> done(["COMMIT"])

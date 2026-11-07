@@ -1,0 +1,231 @@
+\begin{longtable}{@{}p{2.1cm}l p{6.6cm} p{3.2cm}@{}}
+\caption{All REST operations exposed by the backend (paths are relative to 	exttt{/\allowbreak{}api/\allowbreak{}v1}), with the permission each requires.}\label{tab:apilist}\\
+\toprule \textbf{Group} & \textbf{Verb} & \textbf{Path} & \textbf{Permission} \\ \midrule \endfirsthead
+\toprule \textbf{Group} & \textbf{Verb} & \textbf{Path} & \textbf{Permission} \\ \midrule \endhead
+\bottomrule \endlastfoot
+Application & POST & \texttt{/\allowbreak{}applications} & application.create or application.create\_\allowbreak{}own \\
+ & GET & \texttt{/\allowbreak{}applications} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}applications/\allowbreak{}\{applicationId\}} & signed in (service rules) \\
+ & PATCH & \texttt{/\allowbreak{}applications/\allowbreak{}\{applicationId\}} & application.update \\
+ & POST & \texttt{/\allowbreak{}applications/\allowbreak{}\{applicationId\}/\allowbreak{}assign} & application.assign \\
+ & POST & \texttt{/\allowbreak{}applications/\allowbreak{}\{applicationId\}/\allowbreak{}status} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}applications/\allowbreak{}\{applicationId\}/\allowbreak{}history} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}applications/\allowbreak{}\{applicationId\}/\allowbreak{}documents} & document.upload \\
+ & GET & \texttt{/\allowbreak{}applications/\allowbreak{}\{applicationId\}/\allowbreak{}documents} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}documents/\allowbreak{}\{documentId\}/\allowbreak{}file} & signed in (service rules) \\
+ & PATCH & \texttt{/\allowbreak{}documents/\allowbreak{}\{documentId\}/\allowbreak{}verify} & document.verify \\
+ & PATCH & \texttt{/\allowbreak{}documents/\allowbreak{}\{documentId\}/\allowbreak{}reject} & document.verify \\
+ & PATCH & \texttt{/\allowbreak{}documents/\allowbreak{}\{documentId\}/\allowbreak{}expire} & document.verify \\
+Appointment & GET & \texttt{/\allowbreak{}appointment-slots} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}appointment-slots} & appointment.manage \\
+ & PATCH & \texttt{/\allowbreak{}appointment-slots/\allowbreak{}\{slotId\}} & appointment.manage \\
+ & POST & \texttt{/\allowbreak{}applications/\allowbreak{}\{applicationId\}/\allowbreak{}appointments} & appointment.book \\
+ & GET & \texttt{/\allowbreak{}appointments} & signed in (service rules) \\
+ & PATCH & \texttt{/\allowbreak{}appointments/\allowbreak{}\{appointmentId\}/\allowbreak{}cancel} & appointment.book \\
+ & PATCH & \texttt{/\allowbreak{}appointments/\allowbreak{}\{appointmentId\}/\allowbreak{}reschedule} & appointment.book \\
+ & PATCH & \texttt{/\allowbreak{}appointments/\allowbreak{}\{appointmentId\}/\allowbreak{}outcome} & appointment.manage \\
+Auth & POST & \texttt{/\allowbreak{}auth/\allowbreak{}login} & public \\
+ & POST & \texttt{/\allowbreak{}auth/\allowbreak{}refresh} & public \\
+ & POST & \texttt{/\allowbreak{}auth/\allowbreak{}logout} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}auth/\allowbreak{}me} & signed in (service rules) \\
+Citizen & POST & \texttt{/\allowbreak{}citizens} & citizen.create \\
+ & GET & \texttt{/\allowbreak{}citizens} & citizen.view \\
+ & GET & \texttt{/\allowbreak{}citizens/\allowbreak{}me} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}citizens/\allowbreak{}\{citizenId\}} & signed in (service rules) \\
+ & PATCH & \texttt{/\allowbreak{}citizens/\allowbreak{}\{citizenId\}} & citizen.update \\
+ & GET & \texttt{/\allowbreak{}citizens/\allowbreak{}\{citizenId\}/\allowbreak{}addresses} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}citizens/\allowbreak{}\{citizenId\}/\allowbreak{}addresses} & citizen.update \\
+Compliance & GET & \texttt{/\allowbreak{}vehicles/\allowbreak{}\{vehicleId\}/\allowbreak{}compliance} & compliance.view \\
+ & GET & \texttt{/\allowbreak{}compliance/\allowbreak{}expiring} & compliance.view \\
+ & POST & \texttt{/\allowbreak{}compliance/\allowbreak{}refresh-statuses} & compliance.manage \\
+ & POST & \texttt{/\allowbreak{}inspections} & compliance.manage \\
+ & GET & \texttt{/\allowbreak{}inspections} & compliance.view \\
+ & GET & \texttt{/\allowbreak{}inspections/\allowbreak{}\{inspectionId\}} & compliance.view \\
+ & POST & \texttt{/\allowbreak{}fitness-certificates} & compliance.manage \\
+ & GET & \texttt{/\allowbreak{}fitness-certificates} & compliance.view \\
+ & GET & \texttt{/\allowbreak{}fitness-certificates/\allowbreak{}\{certificateId\}} & compliance.view \\
+ & POST & \texttt{/\allowbreak{}fitness-certificates/\allowbreak{}\{certificateId\}/\allowbreak{}revoke} & compliance.manage \\
+ & POST & \texttt{/\allowbreak{}pollution-certificates} & compliance.manage \\
+ & GET & \texttt{/\allowbreak{}pollution-certificates} & compliance.view \\
+ & GET & \texttt{/\allowbreak{}pollution-certificates/\allowbreak{}\{pucId\}} & compliance.view \\
+ & POST & \texttt{/\allowbreak{}insurance-policies} & compliance.manage \\
+ & GET & \texttt{/\allowbreak{}insurance-policies} & compliance.view \\
+ & GET & \texttt{/\allowbreak{}insurance-policies/\allowbreak{}\{policyId\}} & compliance.view \\
+ & POST & \texttt{/\allowbreak{}road-tax} & compliance.manage \\
+ & GET & \texttt{/\allowbreak{}road-tax} & compliance.view \\
+ & GET & \texttt{/\allowbreak{}road-tax/\allowbreak{}\{taxRecordId\}} & compliance.view \\
+Employee & POST & \texttt{/\allowbreak{}employees} & employee.manage \\
+ & GET & \texttt{/\allowbreak{}employees} & employee.view \\
+ & GET & \texttt{/\allowbreak{}employees/\allowbreak{}\{employeeId\}} & employee.view \\
+ & PATCH & \texttt{/\allowbreak{}employees/\allowbreak{}\{employeeId\}} & employee.manage \\
+ & GET & \texttt{/\allowbreak{}employees/\allowbreak{}\{employeeId\}/\allowbreak{}postings} & employee.view \\
+ & POST & \texttt{/\allowbreak{}employees/\allowbreak{}\{employeeId\}/\allowbreak{}postings} & employee.manage \\
+Licence & POST & \texttt{/\allowbreak{}driving-schools} & licence.manage\_\allowbreak{}schools \\
+ & GET & \texttt{/\allowbreak{}driving-schools} & licence.view \\
+ & GET & \texttt{/\allowbreak{}driving-schools/\allowbreak{}\{schoolId\}} & licence.view \\
+ & PATCH & \texttt{/\allowbreak{}driving-schools/\allowbreak{}\{schoolId\}} & licence.manage\_\allowbreak{}schools \\
+ & POST & \texttt{/\allowbreak{}driving-schools/\allowbreak{}\{schoolId\}/\allowbreak{}instructors} & licence.manage\_\allowbreak{}schools \\
+ & GET & \texttt{/\allowbreak{}driving-schools/\allowbreak{}\{schoolId\}/\allowbreak{}instructors} & licence.view \\
+ & POST & \texttt{/\allowbreak{}test-centres} & licence.manage\_\allowbreak{}schools \\
+ & GET & \texttt{/\allowbreak{}test-centres} & licence.view \\
+ & POST & \texttt{/\allowbreak{}learner-licences} & licence.issue \\
+ & GET & \texttt{/\allowbreak{}learner-licences} & licence.view \\
+ & GET & \texttt{/\allowbreak{}learner-licences/\allowbreak{}\{learnerId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}learner-licences/\allowbreak{}\{learnerId\}/\allowbreak{}cancel} & licence.revoke \\
+ & POST & \texttt{/\allowbreak{}driving-licences} & licence.issue \\
+ & GET & \texttt{/\allowbreak{}driving-licences} & licence.view \\
+ & POST & \texttt{/\allowbreak{}driving-licences/\allowbreak{}expire-overdue} & licence.revoke \\
+ & GET & \texttt{/\allowbreak{}driving-licences/\allowbreak{}\{licenceId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}driving-licences/\allowbreak{}\{licenceId\}/\allowbreak{}classes} & licence.issue \\
+ & POST & \texttt{/\allowbreak{}driving-licences/\allowbreak{}\{licenceId\}/\allowbreak{}suspend} & licence.suspend \\
+ & POST & \texttt{/\allowbreak{}driving-licences/\allowbreak{}\{licenceId\}/\allowbreak{}revoke} & licence.revoke \\
+ & POST & \texttt{/\allowbreak{}driving-licences/\allowbreak{}\{licenceId\}/\allowbreak{}reinstate} & licence.issue \\
+ & POST & \texttt{/\allowbreak{}driving-licences/\allowbreak{}\{licenceId\}/\allowbreak{}renew} & licence.issue \\
+ & GET & \texttt{/\allowbreak{}driving-licences/\allowbreak{}\{licenceId\}/\allowbreak{}history} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}driving-tests} & licence.test \\
+ & GET & \texttt{/\allowbreak{}driving-tests} & licence.view \\
+ & GET & \texttt{/\allowbreak{}driving-tests/\allowbreak{}\{testId\}} & licence.view \\
+ & PATCH & \texttt{/\allowbreak{}driving-tests/\allowbreak{}\{testId\}/\allowbreak{}result} & licence.test \\
+Office & POST & \texttt{/\allowbreak{}offices} & office.manage \\
+ & GET & \texttt{/\allowbreak{}offices} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}offices/\allowbreak{}\{officeId\}} & signed in (service rules) \\
+ & PATCH & \texttt{/\allowbreak{}offices/\allowbreak{}\{officeId\}} & office.manage \\
+ & GET & \texttt{/\allowbreak{}offices/\allowbreak{}\{officeId\}/\allowbreak{}counters} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}offices/\allowbreak{}\{officeId\}/\allowbreak{}counters} & office.manage \\
+ & PATCH & \texttt{/\allowbreak{}counters/\allowbreak{}\{counterId\}} & office.manage \\
+ & DELETE & \texttt{/\allowbreak{}counters/\allowbreak{}\{counterId\}} & office.manage \\
+ & GET & \texttt{/\allowbreak{}departments} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}departments} & office.manage \\
+ & GET & \texttt{/\allowbreak{}designations} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}designations} & employee.manage \\
+ & PATCH & \texttt{/\allowbreak{}designations/\allowbreak{}\{designationId\}} & employee.manage \\
+Payment & POST & \texttt{/\allowbreak{}payments} & payment.create \\
+ & GET & \texttt{/\allowbreak{}payments} & payment.view \\
+ & GET & \texttt{/\allowbreak{}payments/\allowbreak{}\{paymentId\}} & payment.view \\
+ & GET & \texttt{/\allowbreak{}payments/\allowbreak{}\{paymentId\}/\allowbreak{}attempts} & payment.view \\
+ & POST & \texttt{/\allowbreak{}payments/\allowbreak{}\{paymentId\}/\allowbreak{}retry} & payment.create \\
+ & POST & \texttt{/\allowbreak{}payments/\allowbreak{}\{paymentId\}/\allowbreak{}refund} & payment.refund \\
+ & GET & \texttt{/\allowbreak{}payments/\allowbreak{}\{paymentId\}/\allowbreak{}refunds} & payment.view \\
+ & GET & \texttt{/\allowbreak{}refunds} & payment.view \\
+ & GET & \texttt{/\allowbreak{}refunds/\allowbreak{}\{refundId\}} & payment.view \\
+ & POST & \texttt{/\allowbreak{}refunds/\allowbreak{}\{refundId\}/\allowbreak{}complete} & payment.refund \\
+ & POST & \texttt{/\allowbreak{}refunds/\allowbreak{}\{refundId\}/\allowbreak{}fail} & payment.refund \\
+ & POST & \texttt{/\allowbreak{}challans/\allowbreak{}\{challanId\}/\allowbreak{}pay} & payment.create \\
+ & GET & \texttt{/\allowbreak{}fee-structures} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}fee-structures} & reference.manage \\
+ & PATCH & \texttt{/\allowbreak{}fee-structures/\allowbreak{}\{feeId\}} & reference.manage \\
+Permit & POST & \texttt{/\allowbreak{}routes} & route.manage \\
+ & GET & \texttt{/\allowbreak{}routes} & permit.view \\
+ & GET & \texttt{/\allowbreak{}routes/\allowbreak{}\{routeId\}} & permit.view \\
+ & POST & \texttt{/\allowbreak{}routes/\allowbreak{}\{routeId\}/\allowbreak{}segments} & route.manage \\
+ & GET & \texttt{/\allowbreak{}routes/\allowbreak{}\{routeId\}/\allowbreak{}segments} & permit.view \\
+ & POST & \texttt{/\allowbreak{}permits} & permit.create \\
+ & GET & \texttt{/\allowbreak{}permits} & permit.view \\
+ & POST & \texttt{/\allowbreak{}permits/\allowbreak{}expire-overdue} & permit.manage \\
+ & GET & \texttt{/\allowbreak{}permits/\allowbreak{}\{permitId\}} & permit.view \\
+ & GET & \texttt{/\allowbreak{}permits/\allowbreak{}\{permitId\}/\allowbreak{}history} & permit.view \\
+ & POST & \texttt{/\allowbreak{}permits/\allowbreak{}\{permitId\}/\allowbreak{}suspend} & permit.manage \\
+ & POST & \texttt{/\allowbreak{}permits/\allowbreak{}\{permitId\}/\allowbreak{}reinstate} & permit.manage \\
+ & POST & \texttt{/\allowbreak{}permits/\allowbreak{}\{permitId\}/\allowbreak{}cancel} & permit.manage \\
+Rbac & GET & \texttt{/\allowbreak{}permissions} & rbac.manage \\
+ & GET & \texttt{/\allowbreak{}roles} & rbac.manage \\
+ & POST & \texttt{/\allowbreak{}roles} & rbac.manage \\
+ & GET & \texttt{/\allowbreak{}roles/\allowbreak{}\{roleId\}} & rbac.manage \\
+ & PUT & \texttt{/\allowbreak{}roles/\allowbreak{}\{roleId\}/\allowbreak{}permissions} & rbac.manage \\
+ & GET & \texttt{/\allowbreak{}users} & user.view \\
+ & POST & \texttt{/\allowbreak{}users} & user.manage \\
+ & GET & \texttt{/\allowbreak{}users/\allowbreak{}\{userId\}} & user.view \\
+ & PATCH & \texttt{/\allowbreak{}users/\allowbreak{}\{userId\}} & user.manage \\
+ & PUT & \texttt{/\allowbreak{}users/\allowbreak{}\{userId\}/\allowbreak{}roles} & rbac.manage \\
+Reference & GET & \texttt{/\allowbreak{}regions} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}regions/\allowbreak{}\{itemId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}regions} & reference.manage \\
+ & PATCH & \texttt{/\allowbreak{}regions/\allowbreak{}\{itemId\}} & reference.manage \\
+ & DELETE & \texttt{/\allowbreak{}regions/\allowbreak{}\{itemId\}} & reference.manage \\
+ & GET & \texttt{/\allowbreak{}vehicle-manufacturers} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}vehicle-manufacturers/\allowbreak{}\{itemId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}vehicle-manufacturers} & reference.manage \\
+ & PATCH & \texttt{/\allowbreak{}vehicle-manufacturers/\allowbreak{}\{itemId\}} & reference.manage \\
+ & DELETE & \texttt{/\allowbreak{}vehicle-manufacturers/\allowbreak{}\{itemId\}} & reference.manage \\
+ & GET & \texttt{/\allowbreak{}vehicle-models} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}vehicle-models/\allowbreak{}\{itemId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}vehicle-models} & reference.manage \\
+ & PATCH & \texttt{/\allowbreak{}vehicle-models/\allowbreak{}\{itemId\}} & reference.manage \\
+ & DELETE & \texttt{/\allowbreak{}vehicle-models/\allowbreak{}\{itemId\}} & reference.manage \\
+ & GET & \texttt{/\allowbreak{}vehicle-types} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}vehicle-types/\allowbreak{}\{itemId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}vehicle-types} & reference.manage \\
+ & PATCH & \texttt{/\allowbreak{}vehicle-types/\allowbreak{}\{itemId\}} & reference.manage \\
+ & DELETE & \texttt{/\allowbreak{}vehicle-types/\allowbreak{}\{itemId\}} & reference.manage \\
+ & GET & \texttt{/\allowbreak{}fuel-types} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}fuel-types/\allowbreak{}\{itemId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}fuel-types} & reference.manage \\
+ & PATCH & \texttt{/\allowbreak{}fuel-types/\allowbreak{}\{itemId\}} & reference.manage \\
+ & DELETE & \texttt{/\allowbreak{}fuel-types/\allowbreak{}\{itemId\}} & reference.manage \\
+ & GET & \texttt{/\allowbreak{}licence-classes} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}licence-classes/\allowbreak{}\{itemId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}licence-classes} & reference.manage \\
+ & PATCH & \texttt{/\allowbreak{}licence-classes/\allowbreak{}\{itemId\}} & reference.manage \\
+ & DELETE & \texttt{/\allowbreak{}licence-classes/\allowbreak{}\{itemId\}} & reference.manage \\
+ & GET & \texttt{/\allowbreak{}document-types} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}document-types/\allowbreak{}\{itemId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}document-types} & reference.manage \\
+ & PATCH & \texttt{/\allowbreak{}document-types/\allowbreak{}\{itemId\}} & reference.manage \\
+ & DELETE & \texttt{/\allowbreak{}document-types/\allowbreak{}\{itemId\}} & reference.manage \\
+ & GET & \texttt{/\allowbreak{}service-types} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}service-types/\allowbreak{}\{itemId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}service-types} & reference.manage \\
+ & PATCH & \texttt{/\allowbreak{}service-types/\allowbreak{}\{itemId\}} & reference.manage \\
+ & DELETE & \texttt{/\allowbreak{}service-types/\allowbreak{}\{itemId\}} & reference.manage \\
+ & GET & \texttt{/\allowbreak{}violation-types} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}violation-types/\allowbreak{}\{itemId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}violation-types} & reference.manage \\
+ & PATCH & \texttt{/\allowbreak{}violation-types/\allowbreak{}\{itemId\}} & reference.manage \\
+ & DELETE & \texttt{/\allowbreak{}violation-types/\allowbreak{}\{itemId\}} & reference.manage \\
+ & GET & \texttt{/\allowbreak{}permit-types} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}permit-types/\allowbreak{}\{itemId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}permit-types} & reference.manage \\
+ & PATCH & \texttt{/\allowbreak{}permit-types/\allowbreak{}\{itemId\}} & reference.manage \\
+ & DELETE & \texttt{/\allowbreak{}permit-types/\allowbreak{}\{itemId\}} & reference.manage \\
+ & GET & \texttt{/\allowbreak{}regions/\allowbreak{}tree} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}payable-types} & signed in (service rules) \\
+Support & POST & \texttt{/\allowbreak{}complaints} & complaint.create \\
+ & GET & \texttt{/\allowbreak{}complaints} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}complaints/\allowbreak{}\{complaintId\}} & signed in (service rules) \\
+ & PATCH & \texttt{/\allowbreak{}complaints/\allowbreak{}\{complaintId\}/\allowbreak{}status} & complaint.manage \\
+ & POST & \texttt{/\allowbreak{}appeals} & appeal.create \\
+ & GET & \texttt{/\allowbreak{}appeals} & signed in (service rules) \\
+ & GET & \texttt{/\allowbreak{}appeals/\allowbreak{}\{appealId\}} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}appeals/\allowbreak{}\{appealId\}/\allowbreak{}review} & appeal.review \\
+ & POST & \texttt{/\allowbreak{}appeals/\allowbreak{}\{appealId\}/\allowbreak{}uphold} & appeal.review \\
+ & POST & \texttt{/\allowbreak{}appeals/\allowbreak{}\{appealId\}/\allowbreak{}dismiss} & appeal.review \\
+ & GET & \texttt{/\allowbreak{}notifications} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}notifications/\allowbreak{}expiry-reminders} & licence.issue or notification.view \\
+ & GET & \texttt{/\allowbreak{}audit-logs} & audit.view \\
+ & GET & \texttt{/\allowbreak{}dashboard/\allowbreak{}summary} & dashboard.view \\
+System & GET & \texttt{/\allowbreak{}health} & public \\
+Vehicle & POST & \texttt{/\allowbreak{}vehicles} & vehicle.create \\
+ & GET & \texttt{/\allowbreak{}vehicles} & vehicle.view \\
+ & GET & \texttt{/\allowbreak{}vehicles/\allowbreak{}\{vehicleId\}} & vehicle.view \\
+ & PATCH & \texttt{/\allowbreak{}vehicles/\allowbreak{}\{vehicleId\}} & vehicle.update \\
+ & GET & \texttt{/\allowbreak{}vehicles/\allowbreak{}\{vehicleId\}/\allowbreak{}owners} & vehicle.view \\
+ & GET & \texttt{/\allowbreak{}vehicles/\allowbreak{}\{vehicleId\}/\allowbreak{}current-owner} & vehicle.view \\
+ & POST & \texttt{/\allowbreak{}vehicles/\allowbreak{}\{vehicleId\}/\allowbreak{}owners} & vehicle.update \\
+ & GET & \texttt{/\allowbreak{}citizens/\allowbreak{}\{citizenId\}/\allowbreak{}vehicles} & signed in (service rules) \\
+ & POST & \texttt{/\allowbreak{}ownership-transfers} & vehicle.transfer \\
+ & GET & \texttt{/\allowbreak{}ownership-transfers} & vehicle.view \\
+ & GET & \texttt{/\allowbreak{}ownership-transfers/\allowbreak{}\{transferId\}} & vehicle.view \\
+ & POST & \texttt{/\allowbreak{}ownership-transfers/\allowbreak{}\{transferId\}/\allowbreak{}approve} & vehicle.transfer\_\allowbreak{}approve \\
+ & POST & \texttt{/\allowbreak{}ownership-transfers/\allowbreak{}\{transferId\}/\allowbreak{}reject} & vehicle.transfer\_\allowbreak{}approve \\
+Violation & POST & \texttt{/\allowbreak{}violations} & violation.create \\
+ & GET & \texttt{/\allowbreak{}violations} & violation.view \\
+ & GET & \texttt{/\allowbreak{}violations/\allowbreak{}\{violationId\}} & violation.view \\
+ & POST & \texttt{/\allowbreak{}challans} & challan.create \\
+ & GET & \texttt{/\allowbreak{}challans} & challan.view \\
+ & GET & \texttt{/\allowbreak{}challans/\allowbreak{}\{challanId\}} & challan.view \\
+ & GET & \texttt{/\allowbreak{}challans/\allowbreak{}\{challanId\}/\allowbreak{}history} & challan.view \\
+ & POST & \texttt{/\allowbreak{}challans/\allowbreak{}\{challanId\}/\allowbreak{}violations} & challan.manage \\
+ & POST & \texttt{/\allowbreak{}challans/\allowbreak{}\{challanId\}/\allowbreak{}dispute} & challan.manage \\
+ & POST & \texttt{/\allowbreak{}challans/\allowbreak{}\{challanId\}/\allowbreak{}reissue} & challan.manage \\
+ & POST & \texttt{/\allowbreak{}challans/\allowbreak{}\{challanId\}/\allowbreak{}cancel} & challan.manage \\
+\end{longtable}

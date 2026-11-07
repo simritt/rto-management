@@ -1,0 +1,158 @@
+\chapter{Results and Discussion}\label{ch:results}
+
+This chapter brings together what the finished system does, what the measurements showed,
+and how far the original objectives were met. Wherever a number appears, it comes from the
+runs described in Chapters~\ref{ch:perf} and~\ref{ch:test}; nothing here is estimated.
+
+\section{Implemented System at a Glance}
+The delivered system has three running parts: a MySQL database, a REST backend and a
+server-rendered web portal. Table~\ref{tab:delivered} summarises the size of each part.
+
+\begin{table}[H]
+\centering\small
+\caption{Size of the delivered system}\label{tab:delivered}
+\begin{tabularx}{\linewidth}{@{}p{5.4cm}X@{}}
+\toprule \textbf{Part} & \textbf{Measured size}\\ \midrule
+Database & 63 tables in 13 functional modules; 91 foreign keys; 25 ENUM columns; 43 unique keys; 6 views; 5 triggers; 3 stored procedures; 25 added indexes\\
+Backend (Java) & 152 source files, about 11\,300 lines of main code and 4\,400 lines of test code; 225 operations on 151 URL paths\\
+Portal (Java and templates) & 18 controllers (about 4\,900 lines), 70 page templates (about 8\,300 lines)\\
+Security data & 7 default roles and 62 permissions, loaded from the database on every request\\
+Automated tests & 185 integration tests in 15 classes, 5 of them concurrency tests; a 42-check SQL suite\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Implemented Features}
+Table~\ref{tab:features} maps each functional area to what a user can actually do in the
+portal. Every row was exercised through the browser with the demonstration data.
+
+\begin{table}[H]
+\centering\small
+\caption{Features available in the portal}\label{tab:features}
+\begin{tabularx}{\linewidth}{@{}p{3.6cm}X@{}}
+\toprule \textbf{Area} & \textbf{What can be done}\\ \midrule
+Citizens & Register with address; search and filter; edit; blacklist with a reason; view addresses and linked records\\
+Applications & Create for a service type and office; follow the status workflow; attach documents; book appointment slots; view history\\
+Vehicles & Register; view current owner and ownership history; request, approve or reject an ownership transfer; view compliance records\\
+Compliance & Fitness certificates, insurance, pollution certificates and road tax, with an \emph{expiring soon} view\\
+Licences & Learner and driving licences, driving tests and attempts, driving schools\\
+Permits and routes & Commercial permits and the transport routes they cover\\
+Violations and challans & Record violations, issue e-challans, follow challan status, file complaints and legal appeals\\
+Payments & Pay fees and challans through attempts and receipts; replaying the same gateway reference is safe; refunds\\
+Administration & Users, roles and permissions, employees, offices and counters, appointment slots, fee structures, reference data, notifications and the audit trail\\
+Citizen self-service & A reduced five-item menu for a signed-in citizen: dashboard, applications, complaints, appeals and notifications, limited by the permissions of the citizen role\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Screens of the Running System}
+Six screens are shown here; the rest of the portal follows the same layout of a left menu,
+a title, and cards or tables. All screens were captured from the running application with
+the demonstration data.
+
+Figure~\ref{fig:scrdash} is the administrator dashboard, the first page after sign-in. It
+shows counts that are read from the backend summary endpoint and shortcuts to the most
+common work.
+\fig{03_dashboard.png}{Administrator dashboard}{fig:scrdash}{0.58}
+
+Figure~\ref{fig:scrapp} shows one application with its current status, the allowed next
+steps, attached documents and booked appointments. Only transitions permitted by the
+state diagram of Chapter~\ref{ch:design} are offered as buttons.
+\fig{09_application_detail.png}{Application detail with status workflow}{fig:scrapp}{0.58}
+
+Figure~\ref{fig:scrveh} is the vehicle page. The current owner is shown separately from the
+ownership history, and the compliance documents are listed with their validity dates.
+\fig{12_vehicle_detail.png}{Vehicle detail with current owner and history}{fig:scrveh}{0.68}
+
+Figure~\ref{fig:scrrole} shows a role with the permissions assigned to it. An administrator
+changes access here without any change to the program, which is the point of keeping the
+permissions in the database.
+\fig{38_admin_role_detail.png}{Role detail with its permissions}{fig:scrrole}{0.58}
+
+Figure~\ref{fig:citizenmenu} is what a citizen sees. The menu has only five items (dashboard,
+applications, complaints, appeals, notifications) and the administrator pages are refused, as tested in Section~\ref{sec:crawl}.
+\fig{44_citizen_dashboard.png}{Citizen dashboard with the reduced menu}{fig:citizenmenu}{0.42}
+
+Finally, Figure~\ref{fig:scrval} shows input checking. A future date of birth, a national
+identity number that is too short and a phone number with letters are all rejected by the
+backend. The portal keeps what the user typed, outlines each wrong field and prints the
+message under it. This screen also records one of the defects found late in the work
+(D-10 in Table~\ref{tab:defects}): in the first version the typed values were lost.
+\fig{06b_citizen_validation_errors.png}{Field-level validation messages on the citizen form}{fig:scrval}{0.62}
+
+\section{Functional Results}
+All 24 functional requirements of Chapter~\ref{ch:srs} are traced to at least one
+passing test in Table~\ref{tab:tc}. The headline results are as follows.
+\begin{itemize}
+\item \textbf{185 of 185} backend integration tests pass against a real MySQL 8.0 server.
+\item \textbf{5 of 5} concurrency tests pass: two users cannot take the last appointment slot, a payment replayed with the same gateway reference is recorded once, and parallel status changes or transfer approvals leave exactly one winner.
+\item \textbf{91 of 91} foreign keys have no orphan rows after the seed is loaded.
+\item The browser crawl ended with \textbf{no server errors}; the only responses that were not successful were the 405 answers expected when a post-only address is opened in a browser (Table~\ref{tab:crawl}).
+\item The SQL suite passes \textbf{39 of 42} checks; the three that fail are explained in Section~\ref{sec:sqltests}; they come from an out-of-date expected value and from the way the script is run (defect D-09), not from the running system.
+\end{itemize}
+
+\section{Performance Results}
+Table~\ref{tab:perfsummary} repeats the key numbers of Chapter~\ref{ch:perf} against the
+target set in Table~\ref{tab:kpi}.
+
+\begin{table}[H]
+\centering\small
+\caption{Performance summary}\label{tab:perfsummary}
+\begin{tabularx}{\linewidth}{@{}p{5.2cm}p{3.6cm}X@{}}
+\toprule \textbf{Measure} & \textbf{Result} & \textbf{Comment}\\ \midrule
+Mean latency, 1 user & 22.6~ms & Read endpoints, one machine\\
+Mean latency, 20 users & 46.2~ms & 95th percentile 158~ms\\
+Throughput, 20 users & 380 req/s & No errors in 2\,160 requests\\
+Sign-in & 445~ms & Deliberately slow (BCrypt cost 12)\\
+Lookup on 500\,000 rows & 405.9~ms $\rightarrow$ 1.4~ms & About 290 times faster with the index\\
+Backend memory & about 110~MB & Idle after the tests\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Comparison with the Original Objectives}
+Table~\ref{tab:objectives} compares each objective of Chapter~\ref{ch:intro} with the
+outcome. We have marked an objective as met only where there is evidence for it in this
+report.
+
+\begin{table}[H]
+\centering\small
+\caption{Objectives against outcomes}\label{tab:objectives}
+\begin{tabularx}{\linewidth}{@{}p{4.4cm}Xp{1.8cm}@{}}
+\toprule \textbf{Objective} & \textbf{Evidence} & \textbf{Status}\\ \midrule
+A normalised schema for the main RTO processes & 63 tables, 91 foreign keys, no orphan rows; Chapter~\ref{ch:design} & Met\\
+Rules enforced by the database, not only by code & 19 applied CHECK rules, unique keys, generated columns, 5 triggers; Section~\ref{sec:schemaaudit} & Met, with D-08\\
+Correct behaviour under concurrent use & Ordered locks, guarded updates; 5 concurrency tests; Section~\ref{sec:conc} & Met\\
+Role-based access with auditability & 7 roles, 62 permissions, audit trail in the same transaction; Section~\ref{sec:rbactest} & Met\\
+A usable web portal for staff and citizens & 70 templates, crawl of about 820 requests; Section~\ref{sec:crawl} & Met\\
+Measured, not assumed, performance & Load test and index experiment; Chapter~\ref{ch:perf} & Met\\
+Use of the course subjects in one system & Chapter~\ref{ch:subjects} & Met\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Discussion}
+\paragraph{What worked well.} Putting the rules in more than one layer paid off. The
+validation of the API, the transaction logic of the services and the constraints of the
+database each caught different mistakes during testing, and none of the three alone would
+have been enough. Reading permissions from the database made the role screen real: it
+changes access immediately and it appears in the audit trail.
+
+\paragraph{What was harder than expected.} Concurrency was the most subtle part. A
+check-then-write sequence looks correct in a single-user test and fails only when two
+requests interleave; the cure was to lock rows in a fixed order and to make the write itself
+conditional. The other surprise was how many faults sat outside the main logic: error pages,
+seed data and form handling accounted for most of the defects in Table~\ref{tab:defects}.
+
+\paragraph{What the numbers do and do not show.} The load test used one laptop and read
+requests only, so the figures describe this machine and this kind of work. They support the
+claim that the system is comfortable at the scale of one office. They do not support any
+claim about a national deployment.
+
+\section{Practical Applicability}
+In its present form the system suits a pilot at a single regional office or a teaching
+environment, where staff handle citizens, applications, vehicles, licences and fines through
+one consistent interface. The structure, with a clear API between the portal and the
+data, would also let a mobile application or another office system reuse the same backend.
+Connection to real payment gateways, SMS providers and national registers is outside the
+scope of this work and is listed in Chapter~\ref{ch:conclusion} as future scope.

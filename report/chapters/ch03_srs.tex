@@ -1,0 +1,215 @@
+\chapter{Software Requirements Specification}\label{ch:srs}
+
+\section{Purpose and Scope of the SRS}
+This chapter states what the RTO Management System must do and how well it must do it.
+It follows the usual structure of a requirements specification \cite{sommerville2015}:
+each requirement has an identifier, a short statement, an acceptance criterion and, in
+our case, a pointer to the test that checks it. The identifiers are used again in
+Chapter~\ref{ch:test} so that every requirement can be traced to its evidence.
+
+The scope is the set of RTO workflows listed in Section~1.5. The system is intended for
+use inside one transport office or one state-level deployment. It is not a replacement
+for the national Vahan and Sarathi systems.
+
+\section{Intended Users and Stakeholders}
+The system has seven roles. Table~\ref{tab:roles} lists them with the number of
+permissions each holds by default (the full matrix is in Appendix~\ref{app:perms}).
+
+\begin{table}[H]
+\centering\small
+\caption{Roles, default permission counts and typical tasks}\label{tab:roles}
+\begin{tabularx}{\linewidth}{@{}p{3.3cm}cX@{}}
+\toprule
+\textbf{Role} & \textbf{Permissions} & \textbf{Typical tasks}\\ \midrule
+Administrator & 62 & Manage users, roles, offices, reference data and fees; view everything\\
+RTO officer & 41 & Verify and approve applications, issue and suspend licences, approve ownership transfers, issue permits\\
+Counter clerk & 21 & Register citizens, create applications, upload documents, manage appointment slots, record payments\\
+Inspector & 8 & Conduct driving tests and vehicle inspections, record violations\\
+Enforcement officer & 8 & Record violations, issue and manage challans\\
+Accountant & 7 & Record payments and refunds, view the audit log and dashboard\\
+Citizen & 9 & Apply for services, upload own documents, book own appointments, file complaints and appeals, view own notifications\\
+\bottomrule
+\end{tabularx}
+\end{table}
+\textit{Note.} The default grants in the source code give the RTO officer 41
+permissions. The demonstration seed grants two more (\cd{citizen.view_sensitive} and
+\cd{licence.manage_schools}), so the demonstration database shows 43. Because
+permissions are data, an administrator can change any role at run time.
+
+Other stakeholders are the Department of Computer Engineering, which evaluates the
+project, and future maintainers, who need a clear schema and API contract.
+
+\section{Overall Product Description}
+\subsection{Product perspective}
+The product is a three-tier web application (Figure~\ref{fig:arch} in
+Chapter~\ref{ch:design}). A browser talks only to the portal. The portal talks to the
+backend with JSON over HTTP and an \cd{Authorization: Bearer} token. Only the backend
+touches the database.
+
+\subsection{Major functions}
+\begin{enumerate}
+\item Sign-in, token refresh, sign-out and permission-based access.
+\item Registration of citizens, employees, offices and reference data.
+\item Service applications with documents, appointments, fees and a controlled workflow.
+\item Learner and driving licences, driving tests and driving schools.
+\item Vehicle registration, ownership history, ownership transfer and compliance records.
+\item Permits and routes; violations and challans.
+\item Payments, attempts, refunds and fee structures.
+\item Complaints, appeals, notifications, audit log and a dashboard.
+\end{enumerate}
+
+\subsection{Dependencies and operating conditions}
+The backend needs Java 21 and a reachable MySQL 8 server, and refuses to start without a
+JWT secret of at least 32 characters. The portal needs the backend to be running; if
+it is not, the user sees a clear ``cannot reach the backend'' page. Uploaded documents
+are stored in a local directory and only their path is stored in the database.
+
+\section{Functional Requirements}
+Table~\ref{tab:fr} lists the functional requirements. The last column names the
+integration-test class (or other check) that verifies each one.
+
+\begingroup\footnotesize
+\begin{longtable}{@{}p{1.1cm}p{5.4cm}p{5.8cm}p{2.4cm}@{}}
+\caption{Functional requirements, acceptance criteria and verification}\label{tab:fr}\\
+\toprule \textbf{ID} & \textbf{Requirement} & \textbf{Acceptance criterion} & \textbf{Verified by}\\ \midrule \endfirsthead
+\toprule \textbf{ID} & \textbf{Requirement} & \textbf{Acceptance criterion} & \textbf{Verified by}\\ \midrule \endhead
+\bottomrule \endlastfoot
+FR-01 & Sign in with username and password; refresh and sign out & Valid login returns tokens and records the last-login time; unknown user and wrong password give the same error; a refresh token works once; sign-out revokes tokens & Auth\allowbreak{}Tests\\
+FR-02 & Authorise every request from database permissions & No token gives 401; a missing permission gives 403; changing a role changes access immediately & Auth\allowbreak{}Tests, Rbac\allowbreak{}Tests\\
+FR-03 & Administer users, roles and role permissions & Roles and users are created and edited by an authorised user; weak passwords and duplicates are refused; the hash is never returned & Rbac\allowbreak{}Tests\\
+FR-04 & Register citizens with addresses & Unique national ID and citizen code; address history is kept; national ID hidden without the sensitive permission; blacklist change needs a reason & Citizen\allowbreak{}Tests\\
+FR-05 & Manage offices, counters, departments, designations & Office code is unique; counter numbers are unique within an office; changes need the manage permission & Office\allowbreak{}Employee\allowbreak{}Tests\\
+FR-06 & Manage employees and postings & An employee has at most one current posting; transfers keep the history; an inactive office cannot receive postings & Office\allowbreak{}Employee\allowbreak{}Tests\\
+FR-07 & Maintain reference data & Region hierarchy of any depth with cycle prevention; unique codes; money held as exact decimals; reads open, writes restricted & Reference\allowbreak{}Tests\\
+FR-08 & Process service applications & Number generated; history and audit written; only legal status moves; reason required for reject, cancel and documents-pending; approval needs verified documents and a successful payment when a fee is due & Application\allowbreak{}Tests\\
+FR-09 & Upload and verify documents & Only PDF, PNG, JPEG whose content matches the extension; size limit; verified, rejected and expired states; later upload supersedes earlier & Document\allowbreak{}Appointment\allowbreak{}Tests\\
+FR-10 & Book appointments & Slot capacity never exceeded, also under concurrency; cancel and reschedule release seats; a failed reschedule changes nothing & Document\allowbreak{}Appointment\allowbreak{}Tests\\
+FR-11 & Issue and manage licences & One active learner licence per citizen; driving licence with classes; suspend, revoke, reinstate, renew; expiry sweep; test result required when tests exist & Licence\allowbreak{}Tests\\
+FR-12 & Manage driving schools, instructors, test centres & Created and listed with permissions & Licence\allowbreak{}Tests\\
+FR-13 & Register vehicles and transfer ownership & One current owner; approval closes the old row, opens the new one and keeps history; failure rolls back everything & Vehicle\allowbreak{}Tests, Ownership\allowbreak{}Rollback\allowbreak{}Tests\\
+FR-14 & Record compliance & Inspection, fitness, PUC, insurance and road tax only on active vehicles; expiring query; time-driven status refresh & Compliance\allowbreak{}Permit\allowbreak{}Tests\\
+FR-15 & Manage permits and routes & Ordered segments; expiry defaulted from permit type; status workflow recorded; expired permit cannot be reinstated & Compliance\allowbreak{}Permit\allowbreak{}Tests\\
+FR-16 & Record violations and issue challans & Violation may have an unknown driver; challan total is the exact decimal sum; cancelled challan releases its violations & Violation\allowbreak{}Challan\allowbreak{}Tests\\
+FR-17 & Take payments and refunds & Amount must match the amount due; replaying the same gateway reference is idempotent; success settles the item; refunds never exceed the payment & Payment\allowbreak{}Tests\\
+FR-18 & File and decide complaints and appeals & Citizens file their own; legal transitions only; an upheld appeal cancels a challan, reopens an application or reinstates a licence & Support\allowbreak{}Tests\\
+FR-19 & Send notifications after commit & A failing provider never breaks the business operation; rows are QUEUED then SENT or FAILED & Support\allowbreak{}Tests\\
+FR-20 & Keep a read-only audit log & Entries carry user and time; secrets and national IDs never appear & Support\allowbreak{}Tests\\
+FR-21 & Show a dashboard & Figures equal database counts and change with the data & Support\allowbreak{}Tests\\
+FR-22 & Page, filter and sort lists & Standard page shape; allowed sort keys only; bounded page size & Module tests; UI crawl\\
+FR-23 & Role-aware portal & Menu limited to permitted pages; field-level form errors; friendly 403, 404 and 5xx pages & UI crawl (Section~\ref{sec:crawl})\\
+FR-24 & Set up and bootstrap & Command-line commands create the schema and the first administrator & Manual run (Chapter~\ref{ch:impl})\\
+\end{longtable}
+\endgroup
+
+\section{Non-Functional Requirements}
+\begin{table}[H]
+\centering\small
+\caption{Non-functional requirements and how they are checked}\label{tab:nfr}
+\begin{tabularx}{\linewidth}{@{}p{1.3cm}p{3.0cm}Xp{2.4cm}@{}}
+\toprule \textbf{ID} & \textbf{Quality} & \textbf{Requirement and measure} & \textbf{Evidence}\\ \midrule
+NFR-01 & Performance & Typical read operations complete in well under a second on the development machine; indexes keep key lookups fast as data grows & Sections~\ref{sec:loadres}, \ref{sec:indexres}\\
+NFR-02 & Consistency & Multi-step changes are atomic; one current owner per vehicle; no overbooked slot; no double payment & Sections~\ref{sec:unit}, \ref{sec:conc}\\
+NFR-03 & Security & Passwords hashed with BCrypt; short-lived JWTs; permissions checked before controller code; uploads checked by content & Section~\ref{sec:security}\\
+NFR-04 & Auditability & Every important change writes an audit row and, where relevant, a history row & FR-20\\
+NFR-05 & Data accuracy & Money is held as \texttt{DECIMAL(10,2)} and sent as an exact string, never as a floating-point number & ReferenceTests, PaymentTests\\
+NFR-06 & Usability & Role-specific menus; understandable validation messages; no raw stack traces & UI crawl\\
+NFR-07 & Maintainability & Layered packages; one service class per area; shared helpers for locking, paging and audit & Chapter~\ref{ch:impl}\\
+NFR-08 & Testability & The whole backend can be tested against a real MySQL test database that is rebuilt from the schema scripts & Chapter~\ref{ch:test}\\
+NFR-09 & Portability & Runs on any machine with Java 21 and MySQL 8; time is stored in UTC & Chapter~\ref{ch:impl}\\
+NFR-10 & Extensibility & Notification delivery sits behind an interface so a real SMS or e-mail provider can replace the mock & Section~\ref{sec:oop}\\
+NFR-11 & Privacy & National ID is hidden from lists and from users without the sensitive permission & Citizen\allowbreak{}Tests\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Hardware and Software Requirements}
+\begin{table}[H]
+\centering\small
+\caption{Environment used for development, testing and measurement}\label{tab:env}
+\begin{tabularx}{\linewidth}{@{}p{4.2cm}X@{}}
+\toprule \textbf{Item} & \textbf{Version or specification}\\ \midrule
+Processor, memory & Intel Core i5-1335U (10 cores, 12 threads), 15.7~GB RAM\\
+Operating system & Windows 11 Home Single Language\\
+Java & Eclipse Temurin JDK 21.0.12\\
+Build tool & Apache Maven 3.9.9\\
+Backend framework & Spring Boot 3.3.5 (Spring MVC, Spring Security, Spring Data JPA)\\
+ORM and mapping & Hibernate ORM 6.5.3, Jakarta Persistence\\
+Security libraries & jjwt 0.12.6 (HS256 tokens), BCrypt password hashing\\
+API documentation & springdoc OpenAPI 2.6.0 (Swagger UI at \cd{/docs})\\
+Database & MySQL Community Server 8.0.44 (InnoDB, \texttt{utf8mb4})\\
+Portal & Spring Boot 3.3.5 with Thymeleaf, Tailwind CSS (loaded from a CDN)\\
+Browser & A current Chromium-based browser\\
+Version control & Git\\
+\bottomrule
+\end{tabularx}
+\end{table}
+A minimum for running the system is a dual-core processor, 4~GB of RAM, Java 21, MySQL 8
+and a modern browser. These are baseline figures, not benchmark results.
+
+\section{Constraints and Assumptions}
+\begin{itemize}
+\item \textbf{Single node.} The load tests were run on one machine with the database, backend, portal and test client together, so they are indicative, not a capacity claim.
+\item \textbf{In-memory token revocation.} Revoked token identifiers are held in memory and forgotten at restart; a shared store would be needed for several instances.
+\item \textbf{Simulated payments.} The gateway reference is supplied by the caller; there is no live gateway.
+\item \textbf{Mock notifications.} Delivery goes to a mock provider.
+\item \textbf{Assumption.} Reference data (service types, fees, document rules) is configured before use; the seed script provides a realistic starting set.
+\item \textbf{MySQL specific.} The schema uses MySQL features (ENUM, stored generated columns, SIGNAL in triggers), so a port to another engine would need changes.
+\end{itemize}
+
+\section{Use Cases and User Stories}
+\subsection{Use cases}
+Figures~\ref{fig:uc1}--\ref{fig:uc3} in Chapter~\ref{ch:design} show the use-case
+diagrams. The principal use cases are described below.
+
+\paragraph{UC-01 Sign in.}
+\emph{Actor:} any user. \emph{Precondition:} an active account. \emph{Main flow:} the
+user submits credentials; the backend verifies the BCrypt hash, records the last login
+and returns an access and a refresh token; the portal loads the user's profile and
+permissions and builds the menu. \emph{Alternative:} an unknown user or wrong password
+gives the same message and takes the same time; an inactive account is refused.
+\emph{Result:} a session that carries the user's permissions.
+
+\paragraph{UC-02 Process an application.}
+\emph{Actors:} clerk, citizen, officer. \emph{Main flow:} an application is created for
+a service at an office and a fee is computed; documents are uploaded and verified;
+the status moves through the permitted transitions, each with a history row; an
+appointment is booked if needed; the fee is paid; the officer approves and the
+application completes. \emph{Alternatives:} rejection or cancellation with a mandatory
+reason; a rejected document puts the application back to documents-pending.
+
+\paragraph{UC-03 Book an appointment.}
+\emph{Actors:} citizen, clerk. \emph{Main flow:} the user chooses an open slot of the
+same office; the system locks the slot, checks that it is in the future and not full,
+takes a seat, issues a token and advances the application. \emph{Alternative:} a full
+or past slot gives a clear conflict message and changes nothing.
+
+\paragraph{UC-04 Transfer vehicle ownership.}
+\emph{Actors:} clerk (requests), officer (approves). \emph{Main flow:} a transfer
+request is created for an active vehicle; the officer approves; in one transaction the
+old ownership row is closed, a new one opened and the transfer marked approved; both
+parties are notified after commit. \emph{Alternatives:} rejection leaves ownership
+untouched; any failed check rolls everything back.
+
+\paragraph{UC-05 Issue and pay a challan.}
+\emph{Actors:} enforcement officer, citizen or accountant. \emph{Main flow:} a violation
+is recorded against a vehicle; one or more violations are bundled into a challan whose
+total is their exact sum; the fine is paid through a payment with a gateway reference;
+the challan becomes paid. \emph{Alternatives:} repeating the same reference returns the
+first result; a failed attempt can be retried; a disputed challan returns to issued
+when the dispute is dismissed.
+
+\paragraph{UC-06 Manage roles.}
+\emph{Actor:} administrator. \emph{Main flow:} the administrator opens a role, ticks or
+clears permissions and saves; the next request of every holder of that role is judged
+with the new set.
+
+\subsection{User stories}
+\begin{itemize}
+\item \textbf{US-01.} As a citizen, I want to apply online and see the state of my application, so that I do not have to visit the office repeatedly.
+\item \textbf{US-02.} As a clerk, I want the system to refuse an application that is missing a required document, so that incomplete files do not reach the officer.
+\item \textbf{US-03.} As an officer, I want ownership transfers to be all-or-nothing, so that a vehicle never ends up with two owners or none.
+\item \textbf{US-04.} As an accountant, I want a repeated payment request to return the first result, so that nobody is charged twice.
+\item \textbf{US-05.} As an administrator, I want to change what a role can do without a new deployment, so that access follows policy.
+\item \textbf{US-06.} As an auditor, I want to see who changed a record and when, so that disputes can be settled from evidence.
+\item \textbf{US-07.} As a citizen, I want to see only my own records, so that my data stays private.
+\end{itemize}

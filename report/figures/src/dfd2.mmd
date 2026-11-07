@@ -1,0 +1,31 @@
+flowchart LR
+  citizen["Citizen"]
+  staff["RTO staff"]
+  P21(("2.1<br/>Register citizen<br/>and applicant"))
+  P22(("2.2<br/>Submit application<br/>and compute fee"))
+  P23(("2.3<br/>Upload and<br/>verify documents"))
+  P24(("2.4<br/>Book appointment<br/>(slot row lock)"))
+  P25(("2.5<br/>Change status<br/>(transition table)"))
+  P26(("2.6<br/>Queue and send<br/>notification"))
+  D2[("D2 persons, citizens,<br/>applicants")]
+  D3[("D3 applications, status history,<br/>documents, slots, appointments")]
+  D7[("D7 service_types,<br/>fee_structures")]
+  D8[("D8 notifications,<br/>audit_logs")]
+  staff -- "personal details, address" --> P21
+  P21 --> D2
+  citizen -- "service, office" --> P22
+  D2 -- "applicant" --> P22
+  D7 -- "base fee + components" --> P22
+  P22 --> D3
+  citizen -- "PDF, PNG, JPEG file" --> P23
+  staff -- "verify or reject (reason)" --> P23
+  P23 <--> D3
+  citizen -- "slot choice" --> P24
+  P24 <--> D3
+  staff -- "target status, reason" --> P25
+  P25 <--> D3
+  P25 -- "audit row" --> D8
+  P25 -- "after commit" --> P26
+  P24 -- "after commit" --> P26
+  P26 --> D8
+  P26 -- "message" --> citizen

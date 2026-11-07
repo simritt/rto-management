@@ -1,0 +1,80 @@
++----------------+--------------------+--------------------+---------------------+---------------------+-----------------+--------------------------+--------------------+----------+-------------+-----------------------+---------------+--------------+---------------+--------------------------+----------------+--------------+
+| application_id | application_number | current_status     | submitted_at        | completed_at        | processing_days | service_name             | service_code       | sla_days | office_code | office_name           | citizen_code  | citizen_name | citizen_phone | citizen_email            | officer_name   | officer_code |
++----------------+--------------------+--------------------+---------------------+---------------------+-----------------+--------------------------+--------------------+----------+-------------+-----------------------+---------------+--------------+---------------+--------------------------+----------------+--------------+
+|              9 | APP-2026-00009     | SUBMITTED          | 2026-10-07 08:00:00 | NULL                |              27 | New Commercial Permit    | NEW_PERMIT         |       30 | GJ-21       | RTO Surat City        | CIT-SUR-00005 | Meera Nair   | 9876543219    | meera.nair@example.com   | Suresh Pillai  | EMP-SUR-001  |
+|              7 | APP-2026-00007     | DOCS_PENDING       | 2026-10-05 10:00:00 | NULL                |              29 | New Vehicle Registration | NEW_VEHICLE_REG    |        7 | GJ-21       | RTO Surat City        | CIT-SUR-00003 | Neha Gupta   | 9876543217    | neha.gupta@example.com   | Suresh Pillai  | EMP-SUR-001  |
+|              5 | APP-2026-00005     | SUBMITTED          | 2026-10-01 09:30:00 | NULL                |              33 | Ownership Transfer       | OWNERSHIP_TRANSFER |       21 | GJ-01       | RTO Ahmedabad Central | CIT-AHM-00005 | Kiran Joshi  | 9876543214    | kiran.joshi@example.com  | NULL           | NULL         |
+|             10 | APP-2026-00010     | APPROVED           | 2026-09-25 09:00:00 | NULL                |              39 | Ownership Transfer       | OWNERSHIP_TRANSFER |       21 | GJ-21       | RTO Surat City        | CIT-SUR-00004 | Vijay Shah   | 9876543218    | vijay.shah@example.com   | Suresh Pillai  | EMP-SUR-001  |
+|              4 | APP-2026-00004     | AWAITING_PAYMENT   | 2026-09-20 14:00:00 | NULL                |              44 | New Vehicle Registration | NEW_VEHICLE_REG    |        7 | GJ-01       | RTO Ahmedabad Central | CIT-AHM-00004 | Sunita Desai | 9876543213    | sunita.desai@example.com | Kavita Iyer    | EMP-AHM-002  |
+|              3 | APP-2026-00003     | UNDER_VERIFICATION | 2026-09-15 11:00:00 | NULL                |              49 | New Driving Licence      | NEW_DL             |       14 | GJ-01       | RTO Ahmedabad Central | CIT-AHM-00003 | Rohan Patel  | 9876543212    | rohan.patel@example.com  | Rajan Kulkarni | EMP-AHM-003  |
+|              8 | APP-2026-00008     | REJECTED           | 2026-09-10 11:00:00 | NULL                |              54 | Driving Licence Renewal  | RENEWAL_DL         |        7 | GJ-21       | RTO Surat City        | CIT-SUR-00004 | Vijay Shah   | 9876543218    | vijay.shah@example.com   | Suresh Pillai  | EMP-SUR-001  |
+|              2 | APP-2026-00002     | APPROVED           | 2026-09-01 10:00:00 | NULL                |              63 | Driving Licence Renewal  | RENEWAL_DL         |        7 | GJ-01       | RTO Ahmedabad Central | CIT-AHM-00002 | Priya Sharma | 9876543211    | priya.sharma@example.com | Kavita Iyer    | EMP-AHM-002  |
+|              1 | APP-2026-00001     | COMPLETED          | 2026-08-01 09:00:00 | 2026-08-12 15:00:00 |              11 | New Driving Licence      | NEW_DL             |       14 | GJ-01       | RTO Ahmedabad Central | CIT-AHM-00001 | Aarav Mehta  | 9876543210    | aarav.mehta@example.com  | Kavita Iyer    | EMP-AHM-002  |
+|              6 | APP-2026-00006     | COMPLETED          | 2026-07-01 09:00:00 | 2026-07-10 16:00:00 |               9 | New Driving Licence      | NEW_DL             |       14 | GJ-21       | RTO Surat City        | CIT-SUR-00001 | Pooja Singh  | 9876543215    | pooja.singh@example.com  | Suresh Pillai  | EMP-SUR-001  |
++----------------+--------------------+--------------------+---------------------+---------------------+-----------------+--------------------------+--------------------+----------+-------------+-----------------------+---------------+--------------+---------------+--------------------------+----------------+--------------+
++------------+---------------------+----------------+-------------------+---------------+---------------+------------------+-----------------+---------------------+--------------------+------------------+--------------------+--------------+-------------+
+| vehicle_id | registration_number | vehicle_status | registration_date | manufacturer  | model_name    | insurance_status | policy_number   | provider_name       | insurance_end_date | owner_citizen_id | owner_citizen_code | owner_name   | owner_phone |
++------------+---------------------+----------------+-------------------+---------------+---------------+------------------+-----------------+---------------------+--------------------+------------------+--------------------+--------------+-------------+
+|          1 | GJ01AB1234          | ACTIVE         | 2022-03-15        | Maruti Suzuki | Swift         | EXPIRED          | NIA-GJ-2024-001 | New India Assurance | 2026-10-25         |                1 | CIT-AHM-00001      | Aarav Mehta  | 9876543210  |
+|          2 | GJ01CD5678          | ACTIVE         | 2021-07-20        | Hero MotoCorp | Splendor Plus | EXPIRED          | BAJ-GJ-2021-002 | Bajaj Allianz       | 2026-07-20         |                4 | CIT-AHM-00004      | Sunita Desai | 9876543213  |
+|          3 | GJ21EF9012          | ACTIVE         | 2020-11-10        | Tata Motors   | Nexon         | INSURED          | HDF-GJ-2020-003 | HDFC Ergo           | 2027-01-01         |                9 | CIT-SUR-00004      | Vijay Shah   | 9876543218  |
+|          4 | GJ21GH3456          | ACTIVE         | 2018-05-25        | Mahindra      | Bolero        | UNINSURED        | NULL            | NULL                | NULL               |                7 | CIT-SUR-00002      | Amit Verma   | 9876543216  |
++------------+---------------------+----------------+-------------------+---------------+---------------+------------------+-----------------+---------------------+--------------------+------------------+--------------------+--------------+-------------+
++--------------+----------------+----------------+--------------+----------------+----------------+----------------------------+------------+
+| employee1_id | employee1_code | employee1_name | employee2_id | employee2_code | employee2_name | shared_designation         | rank_level |
++--------------+----------------+----------------+--------------+----------------+----------------+----------------------------+------------+
+|            1 | EMP-AHM-001    | Dinesh Rao     |            3 | EMP-SUR-001    | Suresh Pillai  | Regional Transport Officer |          1 |
+|            2 | EMP-AHM-002    | Kavita Iyer    |            5 | EMP-AHM-003    | Rajan Kulkarni | Motor Vehicle Inspector    |          2 |
++--------------+----------------+----------------+--------------+----------------+----------------+----------------------------+------------+
++----------------+--------------------+--------------------+---------------------+--------------------------+--------------------+----------+----------+-----------------+-------------+-----------------------+---------------+--------------+
+| application_id | application_number | current_status     | submitted_at        | service_name             | service_code       | sla_days | age_days | overdue_by_days | office_code | office_name           | citizen_code  | citizen_name |
++----------------+--------------------+--------------------+---------------------+--------------------------+--------------------+----------+----------+-----------------+-------------+-----------------------+---------------+--------------+
+|              4 | APP-2026-00004     | AWAITING_PAYMENT   | 2026-09-20 14:00:00 | New Vehicle Registration | NEW_VEHICLE_REG    |        7 |       44 |              37 | GJ-01       | RTO Ahmedabad Central | CIT-AHM-00004 | Sunita Desai |
+|              3 | APP-2026-00003     | UNDER_VERIFICATION | 2026-09-15 11:00:00 | New Driving Licence      | NEW_DL             |       14 |       49 |              35 | GJ-01       | RTO Ahmedabad Central | CIT-AHM-00003 | Rohan Patel  |
+|              7 | APP-2026-00007     | DOCS_PENDING       | 2026-10-05 10:00:00 | New Vehicle Registration | NEW_VEHICLE_REG    |        7 |       29 |              22 | GJ-21       | RTO Surat City        | CIT-SUR-00003 | Neha Gupta   |
+|              5 | APP-2026-00005     | SUBMITTED          | 2026-10-01 09:30:00 | Ownership Transfer       | OWNERSHIP_TRANSFER |       21 |       33 |              12 | GJ-01       | RTO Ahmedabad Central | CIT-AHM-00005 | Kiran Joshi  |
++----------------+--------------------+--------------------+---------------------+--------------------------+--------------------+----------+----------+-----------------+-------------+-----------------------+---------------+--------------+
++------------+---------------+--------------+---------------+------------------+------------------------+------------------------+-------------+
+| citizen_id | citizen_code  | citizen_name | phone_primary | total_violations | unique_violation_types | outstanding_fine_total | blacklisted |
++------------+---------------+--------------+---------------+------------------+------------------------+------------------------+-------------+
+|          4 | CIT-AHM-00004 | Sunita Desai | 9876543213    |                2 |                      2 |                   0.00 |           0 |
+|          7 | CIT-SUR-00002 | Amit Verma   | 9876543216    |                1 |                      1 |                5000.00 |           1 |
+|          1 | CIT-AHM-00001 | Aarav Mehta  | 9876543210    |                1 |                      1 |                   0.00 |           0 |
++------------+---------------+--------------+---------------+------------------+------------------------+------------------------+-------------+
++-----------+-------------+-----------------------+-----------------+------------------+------------------------+--------------------+----------------+
+| office_id | office_code | office_name           | completed_count | performance_rank | performance_dense_rank | total_applications | completion_pct |
++-----------+-------------+-----------------------+-----------------+------------------+------------------------+--------------------+----------------+
+|         1 | GJ-01       | RTO Ahmedabad Central |               1 |                1 |                      1 |                  5 |           20.0 |
+|         2 | GJ-21       | RTO Surat City        |               1 |                1 |                      1 |                  5 |           20.0 |
++-----------+-------------+-----------------------+-----------------+------------------+------------------------+--------------------+----------------+
++------------+---------------+--------------+---------+---------------------+--------------------+------------------------------+
+| citizen_id | citizen_code  | citizen_name | test_id | scheduled_at        | latest_test_result | test_centre_name             |
++------------+---------------+--------------+---------+---------------------+--------------------+------------------------------+
+|          1 | CIT-AHM-00001 | Aarav Mehta  |       1 | 2026-08-08 10:00:00 | PASS               | Ahmedabad Central Test Track |
+|          3 | CIT-AHM-00003 | Rohan Patel  |       3 | 2026-09-25 11:00:00 | PENDING            | Ahmedabad Central Test Track |
+|          6 | CIT-SUR-00001 | Pooja Singh  |       2 | 2026-07-07 09:00:00 | PASS               | Surat Driving Test Centre    |
+|          9 | CIT-SUR-00004 | Vijay Shah   |       5 | 2026-06-14 10:00:00 | PASS               | Ahmedabad Central Test Track |
++------------+---------------+--------------+---------+---------------------+--------------------+------------------------------+
++----------------+--------------------+--------------------+---------------------+---------------------+--------------------------+-------------------------+
+| application_id | application_number | new_status         | changed_at          | previous_changed_at | hours_in_previous_status | days_in_previous_status |
++----------------+--------------------+--------------------+---------------------+---------------------+--------------------------+-------------------------+
+|              1 | APP-2026-00001     | UNDER_VERIFICATION | 2026-08-02 09:30:00 | 2026-08-01 09:00:00 |                    24.50 |                    1.02 |
+|              1 | APP-2026-00001     | AWAITING_PAYMENT   | 2026-08-05 11:00:00 | 2026-08-02 09:30:00 |                    73.50 |                    3.06 |
+|              1 | APP-2026-00001     | APPROVED           | 2026-08-10 14:00:00 | 2026-08-05 11:00:00 |                   123.00 |                    5.13 |
+|              1 | APP-2026-00001     | COMPLETED          | 2026-08-12 15:00:00 | 2026-08-10 14:00:00 |                    49.00 |                    2.04 |
+|              3 | APP-2026-00003     | DOCS_PENDING       | 2026-09-16 10:00:00 | 2026-09-15 11:00:00 |                    23.00 |                    0.96 |
+|              3 | APP-2026-00003     | UNDER_VERIFICATION | 2026-09-18 14:00:00 | 2026-09-16 10:00:00 |                    52.00 |                    2.17 |
+|              6 | APP-2026-00006     | UNDER_VERIFICATION | 2026-07-03 10:00:00 | 2026-07-01 09:00:00 |                    49.00 |                    2.04 |
+|              6 | APP-2026-00006     | AWAITING_PAYMENT   | 2026-07-07 11:00:00 | 2026-07-03 10:00:00 |                    97.00 |                    4.04 |
+|              6 | APP-2026-00006     | APPROVED           | 2026-07-09 14:00:00 | 2026-07-07 11:00:00 |                    51.00 |                    2.13 |
+|              6 | APP-2026-00006     | COMPLETED          | 2026-07-10 16:00:00 | 2026-07-09 14:00:00 |                    26.00 |                    1.08 |
+|              8 | APP-2026-00008     | DOCS_PENDING       | 2026-09-11 09:00:00 | 2026-09-10 11:00:00 |                    22.00 |                    0.92 |
+|              8 | APP-2026-00008     | REJECTED           | 2026-09-13 15:00:00 | 2026-09-11 09:00:00 |                    54.00 |                    2.25 |
++----------------+--------------------+--------------------+---------------------+---------------------+--------------------------+-------------------------+
++-----------------+---------------------+---------------+-----------------+------------------------+----------------+-----------+
+| vehicle_type_id | vehicle_type        | is_commercial | violation_count | outstanding_fine_total | violation_rank | fine_rank |
++-----------------+---------------------+---------------+-----------------+------------------------+----------------+-----------+
+|               2 | Light Motor Vehicle |             0 |               2 |                 500.00 |              1 |         2 |
+|               1 | Two-Wheeler         |             0 |               2 |                   0.00 |              1 |         3 |
+|               3 | Heavy Motor Vehicle |             1 |               1 |                5000.00 |              3 |         1 |
++-----------------+---------------------+---------------+-----------------+------------------------+----------------+-----------+

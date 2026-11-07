@@ -1,0 +1,163 @@
+\chapter{Literature Review and Study of Existing Systems}\label{ch:lit}
+
+\section{Study of Existing Systems}
+\subsection{The national systems}
+India's transport administration runs on a small family of national systems that sit on
+top of state-level transport departments. According to the Parivahan portal, MoRTH
+entrusted the National Informatics Centre with standardising and deploying
+\textbf{Vahan}, used for vehicle registration, and \textbf{Sarathi}, used for driving
+licences, and with compiling their data into state and national registers
+\cite{parivahan-about}. The citizen-facing front is the \textbf{Parivahan Sewa} portal.
+Enforcement uses \textbf{e-challan}, in which traffic penalties are issued and paid
+electronically, and the Motor Vehicles (Amendment) Act, 2019 \cite{mva2019} widened the
+use of electronic monitoring and revised penalties. States run their own portals and
+fee rules on top of these systems.
+
+We studied these systems from their public descriptions only. Their internal designs
+are not public, so we make no claim about how they are built. What the public material
+does show, and what we used as a requirements source, is the \emph{range of services}:
+learner and permanent licences, renewals and duplicates, vehicle registration, transfer
+of ownership, fitness, pollution and insurance records, permits, challans and fee
+payment.
+
+\subsection{Typical office practice}
+Below the national systems, the work done at a counter is still organised around
+paper files and shared logins in many offices. This is a general observation, not a
+measured one, and we do not attribute it to any particular office. We use it only to
+motivate the design questions: who changed a record, what was the previous state, and
+can two staff act on the same file at once?
+
+\subsection{Typical student projects}
+A common way to build such a system in a course is a small CRUD application with five to
+eight tables and rules written only in application code. That approach is simple, but a
+second program, a manual SQL fix or a bug can break the rules without anyone noticing.
+Our project is deliberately at the other end: the rules are in the schema as well as in
+the services.
+
+\begin{table}[H]
+\centering\small
+\caption{Approaches to RTO record-keeping and what this project takes from each}\label{tab:existing}
+\begin{tabularx}{\linewidth}{@{}p{3.2cm}XX@{}}
+\toprule
+\textbf{Approach} & \textbf{Strength} & \textbf{Limitation for our purpose}\\ \midrule
+Paper files and spreadsheets & Flexible, needs no software & No enforced rules, no audit trail, no concurrency control\\
+National portals (Vahan, Sarathi, Parivahan Sewa, e-challan) \cite{parivahan-about} & Nationwide scale, uniform services & Internal design not public; cannot be studied or extended by a student team\\
+Small CRUD course project & Easy to build and explain & Few tables; rules only in application code; usually untested for concurrency\\
+\textbf{This project} & 63 tables, rules in the database and the services, tested concurrency and measured performance & Single-machine prototype; no integration with national registers\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Review of Technical Literature and Resources}
+\subsection{The relational model and normalisation}
+Codd's 1970 paper \cite{codd1970} introduced the relational model: data held as
+relations, queried by their content, with integrity kept independent of programs. The
+standard textbooks \cite{silberschatz2019,elmasri2016} develop the working tools that
+we used: keys, referential integrity, the normal forms and the argument for splitting a
+table to remove update anomalies.
+\emph{Relevance:} the 63-table design is a direct application; reference data such as
+vehicle types and licence classes sit in their own tables, and a person is stored once
+while citizens and employees extend that row.
+\emph{Limit:} normalisation reduces redundancy but does not decide which rules belong in
+the database; that is a design judgement we discuss in Chapter~\ref{ch:design}.
+
+\subsection{Transactions and concurrency}
+The idea that a group of operations should succeed or fail as a unit is usually
+summarised by the ACID properties, a term from H\"arder and Reuter's survey of
+recovery \cite{harder1983}, and treated at length by Gray and Reuter \cite{gray1993}.
+Locking reads such as \cmd{SELECT ... FOR UPDATE} are the practical tool: in InnoDB the
+statement takes exclusive locks on the rows it reads, other writers wait, and the locks
+are released only when the transaction commits or rolls back \cite{mysql-locking}.
+\emph{Relevance:} slot booking, ownership transfer, payments and refunds all follow this
+pattern, with the added rule that locks are always taken in the same order so that two
+transactions cannot wait on each other forever (Chapter~\ref{ch:algo}).
+\emph{Limit:} pessimistic locking serialises competing writers; it is the right choice
+for hot rows such as the last seat of a slot, but it is not free.
+
+\subsection{Constraints and what a database can enforce}
+SQL lets a schema state rules as primary, foreign and unique keys, NOT NULL, CHECK
+constraints and generated columns. MySQL 8 enforces CHECK constraints, but its manual
+limits what a CHECK expression may contain: ``literals, deterministic built-in
+functions, and operators are permitted'', and functions such as \cmd{NOW()} are named as
+non-deterministic and therefore not allowed \cite{mysql-check}.
+\emph{Relevance:} this rule matters in practice. Two constraints in the supplied script
+used the current date and are rejected by the server (Section~\ref{sec:defects}).
+
+\subsection{Role-based access control}
+Sandhu et al.\ \cite{sandhu1996} describe role-based access control, in which users are
+assigned roles and roles are assigned permissions, so that administrators manage a small
+number of roles instead of many user-by-user rules.
+\emph{Relevance:} users, roles, permissions and their two junction tables are ordinary
+tables in the schema. A permission check is a join, not a hard-coded rule, and the
+administrator edits roles from the portal.
+\emph{Limit:} RBAC answers ``may this role do this kind of thing'' but not ``may this
+user see this particular record''. We added an ownership rule on top: permissions such
+as \cmd{application.view_own} restrict a citizen to their own records.
+
+\subsection{Web APIs, tokens and passwords}
+Fielding's thesis \cite{fielding2000} defines the REST style: stateless requests, uniform
+resource addresses and standard verbs. JSON Web Tokens are specified in RFC~7519
+\cite{rfc7519}. Passwords should never be stored in recoverable form; the adaptive
+BCrypt scheme of Provos and Mazi\`eres \cite{provos1999} is deliberately slow, and OWASP's
+guidance \cite{owasp-pw} recommends such a scheme with a per-password salt.
+\emph{Relevance:} the backend is a stateless REST service with short-lived access
+tokens and rotating refresh tokens, and passwords are stored as BCrypt hashes
+(Section~\ref{sec:security}).
+
+\subsection{Software engineering and algorithm analysis}
+The process and documentation practices follow standard texts
+\cite{sommerville2015,pressman2019}: a requirements specification with numbered
+requirements, UML models, layered design, incremental implementation and testing at
+several levels. The analysis of the critical operations in Chapter~\ref{ch:algo}
+uses the standard tools of algorithm analysis \cite{cormen2022}, namely asymptotic
+cost, ordering arguments, and graph methods such as topological ordering.
+
+\section{Comparative Analysis}
+Table~\ref{tab:compare} compares the approaches on the qualities that this project
+cares about. The entries for the national systems say ``not publicly documented''
+where we could not verify a claim; we do not guess.
+
+\begin{table}[H]
+\centering\small
+\caption{Comparison on design qualities (``n/p'' means not publicly documented)}\label{tab:compare}
+\begin{tabularx}{\linewidth}{@{}p{3.4cm}CCCC@{}}
+\toprule
+\textbf{Quality} & \textbf{Paper / spreadsheet} & \textbf{National portals} & \textbf{Small CRUD project} & \textbf{This project}\\ \midrule
+Rules enforced in the database & No & n/p & Rarely & Yes (CHECK, UNIQUE, generated columns, triggers)\\
+Full status history & Manual & n/p & Rarely & Yes (history tables, audit log)\\
+Row-level concurrency control & No & n/p & Rarely & Yes (ordered row locks, guarded updates)\\
+Permissions stored as data & No & n/p & Rarely & Yes (7 roles, 62 permissions)\\
+Idempotent payments & No & n/p & Rarely & Yes (gateway reference)\\
+Automated tests published & No & n/p & Rarely & 185 integration tests plus SQL tests\\
+Integration with national registers & No & Yes & No & No\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Limitations of Existing Approaches}
+\begin{enumerate}
+\item \textbf{Rules live outside the data.} When rules exist only in forms or application code, any other route to the data can break them.
+\item \textbf{History is overwritten.} A single status column shows the present but not the path, which makes audits and appeals harder.
+\item \textbf{No concurrency discipline.} Two people acting on the same file at the same moment is the normal case in an office, yet simple systems ignore it.
+\item \textbf{Access is coarse.} A few fixed access levels either give staff too much or block them from doing their work, and citizens often cannot be limited to their own records.
+\item \textbf{Retries are dangerous.} A repeated payment request can charge twice unless the system recognises it.
+\item \textbf{Claims are untested.} Reports often state that a feature works without saying how it was checked.
+\end{enumerate}
+
+\section{Identified Engineering Gap}
+Existing material covers the individual ideas well: the relational model, transactions,
+RBAC, REST and JWT. What is hard to find, at a size that a student team can inspect, is
+a worked example that \emph{puts them together on one realistic domain and then proves
+the combination holds}, including under concurrent load and with an honest list of the
+defects found. That is the gap this project tries to fill.
+
+\section{Proposed Improvements}
+We respond to the limitations above as follows:
+\begin{itemize}
+\item rules are placed in the schema and repeated in the services;
+\item every status that matters has a history table, and an append-only audit log records changes with the user and the time;
+\item row locks are taken in a fixed order inside transactions, with guarded updates and a database CHECK as the last line of defence;
+\item roles and permissions are tables, with an own-records rule for citizens;
+\item payments are idempotent by gateway reference, and failed or timed-out attempts are kept as attempts;
+\item all of this is covered by automated tests whose results are reported, together with the defects they exposed.
+\end{itemize}

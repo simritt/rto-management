@@ -1,0 +1,25 @@
+flowchart TD
+  A(["HTTP request to /api/v1/..."]) --> B{"Bearer token<br/>supplied?"}
+  B -- no --> C
+  B -- yes --> B2["JwtAuthFilter: verify HS256 signature,<br/>canonical form, type = access, not revoked"]
+  B2 --> B3["UserLoader builds CurrentUser:<br/>roles and permissions read from<br/>user_roles and role_permissions"]
+  B3 --> C{"AuthInterceptor:<br/>endpoint marked @Public?"}
+  C -- yes --> F
+  C -- no --> D{"Valid user<br/>in request?"}
+  D -- no --> E401["401 NOT_AUTHENTICATED"]
+  D -- yes --> E{"Holds the permission<br/>named by @Requires?"}
+  E -- no --> E403["403 PERMISSION_DENIED"]
+  E -- yes --> F["Controller: bean validation<br/>of the DTO (422 on failure)"]
+  F --> G["Service method opens a transaction"]
+  G --> H["Db.lock: SELECT ... FOR UPDATE<br/>rows taken in a fixed order"]
+  H --> I{"Business rules hold?<br/>status transition, ownership,<br/>slot capacity, amount due"}
+  I -- no --> J["ApiException raised:<br/>whole transaction rolls back"]
+  I -- yes --> K["Write rows and Audit.record(...)"]
+  K --> L["COMMIT"]
+  L --> M["afterCommit hook:<br/>Notifications delivered in<br/>their own transaction"]
+  L --> N["Response DTO serialised<br/>(snake_case, money as strings)"]
+  J --> O["GlobalExceptionHandler builds<br/>detail, code, errors"]
+  N --> P(["HTTP response"])
+  O --> P
+  E401 --> P
+  E403 --> P

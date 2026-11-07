@@ -1,0 +1,34 @@
+flowchart TB
+  user(["Users: citizen, counter clerk, RTO officer, inspector,<br/>enforcement officer, accountant, administrator"])
+  subgraph T1["Tier 1 - Presentation: frontend-java (Spring Boot, port 8080)"]
+    direction LR
+    ctl["18 MVC<br/>controllers"]
+    tpl["70 Thymeleaf templates<br/>+ Tailwind CSS"]
+    api["ApiClient<br/>RestClient + bearer token"]
+    ses["UserSession<br/>tokens, permissions"]
+    adv["GlobalAdvice<br/>error pages, 401 to login"]
+    ctl ~~~ tpl ~~~ api ~~~ ses ~~~ adv
+  end
+  subgraph T2["Tier 2 - Application: backend-java (Spring Boot REST, port 8000). Request path, left to right"]
+    direction LR
+    s1["1. JwtAuthFilter<br/>token to CurrentUser"]
+    s2["2. AuthInterceptor<br/>@Public / @Requires"]
+    s3["3. REST controllers<br/>about 225 operations"]
+    s4["4. Service layer<br/>@Transactional rules"]
+    s5["5. core: Db, QB,<br/>Audit, Perms"]
+    s6["6. 63 JPA<br/>entities"]
+    s1 --> s2 --> s3 --> s4 --> s5 --> s6
+  end
+  subgraph T3["Tier 3 - Data: MySQL 8.0 (InnoDB)"]
+    direction LR
+    tbl[("63 tables<br/>91 foreign keys")]
+    obj["6 views, 5 triggers,<br/>3 stored procedures,<br/>25 added indexes"]
+    tbl ~~~ obj
+  end
+  ext1["NotificationProvider<br/>(mock SMS and e-mail)"]
+  ext2["Document storage<br/>(local directory)"]
+  user -- "HTTP: pages and forms" --> T1
+  T1 -- "JSON over HTTP, Authorization: Bearer JWT" --> T2
+  T2 -- "JDBC, Hibernate / JPA" --> T3
+  T2 -. "after commit" .-> ext1
+  T2 -. "file I/O" .-> ext2

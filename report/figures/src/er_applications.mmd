@@ -1,0 +1,73 @@
+---
+title: Applications and documents
+---
+erDiagram
+  service_types {
+    bigint service_type_id PK
+    varchar service_name
+    varchar service_code UK
+    decimal base_fee
+    int sla_days
+  }
+  document_types {
+    bigint document_type_id PK
+    varchar type_name UK
+    tinyint is_mandatory_default
+    int validity_period_days
+  }
+  applicants {
+    bigint applicant_id PK
+    bigint citizen_id FK, UK
+    bigint preferred_office_id FK
+  }
+  applications {
+    bigint application_id PK
+    varchar application_number UK
+    bigint applicant_id FK
+    bigint service_type_id FK
+    bigint office_id FK
+    bigint assigned_officer_id FK
+    enum current_status
+    datetime submitted_at
+    datetime completed_at
+  }
+  application_status_history {
+    bigint history_id PK
+    bigint application_id FK
+    varchar previous_status
+    varchar new_status
+    bigint changed_by_user_id FK
+    timestamp changed_at
+  }
+  documents {
+    bigint document_id PK
+    bigint application_id FK
+    bigint document_type_id FK
+    varchar file_path
+    enum verification_status
+    bigint verified_by_employee_id FK
+    varchar rejection_reason
+  }
+  citizens {
+    bigint citizen_id PK
+  }
+  employees {
+    bigint employee_id PK
+  }
+  rto_offices {
+    bigint office_id PK
+  }
+  users {
+    bigint user_id PK
+  }
+  citizens ||--o{ applicants : "citizen_id"
+  rto_offices |o--o{ applicants : "preferred_office_id"
+  applications ||--o{ application_status_history : "application_id"
+  users |o--o{ application_status_history : "changed_by_user_id"
+  applicants ||--o{ applications : "applicant_id"
+  rto_offices ||--o{ applications : "office_id"
+  employees |o--o{ applications : "assigned_officer_id"
+  service_types ||--o{ applications : "service_type_id"
+  applications ||--o{ documents : "application_id"
+  document_types ||--o{ documents : "document_type_id"
+  employees |o--o{ documents : "verified_by_employee_id"

@@ -1,0 +1,39 @@
+stateDiagram-v2
+  state "Driving licence" as LIC {
+    [*] --> L_ACTIVE
+    L_ACTIVE --> L_SUSPENDED
+    L_ACTIVE --> L_REVOKED
+    L_ACTIVE --> L_EXPIRED
+    L_SUSPENDED --> L_ACTIVE
+    L_SUSPENDED --> L_REVOKED
+    L_EXPIRED --> L_ACTIVE : renewal
+    L_REVOKED --> [*]
+  }
+  state "Challan" as CH {
+    [*] --> C_ISSUED
+    C_ISSUED --> C_DISPUTED
+    C_DISPUTED --> C_ISSUED : dispute dismissed
+    C_ISSUED --> C_PAID
+    C_ISSUED --> C_CANCELLED
+    C_DISPUTED --> C_CANCELLED
+    C_PAID --> [*]
+    C_CANCELLED --> [*]
+  }
+  state "Permit" as PE {
+    [*] --> P_ACTIVE
+    P_ACTIVE --> P_SUSPENDED
+    P_SUSPENDED --> P_ACTIVE
+    P_ACTIVE --> P_CANCELLED
+    P_SUSPENDED --> P_CANCELLED
+    P_ACTIVE --> P_EXPIRED
+    P_SUSPENDED --> P_EXPIRED
+  }
+  state "Vehicle" as VE {
+    [*] --> V_ACTIVE
+    V_ACTIVE --> V_BLACKLISTED
+    V_BLACKLISTED --> V_ACTIVE
+    V_ACTIVE --> V_SCRAPPED
+    V_ACTIVE --> V_DEREGISTERED
+    V_BLACKLISTED --> V_SCRAPPED
+    V_BLACKLISTED --> V_DEREGISTERED
+  }

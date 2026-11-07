@@ -1,0 +1,85 @@
+---
+title: Vehicle compliance records
+---
+erDiagram
+  vehicles {
+    bigint vehicle_id PK
+    varchar registration_number UK
+    varchar chassis_number UK
+    varchar engine_number UK
+    bigint manufacturer_id FK
+    bigint model_id FK
+    bigint vehicle_type_id FK
+    bigint fuel_type_id FK
+    year manufacture_year
+    varchar color
+    bigint registering_office_id FK
+    date registration_date
+  }
+  vehicle_inspections {
+    bigint inspection_id PK
+    bigint vehicle_id FK
+    bigint inspector_employee_id FK
+    datetime inspected_at
+    enum result
+  }
+  fitness_certificates {
+    bigint certificate_id PK
+    bigint vehicle_id FK
+    bigint inspection_id FK
+    date issue_date
+    date expiry_date
+    enum status
+  }
+  pollution_certificates {
+    bigint puc_id PK
+    bigint vehicle_id FK
+    date issue_date
+    date expiry_date
+    enum status
+  }
+  insurance_policies {
+    bigint policy_id PK
+    bigint vehicle_id FK
+    varchar provider_name
+    varchar policy_number UK
+    date start_date
+    date end_date
+  }
+  road_tax_records {
+    bigint tax_record_id PK
+    bigint vehicle_id FK
+    year assessment_year
+    decimal amount_due
+    date due_date
+  }
+  employees {
+    bigint employee_id PK
+  }
+  fuel_types {
+    bigint fuel_type_id PK
+  }
+  rto_offices {
+    bigint office_id PK
+  }
+  vehicle_manufacturers {
+    bigint manufacturer_id PK
+  }
+  vehicle_models {
+    bigint model_id PK
+  }
+  vehicle_types {
+    bigint vehicle_type_id PK
+  }
+  vehicle_inspections |o--o{ fitness_certificates : "inspection_id"
+  vehicles ||--o{ fitness_certificates : "vehicle_id"
+  vehicles ||--o{ insurance_policies : "vehicle_id"
+  vehicles ||--o{ pollution_certificates : "vehicle_id"
+  vehicles ||--o{ road_tax_records : "vehicle_id"
+  employees ||--o{ vehicle_inspections : "inspector_employee_id"
+  vehicles ||--o{ vehicle_inspections : "vehicle_id"
+  fuel_types ||--o{ vehicles : "fuel_type_id"
+  vehicle_manufacturers ||--o{ vehicles : "manufacturer_id"
+  vehicle_models ||--o{ vehicles : "model_id"
+  rto_offices ||--o{ vehicles : "registering_office_id"
+  vehicle_types ||--o{ vehicles : "vehicle_type_id"

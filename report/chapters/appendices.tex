@@ -1,0 +1,54 @@
+\chapter{Data Dictionary}\label{app:dict}
+This appendix lists every table of the database with its columns, types, nullability, key
+role and notes. It was produced from the live schema of the running database, not typed by
+hand. ``bigint u'' means an unsigned 64-bit integer; PK, UK, FK and idx mean primary key,
+unique key, foreign key and secondary index; \emph{generated} columns are computed by the
+database.
+
+\begingroup\footnotesize
+\input{generated/appendix_dictionary}
+\endgroup
+
+\chapter{REST API Operations}\label{app:api}
+The backend exposes 225 operations on 151 paths. They were read from the running
+application's own API description, so the list matches the code. ``Signed in (service
+rules)'' means that any signed-in user may call the operation, and the service itself
+decides what that user may see.
+
+\begingroup\footnotesize
+\input{generated/appendix_api}
+\endgroup
+
+\chapter{Permission Matrix}\label{app:perms}
+The default grants of the seven roles. Role names are abbreviated as ADM (administrator),
+OFF (RTO officer), CLK (clerk), INS (inspector), ENF (enforcement officer), ACC (accounts
+officer) and CIT (citizen). The grants are data in the database and can be changed from the
+role screen of the portal (Figure~\ref{fig:scrrole}).
+
+\begingroup\footnotesize
+\input{generated/appendix_perms}
+\endgroup
+
+\chapter{Build and Run Guide}\label{app:run}
+\section{Prerequisites}
+JDK 21, Maven 3.9, MySQL 8.0 and a modern browser. The portal loads its style library from
+a content-delivery network, so an internet connection is needed the first time a page is
+opened.
+
+\section{Steps}
+\begin{enumerate}
+\item \textbf{Create the database.} In the \cd{database} folder, run the script \cd{00_run_all.sql} with the MySQL client as a user who may create databases. It creates \cd{rto_management} and its 63 tables.
+\item \textbf{Create an application user} with all privileges on \cd{rto_management} (and on \cd{rto_management_test} if the tests will be run).
+\item \textbf{Configure the backend.} Copy \cd{backend-java/.env.example} to \cd{backend-java/.env} and fill in the database host, port, user and password, a signing secret of at least 32 characters, and the name and password of the first administrator. This file must never be committed.
+\item \textbf{Build and prepare.} In \cd{backend-java}, run \cmd{mvn -DskipTests package}, then run the jar once with \cmd{--rto.command=bootstrap} to load the roles, permissions and the first administrator.
+\item \textbf{Optional demonstration data.} Load the comprehensive seed from \cd{database/seed} so that every screen has records to show.
+\item \textbf{Start the backend} (port 8000) with \texttt{java -jar target/\allowbreak{}rto-management-\allowbreak{}backend-1.0.0.jar}. The interactive API documentation is served at \cd{/docs}.
+\item \textbf{Build and start the portal} (port 8080) from \cd{frontend-java} in the same way. It reaches the backend through the setting \cd{RTO_API_BASE_URL}, which defaults to the local backend.
+\item \textbf{Sign in} at \cd{http://localhost:8080} with the administrator account.
+\item \textbf{Run the tests} with \cmd{mvn test} in \cd{backend-java}. They drop and rebuild the test database.
+\end{enumerate}
+
+\section{Repeating the Measurements}
+The load test, the index experiment and the crawl used short scripts that are not part of
+the application. Their numerical results are tabulated in Chapters~\ref{ch:perf}
+and~\ref{ch:test}, and the method of each is described there so that it can be repeated.

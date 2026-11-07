@@ -1,0 +1,10 @@
++----------------------------+-----+
+| k                          | n   |
++----------------------------+-----+
+| base tables                |  63 |
+| views                      |   6 |
+| triggers                   |   5 |
+| procedures                 |   3 |
+| check constraints          |  26 |
+| secondary indexes (non-PK) | 148 |
++----------------------------+-----+

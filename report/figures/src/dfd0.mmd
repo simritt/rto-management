@@ -1,0 +1,14 @@
+flowchart LR
+  citizen["Citizen / applicant"]
+  staff["RTO staff<br/>(clerk, officer, inspector,<br/>enforcement officer, accountant)"]
+  admin["Administrator"]
+  sms["Notification provider<br/>(mock SMS / e-mail)"]
+  P(("0<br/>RTO Management<br/>System"))
+  citizen -- "applications, documents,<br/>payments, complaints, appeals" --> P
+  P -- "status, receipts, challans,<br/>notifications" --> citizen
+  staff -- "verifications, approvals, licence and<br/>permit actions, violations, refunds" --> P
+  P -- "work queues, records,<br/>dashboard, audit trail" --> staff
+  admin -- "users, roles, offices,<br/>reference data, fees, slots" --> P
+  P -- "configuration views,<br/>audit logs" --> admin
+  P -- "message requests" --> sms
+  sms -- "delivery outcome" --> P

@@ -1,0 +1,252 @@
+\chapter{Implementation and Module-Wise Coding}\label{ch:impl}
+
+\section{Development Environment}
+The environment is given in Table~\ref{tab:env}. Everything runs on a single Windows 11
+laptop. The backend and the portal are ordinary Maven projects that produce executable
+JAR files; MySQL runs as a Windows service. Maven and the JDK are the only build tools; no
+Node.js toolchain is part of the product (Node.js was used only to capture screenshots
+for this report).
+
+The three source folders of the repository are:
+\begin{itemize}
+\item \cd{database/} --- the SQL scripts, seed data, test script and advanced queries;
+\item \cd{backend-java/} --- the Spring Boot REST backend (152 main source files, 15 integration-test classes);
+\item \cd{frontend-java/} --- the Spring Boot portal (18 controllers, 70 templates).
+\end{itemize}
+
+\section{Overall Implementation Strategy}
+The work followed the dependency order of the three tiers. The database came first
+because the backend and the portal both depend on its table and column names. The backend
+came next because it defines the API that the portal calls. The portal was built on top, in
+two stages. The database was then hardened with constraints, indexes, views, triggers and
+procedures, after the backend existed, so that the triggers could be designed around what
+the Java services already write. The last stage was validation: running the whole test set,
+crawling the portal, measuring performance, and fixing what was found
+(Chapter~\ref{ch:test}).
+
+\section{Module-Wise Implementation}
+Every module has the same shape: a controller that declares the URL and the permission,
+DTO records that validate the input, a service that holds the rules inside a transaction,
+and entities that map the tables. The paragraphs below give the implementation points that
+are specific to each module.
+
+\paragraph{Authentication and access control.}
+\cd{AuthService} implements sign-in, refresh and sign-out; \cd{JwtService} creates and
+verifies HS256 tokens; \cd{UserLoader} builds the \cd{CurrentUser} of each request from
+the database. \cd{RbacService} lets an administrator create roles and users, set a role's
+permissions and assign roles. Passwords are hashed with BCrypt at cost 12. At first start
+a command-line step creates the roles, the 62 permissions and the first administrator.
+
+\paragraph{Citizens, staff and offices.}
+A citizen is created together with a person row and an optional first address in one
+transaction. A new address closes the previous current address of the same type instead of
+overwriting it, so the address history is kept. Employees have dated postings, and a
+generated column permits only one open posting per employee.
+
+\paragraph{Applications.}
+\cd{ApplicationService} generates the application number, computes the fee as the service's
+base fee plus every fee component in force on that date, and moves the status through the
+transition table. Approval is refused unless the required documents are verified and, when a
+fee is due, a successful payment exists. Every move writes a history row and an audit row.
+
+\paragraph{Documents and appointments.}
+\cd{DocumentService} checks the extension, the leading bytes and the size of an upload,
+stores the file under the storage directory and keeps only its path and metadata in the
+database. A verified document can expire after the number of days defined by its document
+type. \cd{AppointmentService} creates slots (refusing duplicates, which the unique key
+cannot catch when the counter is empty because MySQL treats NULLs as distinct), and books,
+cancels and reschedules seats under the locking rules of Chapter~\ref{ch:algo}.
+
+\paragraph{Licensing.}
+\cd{LicenceService} issues learner licences (one active per citizen, enforced by a generated
+column), records driving tests, issues driving licences with one or more classes, and
+suspends, revokes, reinstates and renews them within the transition table. An expiry
+sweep closes licences whose date has passed. A licence can require a passed test when tests
+exist for the citizen.
+
+\paragraph{Vehicles, ownership and compliance.}
+\cd{VehicleService} normalises registration numbers, rejects duplicate registration,
+chassis and engine numbers and a model that does not belong to the manufacturer, and
+creates the first ownership row. \cd{OwnershipService} implements the transfer algorithm.
+\cd{ComplianceService} records inspections, fitness, pollution, insurance and road-tax
+records on active vehicles, answers the ``what expires soon'' question with a combined
+query, and refreshes time-driven statuses.
+
+\paragraph{Permits, violations and challans.}
+\cd{PermitService} manages routes with ordered segments and permits whose expiry defaults from
+the permit type. \cd{ViolationService} records violations against vehicles (the driver may be
+unknown), bundles them into a challan whose total is the exact decimal sum, and drives the
+challan state machine, including the return to \texttt{ISSUED} when a dispute is dismissed.
+
+\paragraph{Payments.}
+\cd{PaymentService} implements the idempotent payment algorithm, partial and full refunds,
+and the rule that only one refund may be in flight at a time. A refund of a road-tax
+payment returns the road-tax record to its previous state.
+
+\paragraph{Support, notifications and audit.}
+\cd{SupportService} handles complaints and appeals; an upheld appeal acts on its target
+(a challan is cancelled, a rejected application is reopened, a suspended licence is
+reinstated). \cd{Notifications} queues messages inside the business transaction and delivers
+them after it commits. \cd{Audit} writes the audit row. \cd{DashboardService} returns the
+live counts shown on the dashboard.
+
+\section{Front-End Implementation}
+\subsection{Structure}
+Each portal controller does three things: it reads request parameters, calls the backend
+through \cd{ApiClient}, and passes the resulting JSON to a Thymeleaf template. Thymeleaf
+reads the JSON directly with expressions such as \cd{row.path('citizen_code').asText()}, so the
+portal has no duplicate model classes to keep in step with the backend.
+
+\subsection{The API client}
+\cd{ApiClient} adds the session's bearer token to each call. If the backend answers 401 it
+tries once to refresh the token pair; if that fails the session is cleared and the user is
+sent to the sign-in page. Error bodies are converted to one exception type carrying the
+status, the code, the message and the list of field errors. Before a request is sent, the
+paging parameter is clamped to the range 1 to $2^{31}-1$ and a search term longer than 100
+characters is cut to 100, because the API would otherwise reject a hand-edited address
+with a 422; this keeps such addresses working.
+
+\subsection{Templates}
+All pages share a layout fragment with the sidebar and a flash-message area, and a small
+library of fragments for text inputs, selects, pagers and status badges. The sidebar shows an
+entry only if the session holds the matching permission: an administrator sees 27 entries,
+a citizen sees five, including the dashboard (Figure~\ref{fig:citizenmenu}). Forms post to the portal, which sends a
+compact JSON body to the API (blank optional fields are omitted when creating and sent as
+\texttt{null} when updating so that a field can be cleared); a validation error is mapped back
+to the field that caused it and the form is shown again with the user's entries.
+
+\subsection{Screens}
+Figures~\ref{fig:scrdash}, \ref{fig:scrapp}, \ref{fig:scrveh}, \ref{fig:scrrole},
+\ref{fig:citizenmenu} and~\ref{fig:scrval} show six representative screens captured from
+the running system with the demonstration data. They are discussed with the results in
+Chapter~\ref{ch:results}.
+
+\section{Back-End Implementation}
+\subsection{Request pipeline and conventions}
+The pipeline is shown in Figure~\ref{fig:request}. A few conventions run through the API:
+\begin{itemize}
+\item JSON field names are \texttt{snake\_case}; dates are ISO-8601; money is a string with two decimals (\texttt{"1500.50"}), never a floating-point number;
+\item a list returns \texttt{items}, \texttt{page}, \texttt{page\_size}, \texttt{total} and \texttt{pages}, with at most 100 items per page and a whitelist of sort keys;
+\item the database session uses UTC, and times are converted for display only;
+\item the OpenAPI description is generated by springdoc and served as Swagger UI at \cd{/docs}.
+\end{itemize}
+
+\subsection{Persistence}
+Entities are plain mappings of tables with foreign keys held as ids rather than as object
+references, which avoids lazy-loading surprises and makes the locking calls explicit. The
+generated columns are mapped read-only. A tiny helper, \cd{Db}, wraps queries, row locks
+(each lock refreshes the entity so that nothing read before the lock is stale), paging and
+native queries. A schema-audit test verifies that every table and column has a mapping.
+
+\section{Database Implementation}
+\subsection{Scripts and order}
+The scripts are numbered in the order they are run: files 01 to 14 create the database and
+the 63 tables; 15 adds CHECK constraints; 16 adds indexes; 17 creates views; 18 creates
+triggers; 20 creates procedures; 21 holds the analytical queries; 22 and 23 are seed data;
+the verification folder holds the SQL test script. The file \cd{00_run_all.sql} runs the
+creation scripts with \texttt{SOURCE} in this order.
+
+\subsection{Seed data}
+The first seed (file 22) is small, with 10 citizens, 10 applications and 5 vehicles. A
+second, comprehensive seed is generated by a Python script and holds 23 citizens, 20
+applications, 15 vehicles, 11 driving licences, 13 payments and 61 audit entries. It covers
+\emph{every value of every ENUM column}: we checked this by comparing the allowed values of
+all 25 ENUM columns with the values present. It includes edge cases such as a person with
+accents and an apostrophe in the name, a person of gender \texttt{OTHER}, citizens with no
+activity at all, and a long audit trail for pagination. All event dates are written as
+offsets from the current date, so ``expires in four days'' remains true whenever the seed
+is loaded. A foreign-key audit of the loaded data found and removed four orphan references,
+which the seed's \texttt{FOREIGN\_KEY\_CHECKS = 0} setting had hidden (Section~\ref{sec:defects}).
+
+\subsection{Environment and accounts}\label{sec:envsetup}
+The application does not connect as the MySQL administrator. A dedicated account has rights
+only on the project's two databases. Table~\ref{tab:setup} lists the set-up steps that were
+used on the development machine; passwords and the signing secret are placed in the
+git-ignored \texttt{.env} file and are not reproduced here.
+
+\begin{table}[H]
+\centering\small
+\caption{Set-up steps (secrets omitted)}\label{tab:setup}
+\begin{tabularx}{\linewidth}{@{}p{0.8cm}X@{}}
+\toprule \textbf{Step} & \textbf{Action}\\ \midrule
+1 & Install JDK 21 and Maven 3.9; confirm with \cmd{java -version} and \cmd{mvn -v}\\
+2 & Create the schema: run \cmd{00_run_all.sql} with the mysql client from the \texttt{database} folder\\
+3 & Create the application account with \texttt{GRANT ALL} on the project database and on the test database only\\
+4 & Create \texttt{backend-java/.env} from the example: database host, port, user, password; a random JWT secret of at least 32 characters; the first administrator's username and password\\
+5 & Build: \cmd{mvn -DskipTests package} in each of the two projects\\
+6 & Bootstrap: \cmd{java -jar target/rto-management-backend-1.0.0.jar --rto.command=bootstrap}\\
+7 & Start the backend, then the portal; open \cmd{http://localhost:8080}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Communication and Concurrency Implementation}
+The portal and backend communicate over HTTP with JSON bodies. The portal is
+stateful (a session per browser), the backend is stateless (everything it needs is in the
+token and the database). The backend's connection pool has at most 20 connections, and the
+connections use the \texttt{READ COMMITTED} isolation level. Concurrency control is done with
+row locks and guarded updates inside each transaction, as described in
+Chapter~\ref{ch:algo}. The tests that exercise it start several threads together using a
+latch and then check the resulting data (Section~\ref{sec:conc}).
+
+\section{Git Repository and Timeline}\label{sec:timeline}
+The source is kept in a Git repository (\texttt{github.com/simritt/rto-management}).
+Table~\ref{tab:timeline} gives the order of the work from the commit history. Dates are
+commit dates, which show when work was pushed, not necessarily when it was written.
+
+\begin{table}[H]
+\centering\small
+\caption{Development timeline from the repository history}\label{tab:timeline}
+\begin{tabularx}{\linewidth}{@{}p{2.3cm}p{4.4cm}X@{}}
+\toprule \textbf{Date} & \textbf{Work} & \textbf{Reason for the order}\\ \midrule
+10 Aug 2026 & Database schema: 63 tables, run-all and verification scripts & Both other tiers depend on its names and keys\\
+4 Oct 2026 & Spring Boot backend with RBAC, transactions, locking, audit, notifications and integration tests & Needs only the schema; defines the API\\
+7 Oct 2026 & First version of the portal (feature branch) & Needs a working API; kept off the main branch until ready\\
+8 Oct 2026 & Eleven commits: constraints, indexes, views, triggers, locking examples, procedures, advanced queries, seed, run-all update, SQL tests, \texttt{.gitignore} & Added after the backend so triggers avoid duplicating its writes\\
+9 Oct 2026 & Project README & Written once the structure and run steps were settled\\
+20 Oct 2026 & Complete portal modules and workflows; merge into the main branch & Last, because it depends on every other layer\\
+22 Oct 2026 & Fix: challan insert violating the positive-amount rule; real BCrypt hashes for seed users & Corrections to the seed data\\
+3 Nov 2026 & Portal error-handling and input hardening; comprehensive demonstration seed & Result of the final validation (Chapter~\ref{ch:test})\\
+\bottomrule
+\end{tabularx}
+\end{table}
+The database enhancements were committed one concern per commit, in the order in which a
+database is hardened: constraints to define what is valid, indexes to make valid data
+quick to find, views for simple reading, triggers for automatic reactions, transactions
+and locking for correctness under concurrency, procedures to package multi-step
+operations, queries to show analysis, and seed data and tests to demonstrate and verify. A
+reviewer can therefore read or revert one concern without touching the rest. The commit
+messages follow the conventional style (\texttt{feat(db):}, \texttt{test(db):},
+\texttt{docs:}, \texttt{fix(frontend):}).
+
+\section{Integration of Modules}
+A typical end-to-end scenario touches most modules. A clerk registers a citizen and creates
+an application; the citizen uploads a document; a clerk verifies it; a slot is booked;
+the fee is paid; an officer approves; a licence is issued; the audit log shows each step;
+and notifications are delivered after each commit. The integration tests run such
+flows (for example \texttt{fullHappyPathRecordsEveryStep}) against a real database, and the
+portal crawl exercises the same pages a user would visit.
+
+\section{Implementation Challenges and Resolutions}
+Table~\ref{tab:challenges} summarises the implementation-level problems we met and how
+they were resolved. The defects found during final validation are described separately in
+Section~\ref{sec:defects}.
+
+\begin{table}[H]
+\centering\small
+\caption{Implementation challenges and resolutions}\label{tab:challenges}
+\begin{tabularx}{\linewidth}{@{}p{4.3cm}X@{}}
+\toprule \textbf{Challenge} & \textbf{Resolution}\\ \midrule
+Triggers and Java both writing history rows & Analysed what each service writes; added triggers only for licence and permit history and for delete guards\\
+New ownership row rejected by the unique key & Close the old row and flush it to the database before inserting the new row\\
+Duplicate slots when the counter is empty & MySQL treats NULLs as distinct in a unique key, so the service checks for duplicates under an office row lock\\
+Possible deadlock between two bookings & Always lock slots in ascending id order; fixed lock order application, appointment, slot\\
+Money shown with rounding errors & \texttt{DECIMAL} columns, \texttt{BigDecimal} in Java, strings in JSON\\
+Time-zone drift between server, JVM and database & The database session and the JVM both use UTC; the connection URL sets the connection time zone\\
+Token with junk after the signature accepted by a lenient decoder & Require a canonical three-part token and compare re-encoded parts\\
+A repeated payment request returned an error instead of the first result & Answer the replay before validating the target\\
+Triggers and procedures could not be created by the application account & With binary logging on, MySQL needs administrator rights or the \texttt{log\_bin\_trust\_function\_creators} setting before a non-administrator can create triggers or stored routines; the administrator enabled the setting\\
+Thymeleaf variable named \texttt{session} clashed with its built-in & Renamed the variable to \texttt{user}\\
+\bottomrule
+\end{tabularx}
+\end{table}

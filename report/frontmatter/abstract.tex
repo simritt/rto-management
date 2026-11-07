@@ -1,0 +1,35 @@
+\chapter*{Abstract}
+\thispagestyle{plain}
+A Regional Transport Office (RTO) issues licences, registers vehicles, transfers
+ownership, grants permits, fines offenders and collects fees. Almost everything it does
+is a record that moves through states under rules, which makes it a natural place to
+apply database management in depth. This project is a complete RTO Management System in
+which the database is treated as the final authority on correctness, and the
+application layers on top of it add security, workflow and usability.
+
+The data layer is a normalised MySQL 8 schema of 63 tables and 91 foreign keys, grouped
+into 13 modules, with CHECK and UNIQUE rules, generated columns that restrict a
+vehicle to one current owner, 25 additional indexes, 6 views, 5 triggers and 3 stored
+procedures. A Spring Boot 3 / Java 21 REST backend exposes 225 operations; it resolves
+permissions from the database on every request, uses JSON Web Tokens and BCrypt, takes
+row locks in a fixed order, writes an audit row for every important change, and sends
+notifications only after a transaction has committed. A second Spring Boot application
+renders a role-aware web portal with Thymeleaf and Tailwind CSS.
+
+The work was verified rather than assumed. The backend's 185 integration tests, which
+include real concurrent-request tests, pass on a real MySQL server. A crawl of about
+820 requests over every portal page, as an administrator and as a citizen, recorded 125
+failing requests, almost all caused by one defect in error handling, which was fixed and re-tested. In a
+local load test the API averaged 22.6~ms per request for one user and sustained about
+380 requests per second with 20 concurrent users and no errors. On 500,000 rows, a
+lookup that took 405.9~ms as a table scan took 1.4~ms through the project's index.
+Testing also exposed real defects in the supplied database scripts, which are reported.
+
+The system is an academic prototype: notifications use a mock provider, payments use a
+simulated gateway reference, and it does not integrate with national registers.
+Capacity beyond the tested single-machine load is not claimed.
+
+\vspace{0.6cm}
+\textbf{Keywords:} relational database design, integrity constraints, transactions and
+locking, role-based access control, REST API, Spring Boot, MySQL, audit trail.
+\clearpage

@@ -1,0 +1,56 @@
+---
+title: Permits and routes
+---
+erDiagram
+  permit_types {
+    bigint permit_type_id PK
+    varchar type_name UK
+    int validity_months
+  }
+  routes {
+    bigint route_id PK
+    varchar route_name
+    varchar origin
+    varchar destination
+  }
+  route_segments {
+    bigint segment_id PK
+    bigint route_id FK
+    smallint sequence_no
+    varchar segment_name
+  }
+  permits {
+    bigint permit_id PK
+    varchar permit_number UK
+    bigint vehicle_id FK
+    bigint citizen_id FK
+    bigint permit_type_id FK
+    bigint route_id FK
+    bigint application_id FK
+    date issue_date
+    date expiry_date
+    enum status
+  }
+  permit_status_history {
+    bigint history_id PK
+    bigint permit_id FK
+    varchar previous_status
+    varchar new_status
+    timestamp changed_at
+  }
+  applications {
+    bigint application_id PK
+  }
+  citizens {
+    bigint citizen_id PK
+  }
+  vehicles {
+    bigint vehicle_id PK
+  }
+  permits ||--o{ permit_status_history : "permit_id"
+  applications ||--o{ permits : "application_id"
+  citizens ||--o{ permits : "citizen_id"
+  routes |o--o{ permits : "route_id"
+  permit_types ||--o{ permits : "permit_type_id"
+  vehicles ||--o{ permits : "vehicle_id"
+  routes ||--o{ route_segments : "route_id"

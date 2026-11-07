@@ -1,0 +1,72 @@
++-------------------------+---------------------+
+| overdue_records_updated | executed_at         |
++-------------------------+---------------------+
+|                       0 | 2026-11-03 20:33:10 |
++-------------------------+---------------------+
++-------------+------------+-----------------+---------------+---------------------+------------------+----------------+----------+
+| transfer_id | vehicle_id | from_citizen_id | to_citizen_id | closed_ownership_id | new_ownership_id | effective_date | result   |
++-------------+------------+-----------------+---------------+---------------------+------------------+----------------+----------+
+|           2 |          1 |               1 |             5 |                   1 |                7 | 2026-11-03     | APPROVED |
++-------------+------------+-----------------+---------------+---------------------+------------------+----------------+----------+
++--------------+-------------------------------------------------------------------+--------+------------------------------------------------+
+| category     | test_name                                                         | result | detail                                         |
++--------------+-------------------------------------------------------------------+--------+------------------------------------------------+
+| SCHEMA       | Base table count = 33                                             | FAIL   | Found: 63 base tables                          |
+| VIEWS        | vw_current_vehicle_owners exists                                  | PASS   | Check view creation                            |
+| VIEWS        | vw_pending_applications exists                                    | PASS   | Check view creation                            |
+| VIEWS        | vw_outstanding_challans exists                                    | PASS   | Check view creation                            |
+| VIEWS        | vw_expiring_compliances exists                                    | PASS   | Check view creation                            |
+| VIEWS        | vw_active_driving_licences exists                                 | PASS   | Check view creation                            |
+| VIEWS        | vw_application_status_summary exists                              | PASS   | Check view creation                            |
+| VIEW DATA    | vw_current_vehicle_owners returns rows                            | PASS   | Rows: 5                                        |
+| VIEW DATA    | vw_pending_applications returns rows                              | PASS   | Rows: 5                                        |
+| VIEW DATA    | vw_outstanding_challans returns rows                              | PASS   | Rows: 2                                        |
+| VIEW DATA    | vw_active_driving_licences returns rows                           | PASS   | Rows: 2                                        |
+| VIEW DATA    | vw_application_status_summary returns rows                        | PASS   | Rows: 10                                       |
+| TRIGGERS     | All 5 triggers exist                                              | PASS   | Found: 5 triggers                              |
+| TRIGGERS     | trg_after_licence_status_change exists                            | PASS   | Licence history trigger                        |
+| TRIGGERS     | trg_after_permit_status_change exists                             | PASS   | Permit history trigger                         |
+| TRIGGERS     | trg_before_vehicle_delete exists                                  | PASS   | Vehicle delete guard                           |
+| TRIGGERS     | trg_before_licence_delete exists                                  | PASS   | Licence delete guard                           |
+| TRIGGERS     | trg_before_road_tax_update exists                                 | PASS   | Road tax overdue trigger                       |
+| TRIGGER FIRE | trg_after_licence_status_change fires on UPDATE                   | PASS   | History rows before=3 after=4                  |
+| TRIGGER FIRE | trg_before_vehicle_delete blocks ACTIVE vehicle delete            | PASS   | Vehicle 1 still exists: 1 row(s)               |
+| TRIGGER FIRE | trg_before_road_tax_update auto-sets OVERDUE                      | PASS   | status=OVERDUE (expected OVERDUE)              |
+| PROCEDURES   | All 3 stored procedures exist                                     | PASS   | Found: 3                                       |
+| PROCEDURES   | sp_transfer_vehicle_ownership exists                              | PASS   |                                                |
+| PROCEDURES   | sp_process_challan_payment exists                                 | PASS   |                                                |
+| PROCEDURES   | sp_update_overdue_road_tax exists                                 | PASS   |                                                |
+| PROC EXEC    | sp_update_overdue_road_tax runs without error                     | PASS   | Procedure completed successfully               |
+| PROC EXEC    | sp_transfer_vehicle_ownership: new owner inserted                 | PASS   | Owner before=1 after=5                         |
+| PROC EXEC    | sp_transfer_vehicle_ownership: old ownership closed               | PASS   | Previous ownership row has effective_to set    |
+| PROC EXEC    | sp_transfer_vehicle_ownership: transfer marked APPROVED           | PASS   | Transfer 2 status=APPROVED                     |
+| CONSTRAINTS  | chk_person_phone_format rejects bad phone                         | FAIL   | INSERT with invalid phone should be rejected   |
+| CONSTRAINTS  | chk_challan_amount_positive rejects negative amount               | FAIL   | INSERT with negative amount should be rejected |
+| INDEXES      | idx_attempt_gateway_ref exists (critical for payment idempotency) | PASS   |                                                |
+| INDEXES      | idx_dl_expiry exists (licence renewal dashboard)                  | PASS   |                                                |
+| INDEXES      | idx_road_tax_status_due exists (overdue batch)                    | PASS   |                                                |
+| SEED DATA    | 10 citizens loaded                                                | PASS   | Found: 10                                      |
+| SEED DATA    | 10 applications loaded                                            | PASS   | Found: 10                                      |
+| SEED DATA    | 5 vehicles loaded                                                 | PASS   | Found: 5                                       |
+| SEED DATA    | 4 challans loaded                                                 | PASS   | Found: 4                                       |
+| SEED DATA    | 5 payments loaded                                                 | PASS   | Found: 5                                       |
+| ADV SQL      | CTE SLA-breach query runs without error                           | PASS   | SLA-breached applications: 4                   |
+| ADV SQL      | Window RANK() on office applications runs without error           | PASS   | Rows returned: 2                               |
+| ADV SQL      | Window LAG() on status history runs without error                 | PASS   | Transition rows: 12                            |
++--------------+-------------------------------------------------------------------+--------+------------------------------------------------+
++--------+-------+
+| result | count |
++--------+-------+
+| FAIL   |     3 |
+| PASS   |    39 |
++--------+-------+
++-------------------------------------+
+| TEST_SUMMARY                        |
++-------------------------------------+
+| 39 PASSED  |  3 FAILED  |  42 TOTAL |
++-------------------------------------+
+
+--- stderr ---
+ERROR 1644 (45000) at line 183: Cannot delete an ACTIVE vehicle. Change status to SCRAPPED or DEREGISTERED first.
+ERROR 3819 (HY000) at line 289: Check constraint 'chk_person_phone_format' is violated.
+ERROR 3819 (HY000) at line 305: Check constraint 'chk_challan_amount_positive' is violated.

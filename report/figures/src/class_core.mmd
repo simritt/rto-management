@@ -1,0 +1,84 @@
+classDiagram
+  direction LR
+  class ApplicationController {
+    +create()
+    +changeStatus()
+    +uploadDocument()
+  }
+  class ApplicationService {
+    +TRANSITIONS : Map
+    +create(dto, user)
+    +applyStatus(app, next, reason)
+  }
+  class AppointmentService {
+    -lockSlots(ids)
+    -takeSeat(slot, app)
+    +book(app, slot)
+    +reschedule(appt, slot)
+  }
+  class OwnershipService {
+    +create(dto, user)
+    +approve(id, date, user)
+    +reject(id, reason, user)
+  }
+  class PaymentService {
+    -replayOf(reference)
+    +create(dto, user)
+    +retry(id, reference, outcome)
+    +createRefund(id, amount, reason)
+  }
+  class Db {
+    +get(type, id)
+    +lock(type, id)
+    +list(jpql)
+    +page(qb, params)
+  }
+  class Audit {
+    +record(table, id, action, old, new, user)
+  }
+  class Notifications {
+    +notify(personId, subject, message)
+    -deliver()
+  }
+  class NotificationProvider {
+    <<interface>>
+    +send(channel, to, subject, message)
+  }
+  class MockNotificationProvider
+  class JwtService {
+    +accessToken(userId)
+    +refreshToken(userId)
+    +decode(token, type)
+    +revoke(claims)
+  }
+  class AuthInterceptor {
+    +preHandle()
+  }
+  class CurrentUser {
+    +userId
+    +permissions : Set
+    +has(permission)
+    +require(permission)
+  }
+  class ApiException {
+    +status
+    +code
+    +detail
+  }
+  ApplicationController --> ApplicationService
+  ApplicationService --> Db
+  ApplicationService --> Audit
+  ApplicationService --> Notifications
+  AppointmentService --> Db
+  AppointmentService --> ApplicationService
+  OwnershipService --> Db
+  OwnershipService --> Audit
+  OwnershipService --> Notifications
+  PaymentService --> Db
+  PaymentService --> Audit
+  PaymentService --> Notifications
+  Notifications --> NotificationProvider
+  MockNotificationProvider ..|> NotificationProvider
+  AuthInterceptor --> CurrentUser
+  AuthInterceptor --> ApiException
+  JwtService ..> CurrentUser : subject = user id

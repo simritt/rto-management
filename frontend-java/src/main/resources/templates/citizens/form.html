@@ -19,7 +19,7 @@
                 <div th:replace="~{fragments/ui :: input('Date of birth', 'date_of_birth', 'date', true)}"></div>
                 <div th:replace="~{fragments/ui :: select('Gender', 'gender', ${ {'MALE','FEMALE','OTHER'} }, true)}"></div>
                 <div th:replace="~{fragments/ui :: input('National ID number', 'national_id_number', 'text', true)}"></div>
-                <div th:unless="${editing}" th:replace="~{fragments/ui :: input('Citizen code (optional, auto if blank)', 'citizen_code', 'text', false)}"></div>
+                <th:block th:unless="${editing}"><div th:replace="~{fragments/ui :: input('Citizen code (optional, auto if blank)', 'citizen_code', 'text', false)}"></div></th:block>
                 <div th:replace="~{fragments/ui :: input('Primary phone', 'phone_primary', 'text', true)}"></div>
                 <div th:replace="~{fragments/ui :: input('Secondary phone', 'phone_secondary', 'text', false)}"></div>
                 <div class="sm:col-span-2" th:replace="~{fragments/ui :: input('Email', 'email', 'email', false)}"></div>

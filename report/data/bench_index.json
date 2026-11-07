@@ -1,0 +1,133 @@
+{
+ "sizes": [
+  10000,
+  100000,
+  500000
+ ],
+ "attempt_lookup": [
+  {
+   "rows": 10000,
+   "without_index_ms": 4.283,
+   "with_index_ms": 0.669
+  },
+  {
+   "rows": 100000,
+   "without_index_ms": 76.706,
+   "with_index_ms": 0.812
+  },
+  {
+   "rows": 500000,
+   "without_index_ms": 405.882,
+   "with_index_ms": 1.38
+  }
+ ],
+ "road_tax_scan": [
+  {
+   "rows": 10000,
+   "without_index_ms": 6.837,
+   "with_index_ms": 0.963
+  },
+  {
+   "rows": 100000,
+   "without_index_ms": 53.342,
+   "with_index_ms": 2.636
+  },
+  {
+   "rows": 500000,
+   "without_index_ms": 266.492,
+   "with_index_ms": 14.316
+  }
+ ],
+ "explain": {
+  "10000": {
+   "without": {
+    "q1": {
+     "type": "ALL",
+     "key": null,
+     "rows": 9688,
+     "Extra": "Using where"
+    },
+    "q2": {
+     "type": "ALL",
+     "key": null,
+     "rows": 9774,
+     "Extra": "Using where"
+    }
+   },
+   "with": {
+    "q1": {
+     "type": "ref",
+     "key": "idx_attempt_gateway_ref",
+     "rows": 1,
+     "Extra": null
+    },
+    "q2": {
+     "type": "range",
+     "key": "idx_road_tax_status_due",
+     "rows": 303,
+     "Extra": "Using where; Using index"
+    }
+   }
+  },
+  "100000": {
+   "without": {
+    "q1": {
+     "type": "ALL",
+     "key": null,
+     "rows": 99802,
+     "Extra": "Using where"
+    },
+    "q2": {
+     "type": "ALL",
+     "key": null,
+     "rows": 99900,
+     "Extra": "Using where"
+    }
+   },
+   "with": {
+    "q1": {
+     "type": "ref",
+     "key": "idx_attempt_gateway_ref",
+     "rows": 1,
+     "Extra": null
+    },
+    "q2": {
+     "type": "range",
+     "key": "idx_road_tax_status_due",
+     "rows": 3030,
+     "Extra": "Using where; Using index"
+    }
+   }
+  },
+  "500000": {
+   "without": {
+    "q1": {
+     "type": "ALL",
+     "key": null,
+     "rows": 498454,
+     "Extra": "Using where"
+    },
+    "q2": {
+     "type": "ALL",
+     "key": null,
+     "rows": 498834,
+     "Extra": "Using where"
+    }
+   },
+   "with": {
+    "q1": {
+     "type": "ref",
+     "key": "idx_attempt_gateway_ref",
+     "rows": 1,
+     "Extra": null
+    },
+    "q2": {
+     "type": "range",
+     "key": "idx_road_tax_status_due",
+     "rows": 28742,
+     "Extra": "Using where; Using index"
+    }
+   }
+  }
+ }
+}

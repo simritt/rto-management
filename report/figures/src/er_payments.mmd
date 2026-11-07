@@ -1,0 +1,44 @@
+---
+title: Fees, payments and refunds
+---
+erDiagram
+  payable_types {
+    bigint payable_type_id PK
+    varchar type_name UK
+  }
+  fee_structures {
+    bigint fee_id PK
+    bigint service_type_id FK
+    varchar component_name
+    decimal amount
+    date effective_from
+  }
+  payments {
+    bigint payment_id PK
+    varchar receipt_number UK
+    bigint payable_type_id FK
+    bigint payable_id
+    decimal amount
+    enum status
+  }
+  payment_attempts {
+    bigint attempt_id PK
+    bigint payment_id FK
+    smallint attempt_number
+    varchar gateway_reference
+    enum outcome
+  }
+  refunds {
+    bigint refund_id PK
+    bigint payment_id FK
+    decimal amount
+    varchar reason
+    enum status
+  }
+  service_types {
+    bigint service_type_id PK
+  }
+  service_types ||--o{ fee_structures : "service_type_id"
+  payments ||--o{ payment_attempts : "payment_id"
+  payable_types ||--o{ payments : "payable_type_id"
+  payments ||--o{ refunds : "payment_id"

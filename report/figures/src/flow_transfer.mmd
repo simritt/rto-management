@@ -1,0 +1,22 @@
+flowchart TD
+  s(["approve(transfer_id, date)"]) --> a["Lock transfer row"]
+  a --> b{"status = PENDING?"}
+  b -- no --> e1["409 INVALID_TRANSITION"]
+  b -- yes --> c["Lock vehicle row"]
+  c --> d{"vehicle ACTIVE?"}
+  d -- no --> e2["409 VEHICLE_NOT_ACTIVE"]
+  d -- yes --> f["Lock current ownership row<br/>(effective_to IS NULL)"]
+  f --> g{"from-citizen still<br/>the current owner?"}
+  g -- no --> e3["409 NOT_CURRENT_OWNER"]
+  g -- yes --> h{"transferee not blacklisted<br/>and date valid?"}
+  h -- no --> e4["409 / 400"]
+  h -- yes --> i["Close old ownership: effective_to = date"]
+  i --> j["Flush to database"]
+  j --> k["Insert new ownership: effective_from = date"]
+  k --> l["Transfer status = APPROVED, approved_at = now"]
+  l --> m["Audit rows, queue notifications"]
+  m --> ok(["COMMIT"])
+  e1 --> rb(["ROLLBACK"])
+  e2 --> rb
+  e3 --> rb
+  e4 --> rb

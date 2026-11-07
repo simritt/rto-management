@@ -1,0 +1,805 @@
+\subsection*{Reference data (02\_reference\_tables)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{regions}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+region\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+region\_\allowbreak{}name & varchar(100) & N &  &  \\
+region\_\allowbreak{}code & varchar(10) & N & UK &  \\
+parent\_\allowbreak{}region\_\allowbreak{}id & bigint u & Y & idx & FK to regions.region\_\allowbreak{}id, ON DELETE RESTRICT \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{vehicle\_\allowbreak{}manufacturers}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+manufacturer\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+name & varchar(100) & N & UK &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{vehicle\_\allowbreak{}models}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+model\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+manufacturer\_\allowbreak{}id & bigint u & N & idx & FK to vehicle\_\allowbreak{}manufacturers.manufacturer\_\allowbreak{}id, ON DELETE RESTRICT \\
+model\_\allowbreak{}name & varchar(100) & N &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{vehicle\_\allowbreak{}types}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+vehicle\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+type\_\allowbreak{}name & varchar(50) & N & UK &  \\
+is\_\allowbreak{}commercial & tinyint(1) & N &  & default 0 \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{fuel\_\allowbreak{}types}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+fuel\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+fuel\_\allowbreak{}name & varchar(30) & N & UK &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{licence\_\allowbreak{}classes}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+licence\_\allowbreak{}class\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+class\_\allowbreak{}code & varchar(10) & N & UK &  \\
+description & varchar(150) & N &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{document\_\allowbreak{}types}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+document\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+type\_\allowbreak{}name & varchar(100) & N & UK &  \\
+is\_\allowbreak{}mandatory\_\allowbreak{}default & tinyint(1) & N &  & default 1 \\
+validity\_\allowbreak{}period\_\allowbreak{}days & int u & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{service\_\allowbreak{}types}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+service\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+service\_\allowbreak{}name & varchar(100) & N &  &  \\
+service\_\allowbreak{}code & varchar(30) & N & UK &  \\
+base\_\allowbreak{}fee & decimal(10,2) & N &  & default 0.00 \\
+sla\_\allowbreak{}days & int u & N &  & default 7 \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{violation\_\allowbreak{}types}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+violation\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+description & varchar(150) & N & UK &  \\
+base\_\allowbreak{}fine\_\allowbreak{}amount & decimal(10,2) & N &  &  \\
+is\_\allowbreak{}cognizable & tinyint(1) & N &  & default 0 \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{permit\_\allowbreak{}types}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+permit\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+type\_\allowbreak{}name & varchar(50) & N & UK &  \\
+validity\_\allowbreak{}months & int u & N &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{payable\_\allowbreak{}types}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+payable\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+type\_\allowbreak{}name & varchar(30) & N & UK &  \\
+\end{longtable}
+\vspace{-0.4em}
+\subsection*{Identity (03\_identity)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{persons}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+person\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+first\_\allowbreak{}name & varchar(60) & N &  &  \\
+last\_\allowbreak{}name & varchar(60) & N & idx &  \\
+date\_\allowbreak{}of\_\allowbreak{}birth & date & N &  &  \\
+gender & enum('MALE',\allowbreak{}'FEMALE',\allowbreak{}'OTHER') & N &  &  \\
+national\_\allowbreak{}id\_\allowbreak{}number & varchar(20) & N & UK &  \\
+phone\_\allowbreak{}primary & varchar(15) & N & idx &  \\
+phone\_\allowbreak{}secondary & varchar(15) & Y &  &  \\
+email & varchar(120) & Y &  &  \\
+photo\_\allowbreak{}path & varchar(255) & Y &  &  \\
+created\_\allowbreak{}at & timestamp & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+updated\_\allowbreak{}at & timestamp & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{addresses}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+address\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+person\_\allowbreak{}id & bigint u & N & idx & FK to persons.person\_\allowbreak{}id, ON DELETE CASCADE \\
+line1 & varchar(150) & N &  &  \\
+line2 & varchar(150) & Y &  &  \\
+city & varchar(80) & N &  &  \\
+state & varchar(80) & N &  &  \\
+pincode & varchar(10) & N & idx &  \\
+address\_\allowbreak{}type & enum('PERMANENT',\allowbreak{}'CURRENT',\allowbreak{}'OFFICE') & N &  & default CURRENT \\
+is\_\allowbreak{}current & tinyint(1) & N &  & default 1 \\
+valid\_\allowbreak{}from & date & N &  &  \\
+valid\_\allowbreak{}to & date & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{citizens}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+citizen\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+person\_\allowbreak{}id & bigint u & N & UK & FK to persons.person\_\allowbreak{}id, ON DELETE RESTRICT \\
+citizen\_\allowbreak{}code & varchar(20) & N & UK &  \\
+blacklisted & tinyint(1) & N &  & default 0 \\
+blacklist\_\allowbreak{}reason & varchar(255) & Y &  &  \\
+registered\_\allowbreak{}at & timestamp & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+\end{longtable}
+\vspace{-0.4em}
+\subsection*{Office structure (04\_office\_structure)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{rto\_\allowbreak{}offices}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+office\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+region\_\allowbreak{}id & bigint u & N & idx & FK to regions.region\_\allowbreak{}id, ON DELETE RESTRICT \\
+office\_\allowbreak{}name & varchar(100) & N &  &  \\
+office\_\allowbreak{}code & varchar(15) & N & UK &  \\
+address\_\allowbreak{}line & varchar(200) & N &  &  \\
+is\_\allowbreak{}active & tinyint(1) & N &  & default 1 \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{departments}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+department\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+department\_\allowbreak{}name & varchar(80) & N & UK &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{designations}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+designation\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+title & varchar(80) & N & UK &  \\
+rank\_\allowbreak{}level & tinyint u & N &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{counters}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+counter\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+office\_\allowbreak{}id & bigint u & N & idx & FK to rto\_\allowbreak{}offices.office\_\allowbreak{}id, ON DELETE CASCADE \\
+counter\_\allowbreak{}number & varchar(10) & N &  &  \\
+service\_\allowbreak{}category & varchar(50) & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\subsection*{Employees (05\_employees)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{employees}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+employee\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+person\_\allowbreak{}id & bigint u & N & UK & FK to persons.person\_\allowbreak{}id, ON DELETE RESTRICT \\
+employee\_\allowbreak{}code & varchar(20) & N & UK &  \\
+designation\_\allowbreak{}id & bigint u & N & idx & FK to designations.designation\_\allowbreak{}id, ON DELETE RESTRICT \\
+date\_\allowbreak{}joined & date & N &  &  \\
+is\_\allowbreak{}active & tinyint(1) & N &  & default 1 \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{employee\_\allowbreak{}postings}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+posting\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+employee\_\allowbreak{}id & bigint u & N & idx & FK to employees.employee\_\allowbreak{}id, ON DELETE CASCADE \\
+office\_\allowbreak{}id & bigint u & N & idx & FK to rto\_\allowbreak{}offices.office\_\allowbreak{}id, ON DELETE RESTRICT \\
+department\_\allowbreak{}id & bigint u & N & idx & FK to departments.department\_\allowbreak{}id, ON DELETE RESTRICT \\
+posted\_\allowbreak{}from & date & N &  &  \\
+posted\_\allowbreak{}to & date & Y &  &  \\
+current\_\allowbreak{}flag & tinyint & Y &  & generated: if((posted\_\allowbreak{}to is null),1,NULL) \\
+\end{longtable}
+\vspace{-0.4em}
+\subsection*{Access control (06\_rbac)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{users}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+user\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+person\_\allowbreak{}id & bigint u & N & idx & FK to persons.person\_\allowbreak{}id, ON DELETE CASCADE \\
+username & varchar(50) & N & UK &  \\
+password\_\allowbreak{}hash & varchar(255) & N &  &  \\
+is\_\allowbreak{}active & tinyint(1) & N &  & default 1 \\
+last\_\allowbreak{}login\_\allowbreak{}at & datetime & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{roles}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+role\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+role\_\allowbreak{}name & varchar(50) & N & UK &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{permissions}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+permission\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+permission\_\allowbreak{}key & varchar(80) & N & UK &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{user\_\allowbreak{}roles}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+user\_\allowbreak{}id & bigint u & N & PK & FK to users.user\_\allowbreak{}id, ON DELETE CASCADE \\
+role\_\allowbreak{}id & bigint u & N & PK & FK to roles.role\_\allowbreak{}id, ON DELETE CASCADE \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{role\_\allowbreak{}permissions}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+role\_\allowbreak{}id & bigint u & N & PK & FK to roles.role\_\allowbreak{}id, ON DELETE CASCADE \\
+permission\_\allowbreak{}id & bigint u & N & PK & FK to permissions.permission\_\allowbreak{}id, ON DELETE CASCADE \\
+\end{longtable}
+\vspace{-0.4em}
+\subsection*{Applications (07\_applications)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{applicants}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+applicant\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+citizen\_\allowbreak{}id & bigint u & N & UK & FK to citizens.citizen\_\allowbreak{}id, ON DELETE RESTRICT \\
+preferred\_\allowbreak{}office\_\allowbreak{}id & bigint u & Y & idx & FK to rto\_\allowbreak{}offices.office\_\allowbreak{}id, ON DELETE SET NULL \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{applications}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+application\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+application\_\allowbreak{}number & varchar(30) & N & UK &  \\
+applicant\_\allowbreak{}id & bigint u & N & idx & FK to applicants.applicant\_\allowbreak{}id, ON DELETE RESTRICT \\
+service\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & idx & FK to service\_\allowbreak{}types.service\_\allowbreak{}type\_\allowbreak{}id, ON DELETE RESTRICT \\
+office\_\allowbreak{}id & bigint u & N & idx & FK to rto\_\allowbreak{}offices.office\_\allowbreak{}id, ON DELETE RESTRICT \\
+assigned\_\allowbreak{}officer\_\allowbreak{}id & bigint u & Y & idx & FK to employees.employee\_\allowbreak{}id, ON DELETE SET NULL \\
+current\_\allowbreak{}status & enum('SUBMITTED',\allowbreak{}'DOCS\_\allowbreak{}PENDING',\allowbreak{}'UNDER\_\allowbreak{}VERIFICATION',\allowbreak{}'APPOINTMENT\_\allowbreak{}SCHEDULED',\allowbreak{}'AWAITING\_\allowbreak{}PAYMENT',\allowbreak{}'APPROVED',\allowbreak{}'REJECTED',\allowbreak{}'COMPLETED',\allowbreak{}'CANCELLED') & N & idx & default SUBMITTED \\
+submitted\_\allowbreak{}at & datetime & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+completed\_\allowbreak{}at & datetime & Y &  &  \\
+remarks & varchar(500) & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{application\_\allowbreak{}status\_\allowbreak{}history}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+history\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+application\_\allowbreak{}id & bigint u & N & idx & FK to applications.application\_\allowbreak{}id, ON DELETE CASCADE \\
+previous\_\allowbreak{}status & varchar(30) & Y &  &  \\
+new\_\allowbreak{}status & varchar(30) & N &  &  \\
+changed\_\allowbreak{}by\_\allowbreak{}user\_\allowbreak{}id & bigint u & Y & idx & FK to users.user\_\allowbreak{}id, ON DELETE SET NULL \\
+changed\_\allowbreak{}at & timestamp & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+reason & varchar(255) & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{documents}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+document\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+application\_\allowbreak{}id & bigint u & N & idx & FK to applications.application\_\allowbreak{}id, ON DELETE CASCADE \\
+document\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & idx & FK to document\_\allowbreak{}types.document\_\allowbreak{}type\_\allowbreak{}id, ON DELETE RESTRICT \\
+file\_\allowbreak{}path & varchar(255) & N &  &  \\
+verification\_\allowbreak{}status & enum('PENDING',\allowbreak{}'VERIFIED',\allowbreak{}'REJECTED',\allowbreak{}'EXPIRED') & N &  & default PENDING \\
+verified\_\allowbreak{}by\_\allowbreak{}employee\_\allowbreak{}id & bigint u & Y & idx & FK to employees.employee\_\allowbreak{}id, ON DELETE SET NULL \\
+rejection\_\allowbreak{}reason & varchar(255) & Y &  &  \\
+uploaded\_\allowbreak{}at & datetime & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+verified\_\allowbreak{}at & datetime & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{appointment\_\allowbreak{}slots}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+slot\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+office\_\allowbreak{}id & bigint u & N & idx & FK to rto\_\allowbreak{}offices.office\_\allowbreak{}id, ON DELETE CASCADE \\
+counter\_\allowbreak{}id & bigint u & Y & idx & FK to counters.counter\_\allowbreak{}id, ON DELETE SET NULL \\
+slot\_\allowbreak{}date & date & N &  &  \\
+start\_\allowbreak{}time & time & N &  &  \\
+end\_\allowbreak{}time & time & N &  &  \\
+capacity & smallint u & N &  & default 1 \\
+booked\_\allowbreak{}count & smallint u & N &  & default 0 \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{appointments}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+appointment\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+application\_\allowbreak{}id & bigint u & N & UK & FK to applications.application\_\allowbreak{}id, ON DELETE CASCADE \\
+slot\_\allowbreak{}id & bigint u & N & idx & FK to appointment\_\allowbreak{}slots.slot\_\allowbreak{}id, ON DELETE RESTRICT \\
+token\_\allowbreak{}number & varchar(15) & N &  &  \\
+status & enum('BOOKED',\allowbreak{}'RESCHEDULED',\allowbreak{}'CANCELLED',\allowbreak{}'NO\_\allowbreak{}SHOW',\allowbreak{}'COMPLETED') & N &  & default BOOKED \\
+booked\_\allowbreak{}at & datetime & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+\end{longtable}
+\vspace{-0.4em}
+\subsection*{Licensing (08\_licence)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{driving\_\allowbreak{}schools}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+school\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+school\_\allowbreak{}name & varchar(120) & N &  &  \\
+licence\_\allowbreak{}number & varchar(30) & N & UK &  \\
+office\_\allowbreak{}id & bigint u & N & idx & FK to rto\_\allowbreak{}offices.office\_\allowbreak{}id, ON DELETE RESTRICT \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{driving\_\allowbreak{}instructors}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+instructor\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+person\_\allowbreak{}id & bigint u & N & UK & FK to persons.person\_\allowbreak{}id, ON DELETE RESTRICT \\
+school\_\allowbreak{}id & bigint u & N & idx & FK to driving\_\allowbreak{}schools.school\_\allowbreak{}id, ON DELETE CASCADE \\
+licence\_\allowbreak{}class\_\allowbreak{}id & bigint u & N & idx & FK to licence\_\allowbreak{}classes.licence\_\allowbreak{}class\_\allowbreak{}id, ON DELETE RESTRICT \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{test\_\allowbreak{}centres}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+test\_\allowbreak{}centre\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+office\_\allowbreak{}id & bigint u & N & idx & FK to rto\_\allowbreak{}offices.office\_\allowbreak{}id, ON DELETE CASCADE \\
+centre\_\allowbreak{}name & varchar(120) & N &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{learner\_\allowbreak{}licences}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+learner\_\allowbreak{}licence\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+licence\_\allowbreak{}number & varchar(30) & N & UK &  \\
+citizen\_\allowbreak{}id & bigint u & N & idx & FK to citizens.citizen\_\allowbreak{}id, ON DELETE RESTRICT \\
+application\_\allowbreak{}id & bigint u & N & idx & FK to applications.application\_\allowbreak{}id, ON DELETE RESTRICT \\
+office\_\allowbreak{}id & bigint u & N & idx & FK to rto\_\allowbreak{}offices.office\_\allowbreak{}id, ON DELETE RESTRICT \\
+issue\_\allowbreak{}date & date & N &  &  \\
+expiry\_\allowbreak{}date & date & N &  &  \\
+status & enum('ACTIVE',\allowbreak{}'EXPIRED',\allowbreak{}'CONVERTED',\allowbreak{}'CANCELLED') & N &  & default ACTIVE \\
+active\_\allowbreak{}flag & tinyint & Y &  & generated: if((status = \_\allowbreak{}utf8mb4'ACTIVE'),1,NULL) \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{driving\_\allowbreak{}licences}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+driving\_\allowbreak{}licence\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+licence\_\allowbreak{}number & varchar(30) & N & UK &  \\
+citizen\_\allowbreak{}id & bigint u & N & idx & FK to citizens.citizen\_\allowbreak{}id, ON DELETE RESTRICT \\
+learner\_\allowbreak{}licence\_\allowbreak{}id & bigint u & Y & idx & FK to learner\_\allowbreak{}licences.learner\_\allowbreak{}licence\_\allowbreak{}id, ON DELETE SET NULL \\
+application\_\allowbreak{}id & bigint u & N & idx & FK to applications.application\_\allowbreak{}id, ON DELETE RESTRICT \\
+office\_\allowbreak{}id & bigint u & N & idx & FK to rto\_\allowbreak{}offices.office\_\allowbreak{}id, ON DELETE RESTRICT \\
+issue\_\allowbreak{}date & date & N &  &  \\
+expiry\_\allowbreak{}date & date & N &  &  \\
+current\_\allowbreak{}status & enum('ACTIVE',\allowbreak{}'SUSPENDED',\allowbreak{}'REVOKED',\allowbreak{}'EXPIRED') & N & idx & default ACTIVE \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{licence\_\allowbreak{}class\_\allowbreak{}assignments}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+driving\_\allowbreak{}licence\_\allowbreak{}id & bigint u & N & PK & FK to driving\_\allowbreak{}licences.driving\_\allowbreak{}licence\_\allowbreak{}id, ON DELETE CASCADE \\
+licence\_\allowbreak{}class\_\allowbreak{}id & bigint u & N & PK & FK to licence\_\allowbreak{}classes.licence\_\allowbreak{}class\_\allowbreak{}id, ON DELETE RESTRICT \\
+granted\_\allowbreak{}on & date & N &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{licence\_\allowbreak{}status\_\allowbreak{}history}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+history\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+driving\_\allowbreak{}licence\_\allowbreak{}id & bigint u & N & idx & FK to driving\_\allowbreak{}licences.driving\_\allowbreak{}licence\_\allowbreak{}id, ON DELETE CASCADE \\
+previous\_\allowbreak{}status & varchar(20) & Y &  &  \\
+new\_\allowbreak{}status & varchar(20) & N &  &  \\
+changed\_\allowbreak{}by\_\allowbreak{}user\_\allowbreak{}id & bigint u & Y & idx & FK to users.user\_\allowbreak{}id, ON DELETE SET NULL \\
+changed\_\allowbreak{}at & timestamp & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+reason & varchar(255) & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{driving\_\allowbreak{}tests}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+test\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+application\_\allowbreak{}id & bigint u & N & idx & FK to applications.application\_\allowbreak{}id, ON DELETE CASCADE \\
+citizen\_\allowbreak{}id & bigint u & N & idx & FK to citizens.citizen\_\allowbreak{}id, ON DELETE RESTRICT \\
+test\_\allowbreak{}centre\_\allowbreak{}id & bigint u & N & idx & FK to test\_\allowbreak{}centres.test\_\allowbreak{}centre\_\allowbreak{}id, ON DELETE RESTRICT \\
+examiner\_\allowbreak{}employee\_\allowbreak{}id & bigint u & N & idx & FK to employees.employee\_\allowbreak{}id, ON DELETE RESTRICT \\
+scheduled\_\allowbreak{}at & datetime & N &  &  \\
+result & enum('PENDING',\allowbreak{}'PASS',\allowbreak{}'FAIL',\allowbreak{}'ABSENT') & N &  & default PENDING \\
+remarks & varchar(255) & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\subsection*{Vehicles (09\_vehicles)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{vehicles}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+vehicle\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+registration\_\allowbreak{}number & varchar(20) & N & UK &  \\
+chassis\_\allowbreak{}number & varchar(40) & N & UK &  \\
+engine\_\allowbreak{}number & varchar(40) & N & UK &  \\
+manufacturer\_\allowbreak{}id & bigint u & N & idx & FK to vehicle\_\allowbreak{}manufacturers.manufacturer\_\allowbreak{}id, ON DELETE RESTRICT \\
+model\_\allowbreak{}id & bigint u & N & idx & FK to vehicle\_\allowbreak{}models.model\_\allowbreak{}id, ON DELETE RESTRICT \\
+vehicle\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & idx & FK to vehicle\_\allowbreak{}types.vehicle\_\allowbreak{}type\_\allowbreak{}id, ON DELETE RESTRICT \\
+fuel\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & idx & FK to fuel\_\allowbreak{}types.fuel\_\allowbreak{}type\_\allowbreak{}id, ON DELETE RESTRICT \\
+manufacture\_\allowbreak{}year & year & N &  &  \\
+color & varchar(30) & Y &  &  \\
+registering\_\allowbreak{}office\_\allowbreak{}id & bigint u & N & idx & FK to rto\_\allowbreak{}offices.office\_\allowbreak{}id, ON DELETE RESTRICT \\
+registration\_\allowbreak{}date & date & N &  &  \\
+status & enum('ACTIVE',\allowbreak{}'BLACKLISTED',\allowbreak{}'SCRAPPED',\allowbreak{}'DEREGISTERED') & N &  & default ACTIVE \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{vehicle\_\allowbreak{}ownerships}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+ownership\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+vehicle\_\allowbreak{}id & bigint u & N & idx & FK to vehicles.vehicle\_\allowbreak{}id, ON DELETE RESTRICT \\
+citizen\_\allowbreak{}id & bigint u & N & idx & FK to citizens.citizen\_\allowbreak{}id, ON DELETE RESTRICT \\
+effective\_\allowbreak{}from & date & N &  &  \\
+effective\_\allowbreak{}to & date & Y &  &  \\
+current\_\allowbreak{}flag & tinyint & Y &  & generated: if((effective\_\allowbreak{}to is null),1,NULL) \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{ownership\_\allowbreak{}transfers}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+transfer\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+vehicle\_\allowbreak{}id & bigint u & N & idx & FK to vehicles.vehicle\_\allowbreak{}id, ON DELETE RESTRICT \\
+from\_\allowbreak{}citizen\_\allowbreak{}id & bigint u & N & idx & FK to citizens.citizen\_\allowbreak{}id, ON DELETE RESTRICT \\
+to\_\allowbreak{}citizen\_\allowbreak{}id & bigint u & N & idx & FK to citizens.citizen\_\allowbreak{}id, ON DELETE RESTRICT \\
+application\_\allowbreak{}id & bigint u & N & idx & FK to applications.application\_\allowbreak{}id, ON DELETE RESTRICT \\
+requested\_\allowbreak{}at & datetime & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+approved\_\allowbreak{}at & datetime & Y &  &  \\
+status & enum('PENDING',\allowbreak{}'APPROVED',\allowbreak{}'REJECTED') & N &  & default PENDING \\
+\end{longtable}
+\vspace{-0.4em}
+\subsection*{Compliance (10\_compliance)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{vehicle\_\allowbreak{}inspections}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+inspection\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+vehicle\_\allowbreak{}id & bigint u & N & idx & FK to vehicles.vehicle\_\allowbreak{}id, ON DELETE CASCADE \\
+inspector\_\allowbreak{}employee\_\allowbreak{}id & bigint u & N & idx & FK to employees.employee\_\allowbreak{}id, ON DELETE RESTRICT \\
+inspected\_\allowbreak{}at & datetime & N &  &  \\
+result & enum('PASS',\allowbreak{}'FAIL') & N &  &  \\
+remarks & varchar(255) & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{fitness\_\allowbreak{}certificates}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+certificate\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+vehicle\_\allowbreak{}id & bigint u & N & idx & FK to vehicles.vehicle\_\allowbreak{}id, ON DELETE CASCADE \\
+inspection\_\allowbreak{}id & bigint u & Y & idx & FK to vehicle\_\allowbreak{}inspections.inspection\_\allowbreak{}id, ON DELETE SET NULL \\
+issue\_\allowbreak{}date & date & N &  &  \\
+expiry\_\allowbreak{}date & date & N &  &  \\
+status & enum('ACTIVE',\allowbreak{}'EXPIRED',\allowbreak{}'REVOKED') & N &  & default ACTIVE \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{pollution\_\allowbreak{}certificates}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+puc\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+vehicle\_\allowbreak{}id & bigint u & N & idx & FK to vehicles.vehicle\_\allowbreak{}id, ON DELETE CASCADE \\
+issue\_\allowbreak{}date & date & N &  &  \\
+expiry\_\allowbreak{}date & date & N &  &  \\
+status & enum('ACTIVE',\allowbreak{}'EXPIRED') & N &  & default ACTIVE \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{insurance\_\allowbreak{}policies}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+policy\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+vehicle\_\allowbreak{}id & bigint u & N & idx & FK to vehicles.vehicle\_\allowbreak{}id, ON DELETE CASCADE \\
+provider\_\allowbreak{}name & varchar(100) & N &  &  \\
+policy\_\allowbreak{}number & varchar(40) & N & UK &  \\
+start\_\allowbreak{}date & date & N &  &  \\
+end\_\allowbreak{}date & date & N &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{road\_\allowbreak{}tax\_\allowbreak{}records}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+tax\_\allowbreak{}record\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+vehicle\_\allowbreak{}id & bigint u & N & idx & FK to vehicles.vehicle\_\allowbreak{}id, ON DELETE CASCADE \\
+assessment\_\allowbreak{}year & year & N &  &  \\
+amount\_\allowbreak{}due & decimal(10,2) & N &  &  \\
+due\_\allowbreak{}date & date & N &  &  \\
+status & enum('DUE',\allowbreak{}'PAID',\allowbreak{}'OVERDUE') & N &  & default DUE \\
+\end{longtable}
+\vspace{-0.4em}
+\subsection*{Permits (11\_permits)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{routes}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+route\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+route\_\allowbreak{}name & varchar(120) & N &  &  \\
+origin & varchar(80) & N &  &  \\
+destination & varchar(80) & N &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{route\_\allowbreak{}segments}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+segment\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+route\_\allowbreak{}id & bigint u & N & idx & FK to routes.route\_\allowbreak{}id, ON DELETE CASCADE \\
+sequence\_\allowbreak{}no & smallint u & N &  &  \\
+segment\_\allowbreak{}name & varchar(120) & N &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{permits}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+permit\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+permit\_\allowbreak{}number & varchar(30) & N & UK &  \\
+vehicle\_\allowbreak{}id & bigint u & N & idx & FK to vehicles.vehicle\_\allowbreak{}id, ON DELETE RESTRICT \\
+citizen\_\allowbreak{}id & bigint u & N & idx & FK to citizens.citizen\_\allowbreak{}id, ON DELETE RESTRICT \\
+permit\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & idx & FK to permit\_\allowbreak{}types.permit\_\allowbreak{}type\_\allowbreak{}id, ON DELETE RESTRICT \\
+route\_\allowbreak{}id & bigint u & Y & idx & FK to routes.route\_\allowbreak{}id, ON DELETE SET NULL \\
+application\_\allowbreak{}id & bigint u & N & idx & FK to applications.application\_\allowbreak{}id, ON DELETE RESTRICT \\
+issue\_\allowbreak{}date & date & N &  &  \\
+expiry\_\allowbreak{}date & date & N &  &  \\
+status & enum('ACTIVE',\allowbreak{}'EXPIRED',\allowbreak{}'SUSPENDED',\allowbreak{}'CANCELLED') & N &  & default ACTIVE \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{permit\_\allowbreak{}status\_\allowbreak{}history}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+history\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+permit\_\allowbreak{}id & bigint u & N & idx & FK to permits.permit\_\allowbreak{}id, ON DELETE CASCADE \\
+previous\_\allowbreak{}status & varchar(20) & Y &  &  \\
+new\_\allowbreak{}status & varchar(20) & N &  &  \\
+changed\_\allowbreak{}at & timestamp & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+reason & varchar(255) & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\subsection*{Violations (12\_violations)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{violations}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+violation\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+vehicle\_\allowbreak{}id & bigint u & N & idx & FK to vehicles.vehicle\_\allowbreak{}id, ON DELETE RESTRICT \\
+driver\_\allowbreak{}citizen\_\allowbreak{}id & bigint u & Y & idx & FK to citizens.citizen\_\allowbreak{}id, ON DELETE SET NULL \\
+violation\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & idx & FK to violation\_\allowbreak{}types.violation\_\allowbreak{}type\_\allowbreak{}id, ON DELETE RESTRICT \\
+officer\_\allowbreak{}employee\_\allowbreak{}id & bigint u & N & idx & FK to employees.employee\_\allowbreak{}id, ON DELETE RESTRICT \\
+location & varchar(200) & N &  &  \\
+occurred\_\allowbreak{}at & datetime & N &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{challans}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+challan\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+challan\_\allowbreak{}number & varchar(30) & N & UK &  \\
+total\_\allowbreak{}amount & decimal(10,2) & N &  &  \\
+status & enum('ISSUED',\allowbreak{}'DISPUTED',\allowbreak{}'PAID',\allowbreak{}'CANCELLED') & N & idx & default ISSUED \\
+issued\_\allowbreak{}at & datetime & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{challan\_\allowbreak{}violations}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+challan\_\allowbreak{}id & bigint u & N & PK & FK to challans.challan\_\allowbreak{}id, ON DELETE CASCADE \\
+violation\_\allowbreak{}id & bigint u & N & PK & FK to violations.violation\_\allowbreak{}id, ON DELETE RESTRICT \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{challan\_\allowbreak{}status\_\allowbreak{}history}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+history\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+challan\_\allowbreak{}id & bigint u & N & idx & FK to challans.challan\_\allowbreak{}id, ON DELETE CASCADE \\
+previous\_\allowbreak{}status & varchar(20) & Y &  &  \\
+new\_\allowbreak{}status & varchar(20) & N &  &  \\
+changed\_\allowbreak{}at & timestamp & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+\end{longtable}
+\vspace{-0.4em}
+\subsection*{Payments (13\_payments)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{fee\_\allowbreak{}structures}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+fee\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+service\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & idx & FK to service\_\allowbreak{}types.service\_\allowbreak{}type\_\allowbreak{}id, ON DELETE CASCADE \\
+component\_\allowbreak{}name & varchar(80) & N &  &  \\
+amount & decimal(10,2) & N &  &  \\
+effective\_\allowbreak{}from & date & N &  &  \\
+effective\_\allowbreak{}to & date & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{payments}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+payment\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+receipt\_\allowbreak{}number & varchar(30) & N & UK &  \\
+payable\_\allowbreak{}type\_\allowbreak{}id & bigint u & N & idx & FK to payable\_\allowbreak{}types.payable\_\allowbreak{}type\_\allowbreak{}id, ON DELETE RESTRICT \\
+payable\_\allowbreak{}id & bigint u & N &  &  \\
+amount & decimal(10,2) & N &  &  \\
+status & enum('PENDING',\allowbreak{}'SUCCESS',\allowbreak{}'FAILED',\allowbreak{}'REFUNDED') & N & idx & default PENDING \\
+paid\_\allowbreak{}at & datetime & Y &  &  \\
+created\_\allowbreak{}at & datetime & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{payment\_\allowbreak{}attempts}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+attempt\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+payment\_\allowbreak{}id & bigint u & N & idx & FK to payments.payment\_\allowbreak{}id, ON DELETE CASCADE \\
+attempt\_\allowbreak{}number & smallint u & N &  &  \\
+gateway\_\allowbreak{}reference & varchar(60) & Y &  &  \\
+outcome & enum('SUCCESS',\allowbreak{}'FAILED',\allowbreak{}'TIMEOUT') & N &  &  \\
+attempted\_\allowbreak{}at & datetime & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{refunds}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+refund\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+payment\_\allowbreak{}id & bigint u & N & idx & FK to payments.payment\_\allowbreak{}id, ON DELETE RESTRICT \\
+amount & decimal(10,2) & N &  &  \\
+reason & varchar(255) & N &  &  \\
+status & enum('INITIATED',\allowbreak{}'COMPLETED',\allowbreak{}'FAILED') & N &  & default INITIATED \\
+processed\_\allowbreak{}at & datetime & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\subsection*{Support (14\_support)}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{notifications}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+notification\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+person\_\allowbreak{}id & bigint u & N & idx & FK to persons.person\_\allowbreak{}id, ON DELETE CASCADE \\
+channel & enum('SMS',\allowbreak{}'EMAIL') & N &  &  \\
+subject & varchar(150) & Y &  &  \\
+message & varchar(500) & N &  &  \\
+status & enum('QUEUED',\allowbreak{}'SENT',\allowbreak{}'FAILED') & N &  & default QUEUED \\
+sent\_\allowbreak{}at & datetime & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{complaints}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+complaint\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+citizen\_\allowbreak{}id & bigint u & N & idx & FK to citizens.citizen\_\allowbreak{}id, ON DELETE RESTRICT \\
+office\_\allowbreak{}id & bigint u & N & idx & FK to rto\_\allowbreak{}offices.office\_\allowbreak{}id, ON DELETE RESTRICT \\
+subject & varchar(150) & N &  &  \\
+description & varchar(1000) & N &  &  \\
+status & enum('OPEN',\allowbreak{}'IN\_\allowbreak{}PROGRESS',\allowbreak{}'RESOLVED',\allowbreak{}'CLOSED') & N &  & default OPEN \\
+filed\_\allowbreak{}at & datetime & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{appeals}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+appeal\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+citizen\_\allowbreak{}id & bigint u & N & idx & FK to citizens.citizen\_\allowbreak{}id, ON DELETE RESTRICT \\
+against\_\allowbreak{}type & enum('CHALLAN',\allowbreak{}'APPLICATION\_\allowbreak{}REJECTION',\allowbreak{}'LICENCE\_\allowbreak{}SUSPENSION') & N &  &  \\
+against\_\allowbreak{}id & bigint u & N &  &  \\
+grounds & varchar(1000) & N &  &  \\
+status & enum('FILED',\allowbreak{}'UNDER\_\allowbreak{}REVIEW',\allowbreak{}'UPHELD',\allowbreak{}'DISMISSED') & N &  & default FILED \\
+filed\_\allowbreak{}at & datetime & N &  & default CURRENT\_\allowbreak{}TIMESTAMP \\
+resolved\_\allowbreak{}at & datetime & Y &  &  \\
+\end{longtable}
+\vspace{-0.4em}
+\begin{longtable}{@{}p{3.4cm}p{2.9cm}c c p{5.6cm}@{}}
+\caption*{\textbf{audit\_\allowbreak{}logs}}\\
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endfirsthead
+\toprule \textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Notes} \\ \midrule \endhead
+\bottomrule \endlastfoot
+audit\_\allowbreak{}id & bigint u & N & PK & auto-increment \\
+table\_\allowbreak{}name & varchar(64) & N & idx &  \\
+record\_\allowbreak{}id & bigint u & N &  &  \\
+action & enum('INSERT',\allowbreak{}'UPDATE',\allowbreak{}'DELETE') & N &  &  \\
+old\_\allowbreak{}values & json & Y &  &  \\
+new\_\allowbreak{}values & json & Y &  &  \\
+changed\_\allowbreak{}by\_\allowbreak{}user\_\allowbreak{}id & bigint u & Y &  &  \\
+changed\_\allowbreak{}at & timestamp & N & idx & default CURRENT\_\allowbreak{}TIMESTAMP \\
+\end{longtable}
+\vspace{-0.4em}

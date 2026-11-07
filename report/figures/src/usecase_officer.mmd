@@ -1,0 +1,19 @@
+flowchart LR
+  off(["RTO officer"])
+  insp(["Inspector"])
+  subgraph S3["Decisions and licensing"]
+    v1(["Approve or reject application"])
+    v2(["Issue learner licence"])
+    v3(["Record driving test result"])
+    v4(["Issue, suspend, revoke,<br/>renew driving licence"])
+    v5(["Review complaints and appeals"])
+  end
+  subgraph S4["Vehicles, compliance and permits"]
+    v6(["Register vehicle"])
+    v7(["Approve or reject<br/>ownership transfer"])
+    v8(["Record inspection and issue<br/>fitness, PUC, insurance, road tax"])
+    v9(["Issue, suspend or cancel permit"])
+    v10(["Record traffic violation"])
+  end
+  off --> v1 & v2 & v3 & v4 & v5 & v6 & v7 & v8 & v9
+  insp --> v3 & v8 & v10

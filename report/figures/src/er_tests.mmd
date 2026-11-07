@@ -1,0 +1,57 @@
+---
+title: Driving schools and tests
+---
+erDiagram
+  driving_schools {
+    bigint school_id PK
+    varchar school_name
+    varchar licence_number UK
+    bigint office_id FK
+  }
+  driving_instructors {
+    bigint instructor_id PK
+    bigint person_id FK, UK
+    bigint school_id FK
+    bigint licence_class_id FK
+  }
+  test_centres {
+    bigint test_centre_id PK
+    bigint office_id FK
+    varchar centre_name
+  }
+  driving_tests {
+    bigint test_id PK
+    bigint application_id FK
+    bigint citizen_id FK
+    bigint test_centre_id FK
+    bigint examiner_employee_id FK
+    datetime scheduled_at
+    enum result
+  }
+  applications {
+    bigint application_id PK
+  }
+  citizens {
+    bigint citizen_id PK
+  }
+  employees {
+    bigint employee_id PK
+  }
+  licence_classes {
+    bigint licence_class_id PK
+  }
+  persons {
+    bigint person_id PK
+  }
+  rto_offices {
+    bigint office_id PK
+  }
+  licence_classes ||--o{ driving_instructors : "licence_class_id"
+  persons ||--o{ driving_instructors : "person_id"
+  driving_schools ||--o{ driving_instructors : "school_id"
+  rto_offices ||--o{ driving_schools : "office_id"
+  applications ||--o{ driving_tests : "application_id"
+  test_centres ||--o{ driving_tests : "test_centre_id"
+  citizens ||--o{ driving_tests : "citizen_id"
+  employees ||--o{ driving_tests : "examiner_employee_id"
+  rto_offices ||--o{ test_centres : "office_id"

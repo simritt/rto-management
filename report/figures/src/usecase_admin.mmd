@@ -1,0 +1,20 @@
+flowchart LR
+  enf(["Enforcement<br/>officer"])
+  acc(["Accountant"])
+  adm(["Administrator"])
+  subgraph S5["Enforcement and money"]
+    w1(["Record traffic violation"])
+    w2(["Issue challan"])
+    w3(["Dispute or cancel challan"])
+    w4(["Record payment attempt"])
+    w5(["Refund a payment"])
+  end
+  subgraph S6["Administration and oversight"]
+    w6(["Manage users and roles"])
+    w7(["Manage offices, counters,<br/>reference data and fees"])
+    w8(["View dashboard"])
+    w9(["View audit log"])
+  end
+  enf --> w1 & w2 & w3
+  acc --> w4 & w5 & w8 & w9
+  adm --> w6 & w7 & w8 & w9

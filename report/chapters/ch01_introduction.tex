@@ -1,0 +1,178 @@
+\chapter{Introduction and Problem Definition}\label{ch:intro}
+
+\section{Project Background}
+Every motor vehicle on an Indian road is tied to a Regional Transport Office. The RTO
+is the state-level office that registers vehicles, issues learner and driving
+licences, grants permits for commercial transport, collects road tax and fees, and
+enforces the Motor Vehicles Act, 1988 by issuing challans (traffic fines). The Ministry
+of Road Transport and Highways (MoRTH) lays down the national framework, and the
+National Informatics Centre (NIC) builds the common systems, Vahan for vehicle
+registration and Sarathi for driving licences, whose data is compiled into state and
+national registers \cite{parivahan-about}. What happens at the counter of one office,
+however, is still a long chain of small decisions made by different people on
+different days: a clerk checks documents, an officer approves, an accountant records
+a payment, an inspector passes a test.
+
+Each of those decisions leaves a record, and the records are tightly connected. A
+vehicle has an owner, the owner has a licence, the licence has classes, the vehicle
+has insurance and a fitness certificate, a violation is committed with a vehicle and
+produces a challan, the challan is paid through a payment that can be retried or
+refunded. If any link is wrong, for example two current owners for one vehicle or a
+challan paid twice, the damage reaches the citizen, the office and the revenue.
+
+This project, the \textbf{RTO Management System}, models that world end to end. It
+consists of three parts that depend on each other in a clear order: a MySQL 8 database
+of 63 tables that carries the rules, a Spring Boot REST backend that adds security,
+workflow and transactions, and a Spring Boot web portal that lets each kind of staff
+member and citizen use the system without knowing any SQL.
+
+\section{Problem Statement}
+Office work of this kind is usually described as ``data entry'', but it is really a
+correctness problem. The system must guarantee, whoever the user is and however many
+users act at once, that:
+\begin{itemize}
+\item a vehicle has exactly one current owner at any moment, and its ownership history is never lost;
+\item an appointment slot is never booked beyond its capacity;
+\item a fee or a fine is never recorded as paid twice, even if the payment request is repeated;
+\item every status change follows a legal path and leaves a trace of who changed it, when and why;
+\item each person can see and do only what their role allows, and a citizen sees only their own records.
+\end{itemize}
+Systems built around paper files, spreadsheets or loosely validated forms cannot make
+these guarantees. The problem addressed here is therefore to design and build a
+centralised RTO management system whose \emph{database enforces these rules itself},
+so that a mistake in an application, a script or a person cannot put wrong data in,
+and to demonstrate with tests that the rules actually hold.
+
+\section{Motivation}
+We chose an RTO for three reasons. First, the domain is rich enough to need a
+real design: the final schema has 63 tables and 91 foreign keys, far beyond the
+handful of tables of a typical course exercise, so normalisation, keys, constraints,
+indexes and views have to be used for real reasons and not for show. Second, almost
+every topic of our database course has a natural home in it. History tables record
+status changes, a trigger protects active vehicles from deletion, a stored procedure
+transfers ownership in one transaction, row locks protect the last appointment seat,
+and window functions rank offices by workload. Third, the problem is familiar. Anyone
+who has queued at a transport office, lost a document or paid an agent to push a
+form through understands why traceable, rule-driven processing matters.
+
+A further motivation was to test our own work honestly. We wanted claims such as ``two
+users cannot book the last seat'' to be backed by an automated test that fires
+concurrent requests at a real MySQL server, not merely stated in a report.
+
+\section{Objectives}
+The objectives of the project are:
+\begin{enumerate}
+\item To design a normalised relational schema for the complete RTO domain and to keep the business rules inside the database as constraints, generated columns, triggers and procedures.
+\item To build a secure Java REST backend with permissions stored in the database, transactional workflows, safe concurrent updates and an audit trail.
+\item To build a web portal in which every role sees only the screens and actions its permissions allow.
+\item To show advanced database features working together: indexes, views, triggers, stored procedures, transactions, locking and analytical SQL.
+\item To verify the system with automated tests, a crawl of the whole user interface, a load test and measured index experiments, and to report defects found along the way.
+\item To apply the concepts of five courses (Object Oriented Programming, Database Management, Software Engineering, Data Structures, and Design and Analysis of Algorithms) to one working system.
+\end{enumerate}
+
+\section{Scope of the Project}
+\subsection{In scope}
+The system covers: citizens, addresses and applicants; offices, counters, departments,
+designations and employees with their postings; users, roles and permissions; service
+applications with documents, status history and appointments; learner licences,
+driving tests, driving licences and licence classes; driving schools and instructors;
+vehicles, ownership history and ownership transfers; inspections, fitness, pollution
+and insurance certificates and road-tax records; routes and commercial permits;
+violations and challans; fee structures, payments, payment attempts and refunds;
+complaints, appeals, notifications and an audit log; and a management dashboard.
+
+\subsection{Out of scope}
+The project is an academic prototype. It does not connect to Aadhaar, DigiLocker, the
+national Vahan and Sarathi registers or a live payment gateway; notifications go to a
+mock provider and no real SMS or e-mail is sent; there is no mobile application; and
+no claim is made about capacity beyond the single-machine load tests reported in
+Chapter~\ref{ch:perf}.
+
+\subsection{Users and environment}
+There are seven seeded roles: administrator, RTO officer, counter clerk, inspector,
+enforcement officer, accountant and citizen. The backend runs on Java 21 and listens on
+port 8000; the portal runs on its own port 8080; both use a MySQL 8.0 server. A normal
+web browser is all a user needs.
+
+\section{Proposed Solution}
+The solution is organised as three tiers, shown in Chapter~\ref{ch:design}, that are
+built and tested in dependency order.
+
+\begin{enumerate}
+\item \textbf{Database tier.} Thirteen module scripts (files 02 to 14) create the 63
+tables in a fixed dependency order. A second set of scripts adds CHECK constraints, indexes, views, triggers and
+stored procedures. A seed script loads realistic data so that every status and filter
+can be demonstrated, and a SQL test script checks the enhancements.
+\item \textbf{Application tier.} A layered Spring Boot backend: controllers receive
+requests; an interceptor enforces authentication and permissions before any controller
+code runs; services hold the business rules inside transactions; a small data-access
+helper provides locking, paging and auditing.
+\item \textbf{Presentation tier.} A server-rendered Thymeleaf portal styled with
+Tailwind CSS. It holds the login token in a server-side session, calls the backend,
+and shows each user only the menu items their permissions allow.
+\end{enumerate}
+
+\section{Novelty and Originality}
+Individually, none of the techniques here is new: foreign keys, row locking and JWT
+are standard. The contribution lies in how they are combined and in how carefully the
+result is checked.
+\begin{itemize}
+\item \textbf{Two layers guard each important rule.} For instance, the one-current-owner rule is enforced by a unique key on a generated column in the database and, independently, by a locked, ordered check in the service. Either alone would be enough on a good day; together they are enough on a bad one.
+\item \textbf{Permissions are data.} Roles and 62 permissions live in tables, so an administrator can change access from the portal without a deployment.
+\item \textbf{A deliberate division of labour between triggers and Java.} Triggers were added only where the backend does not already write the row, which avoids duplicate history entries (Section~\ref{sec:trigdesign}).
+\item \textbf{Evidence over assertion.} The report states real results, including defects the testing uncovered in the supplied scripts.
+\end{itemize}
+
+\section{Feasibility Analysis}
+\subsection{Technical feasibility}
+Everything used is mature and open source: MySQL 8, Java 21, Spring Boot 3.3.5,
+Hibernate, Thymeleaf and Tailwind CSS. The work divides cleanly along the schema and the
+REST contract, so the three tiers could be developed in parallel by different team
+members and joined later.
+
+\subsection{Economic feasibility}
+No licence fees are involved. The whole system runs on one ordinary laptop (Intel Core
+i5-1335U, 16~GB RAM, Windows~11) and a free MySQL Community Server. A real deployment
+would add hosting, backups and an SMS or e-mail gateway.
+
+\subsection{Operational feasibility}
+Staff use a browser. The menu adapts to each role, and error pages are written in plain
+language, so a clerk is not shown a stack trace. Reference data such as fees, offices
+and slots can be changed from the portal.
+
+\subsection{Schedule feasibility}
+The repository history shows the order in which the work was done: the schema first,
+then the backend, a first version of the portal, the database enhancements, and finally
+the complete portal and the final validation (Section~\ref{sec:timeline}).
+
+\section{Social Relevance and Practical Applications}
+Delays, repeated visits and opaque fees at transport offices are everyday experiences.
+A traceable system, in which every fee comes from a published table and every status
+change has a name and a time attached, lowers the room for informal charges and makes
+complaints and appeals easier to resolve. The design could serve as the core of a
+state-level pilot, a teaching reference for relational design, or the starting point for
+a citizen mobile application, because the REST API is documented with Swagger and is
+independent of the portal. It is not a replacement for the national systems and makes
+no such claim.
+
+\section{Success Criteria and Key Performance Indicators}
+Table~\ref{tab:kpi} lists the measurable criteria we set, how each is measured and
+where the result is reported. The results themselves appear in Chapters~\ref{ch:perf}
+and~\ref{ch:test}.
+
+\begin{table}[H]
+\centering\small
+\caption{Key performance indicators and how they are measured}\label{tab:kpi}
+\begin{tabularx}{\linewidth}{@{}p{3.1cm}Xp{3.3cm}@{}}
+\toprule
+\textbf{KPI} & \textbf{Measurement method} & \textbf{Reported in}\\ \midrule
+Functional correctness & Share of backend integration tests that pass on a real MySQL server & Section~\ref{sec:unit}\\
+Rule enforcement under concurrency & Parallel-request tests for slot booking, payments, refunds, status changes and ownership approval & Section~\ref{sec:conc}\\
+Schema integrity & Number of foreign keys with orphan rows; schema audit test; SQL test suite & Sections~\ref{sec:schemaaudit}, \ref{sec:sqltests}\\
+UI robustness & Crawl of all reachable pages and edge-case URLs; count of server errors (5xx) & Section~\ref{sec:crawl}\\
+Response time & Average and 95th-percentile latency of read operations at 1, 5, 10 and 20 concurrent users & Section~\ref{sec:loadres}\\
+Index effectiveness & Lookup time with and without the project's indexes on 10\,000 to 500\,000 rows & Section~\ref{sec:indexres}\\
+Access control & Permission checks per role; a low-privilege account cannot reach administrator pages & Sections~\ref{sec:rbactest}, \ref{sec:crawl}\\
+\bottomrule
+\end{tabularx}
+\end{table}

@@ -1,0 +1,59 @@
+---
+title: Organisation and staff
+---
+erDiagram
+  regions {
+    bigint region_id PK
+    varchar region_name
+    varchar region_code UK
+    bigint parent_region_id FK
+  }
+  rto_offices {
+    bigint office_id PK
+    bigint region_id FK
+    varchar office_name
+    varchar office_code UK
+    varchar address_line
+  }
+  counters {
+    bigint counter_id PK
+    bigint office_id FK
+    varchar counter_number
+    varchar service_category
+  }
+  departments {
+    bigint department_id PK
+    varchar department_name UK
+  }
+  designations {
+    bigint designation_id PK
+    varchar title UK
+    tinyint rank_level
+  }
+  employees {
+    bigint employee_id PK
+    bigint person_id FK, UK
+    varchar employee_code UK
+    bigint designation_id FK
+    date date_joined
+  }
+  employee_postings {
+    bigint posting_id PK
+    bigint employee_id FK
+    bigint office_id FK
+    bigint department_id FK
+    date posted_from
+    date posted_to
+    tinyint current_flag
+  }
+  persons {
+    bigint person_id PK
+  }
+  rto_offices ||--o{ counters : "office_id"
+  departments ||--o{ employee_postings : "department_id"
+  employees ||--o{ employee_postings : "employee_id"
+  rto_offices ||--o{ employee_postings : "office_id"
+  designations ||--o{ employees : "designation_id"
+  persons ||--o{ employees : "person_id"
+  regions |o--o{ regions : "parent_region_id"
+  regions ||--o{ rto_offices : "region_id"

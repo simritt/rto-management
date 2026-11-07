@@ -1,0 +1,18 @@
+flowchart TD
+  s(["Request reaches AuthInterceptor"]) --> a{"Handler is a controller method?"}
+  a -- no --> go(["Allow"])
+  a -- yes --> b{"@Public on method or class?"}
+  b -- yes --> go
+  b -- no --> c{"Token error recorded<br/>by JwtAuthFilter?"}
+  c -- yes --> e1["Throw the recorded 401"]
+  c -- no --> d{"CurrentUser present?"}
+  d -- no --> e2["401 NOT_AUTHENTICATED"]
+  d -- yes --> f["For each key in @Requires:<br/>user.require(key)"]
+  f --> g{"All keys held?"}
+  g -- no --> e3["403 PERMISSION_DENIED"]
+  g -- yes --> h{"@RequiresAny present?"}
+  h -- no --> go
+  h -- yes --> i{"At least one key held?"}
+  i -- yes --> go
+  i -- no --> e3
+  go --> own["Service still applies row-level rules:<br/>x.view_own limits a citizen to own records"]

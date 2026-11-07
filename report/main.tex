@@ -1,0 +1,143 @@
+% ============================================================================
+%  RTO Management System - Mini Project Report
+%  Build:  pdflatex main  (run three times)   or upload the whole folder to Overleaf
+%  Front-page structure follows the airCrypt mini-project report template.
+% ============================================================================
+\documentclass[12pt,a4paper]{report}
+
+% ---------- page, fonts, spacing -------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{newtxtext,newtxmath}
+\usepackage[a4paper,left=3cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+\setstretch{1.12}
+\usepackage{microtype}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{enumitem}
+\setlist{itemsep=2pt,topsep=4pt,parsep=0pt}
+
+% ---------- graphics, tables, floats ---------------------------------------
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{pdflscape}
+\usepackage[font=small,labelfont=bf,skip=4pt]{caption}
+\usepackage{amsmath}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{xurl}
+\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue!40!black]{hyperref}
+
+\graphicspath{{figures/screens/}{figures/diagrams/}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\renewcommand{\arraystretch}{1.18}
+\setlength{\emergencystretch}{2em}
+\raggedbottom
+
+% inline code / identifiers (breaks at underscores and dots)
+\DeclareRobustCommand{\cd}[1]{{\small\path{#1}}}
+% inline SQL / code that contains spaces
+\DeclareRobustCommand{\cmd}[1]{\texttt{\small\detokenize{#1}}}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\figw}{\linewidth}
+% figure helper: \fig{file}{caption}{label}{max-height}
+\newcommand{\fig}[4]{\begin{figure}[H]\centering
+  \includegraphics[width=\linewidth,height=#4\textheight,keepaspectratio]{#1}
+  \caption{#2}\label{#3}\end{figure}}
+
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,
+  frame=single,framerule=0.3pt,rulecolor=\color{black!35},xleftmargin=4pt,xrightmargin=4pt,
+  aboveskip=6pt,belowskip=6pt,showstringspaces=false,keywordstyle=\bfseries,
+  morekeywords={SELECT,FROM,WHERE,FOR,UPDATE,JOIN,LEFT,ON,AND,OR,AS,WITH,OVER,PARTITION,BY,ORDER,GROUP,HAVING,INSERT,INTO,VALUES,CREATE,TABLE,INDEX,TRIGGER,BEFORE,AFTER,BEGIN,END,IF,THEN,SIGNAL,SET,START,TRANSACTION,COMMIT,ROLLBACK,PROCEDURE,CALL,DECLARE,ALTER,ADD,CONSTRAINT,CHECK,NOT,NULL,IS,IN,EXISTS,LIMIT,DESC,ASC,CASE,WHEN,ELSE,USING}}
+
+% ---------- headings ---------------------------------------------------------
+\titleformat{\chapter}[hang]{\bfseries\huge}{\thechapter}{0.6em}{\huge}
+\titlespacing*{\chapter}{0pt}{-10pt}{14pt}
+\titleformat{\section}{\bfseries\Large}{\thesection}{0.5em}{}
+\titleformat{\subsection}{\bfseries\large}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\bfseries\normalsize}{\thesubsubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{14pt}{6pt}
+\titlespacing*{\subsection}{0pt}{10pt}{4pt}
+\titlespacing*{\subsubsection}{0pt}{8pt}{2pt}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchappagefont}{\bfseries}
+\renewcommand{\cftchapaftersnum}{.}
+\setlength{\cftbeforechapskip}{6pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% ---------- project constants ------------------------------------------------
+\newcommand{\ProjectTitle}{RTO Management System}
+\newcommand{\ProjectSub}{A Normalised, Auditable and Role-Secured Platform for Regional Transport Office Workflows}
+\newcommand{\MemberA}{Vaibhavi Pednekar}\newcommand{\UidA}{2024300177}
+\newcommand{\MemberB}{Simrit Kaur}\newcommand{\UidB}{2024300276}
+\newcommand{\MemberC}{Vansh Bhimani}\newcommand{\UidC}{2024300277}
+\newcommand{\Guide}{Prof. Govind Gaundalkar}
+\newcommand{\GroupNo}{68}
+\newcommand{\AY}{2026--2027}
+
+\renewcommand{\bibname}{References}
+\begin{document}
+
+% ============================== FRONT MATTER ================================
+\pagenumbering{gobble}
+\input{frontmatter/cover}
+\clearpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+\input{frontmatter/certificate}
+\input{frontmatter/approval}
+\input{frontmatter/declaration}
+\input{frontmatter/acknowledgement}
+\input{frontmatter/abstract}
+
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+\clearpage
+\input{frontmatter/abbreviations}
+
+% ============================== MAIN MATTER =================================
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{chapters/ch01_introduction}
+\input{chapters/ch02_literature}
+\input{chapters/ch03_srs}
+\input{chapters/ch04_design}
+\input{chapters/ch05_algorithms}
+\input{chapters/ch06_subjects}
+\input{chapters/ch07_implementation}
+\input{chapters/ch08_performance}
+\input{chapters/ch09_testing}
+\input{chapters/ch10_results}
+\input{chapters/ch11_conclusion}
+
+\input{chapters/references}
+
+% ============================== APPENDICES ==================================
+\appendix
+\input{chapters/appendices}
+
+\end{document}

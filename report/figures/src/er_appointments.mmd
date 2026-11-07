@@ -1,0 +1,45 @@
+---
+title: Appointment slots and bookings
+---
+erDiagram
+  rto_offices {
+    bigint office_id PK
+    bigint region_id FK
+    varchar office_name
+    varchar office_code UK
+    varchar address_line
+  }
+  counters {
+    bigint counter_id PK
+    bigint office_id FK
+    varchar counter_number
+    varchar service_category
+  }
+  appointment_slots {
+    bigint slot_id PK
+    bigint office_id FK
+    bigint counter_id FK
+    date slot_date
+    time start_time
+    time end_time
+  }
+  appointments {
+    bigint appointment_id PK
+    bigint application_id FK, UK
+    bigint slot_id FK
+    varchar token_number
+    enum status
+    datetime booked_at
+  }
+  applications {
+    bigint application_id PK
+  }
+  regions {
+    bigint region_id PK
+  }
+  counters |o--o{ appointment_slots : "counter_id"
+  rto_offices ||--o{ appointment_slots : "office_id"
+  applications ||--o{ appointments : "application_id"
+  appointment_slots ||--o{ appointments : "slot_id"
+  rto_offices ||--o{ counters : "office_id"
+  regions ||--o{ rto_offices : "region_id"

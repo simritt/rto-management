@@ -1,0 +1,5758 @@
+{
+ "tables": {
+  "addresses": [
+   {
+    "name": "address_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "person_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "line1",
+    "type": "varchar(150)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "line2",
+    "type": "varchar(150)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "city",
+    "type": "varchar(80)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "state",
+    "type": "varchar(80)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "pincode",
+    "type": "varchar(10)",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "address_type",
+    "type": "enum('PERMANENT','CURRENT','OFFICE')",
+    "null": false,
+    "key": "",
+    "default": "CURRENT",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "is_current",
+    "type": "tinyint(1)",
+    "null": false,
+    "key": "",
+    "default": "1",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "valid_from",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "valid_to",
+    "type": "date",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "appeals": [
+   {
+    "name": "appeal_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "citizen_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "against_type",
+    "type": "enum('CHALLAN','APPLICATION_REJECTION','LICENCE_SUSPENSION')",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "against_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "grounds",
+    "type": "varchar(1000)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('FILED','UNDER_REVIEW','UPHELD','DISMISSED')",
+    "null": false,
+    "key": "",
+    "default": "FILED",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "filed_at",
+    "type": "datetime",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   },
+   {
+    "name": "resolved_at",
+    "type": "datetime",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "applicants": [
+   {
+    "name": "applicant_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "citizen_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "preferred_office_id",
+    "type": "bigint unsigned",
+    "null": true,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "application_status_history": [
+   {
+    "name": "history_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "application_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "previous_status",
+    "type": "varchar(30)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "new_status",
+    "type": "varchar(30)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "changed_by_user_id",
+    "type": "bigint unsigned",
+    "null": true,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "changed_at",
+    "type": "timestamp",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   },
+   {
+    "name": "reason",
+    "type": "varchar(255)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "applications": [
+   {
+    "name": "application_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "application_number",
+    "type": "varchar(30)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "applicant_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "service_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "office_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "assigned_officer_id",
+    "type": "bigint unsigned",
+    "null": true,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "current_status",
+    "type": "enum('SUBMITTED','DOCS_PENDING','UNDER_VERIFICATION','APPOINTMENT_SCHEDULED','AWAITING_PAYMENT','APPROVED','REJECTED','COMPLETED','CANCELLED')",
+    "null": false,
+    "key": "MUL",
+    "default": "SUBMITTED",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "submitted_at",
+    "type": "datetime",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   },
+   {
+    "name": "completed_at",
+    "type": "datetime",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "remarks",
+    "type": "varchar(500)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "appointment_slots": [
+   {
+    "name": "slot_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "office_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "counter_id",
+    "type": "bigint unsigned",
+    "null": true,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "slot_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "start_time",
+    "type": "time",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "end_time",
+    "type": "time",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "capacity",
+    "type": "smallint unsigned",
+    "null": false,
+    "key": "",
+    "default": "1",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "booked_count",
+    "type": "smallint unsigned",
+    "null": false,
+    "key": "",
+    "default": "0",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "appointments": [
+   {
+    "name": "appointment_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "application_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "slot_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "token_number",
+    "type": "varchar(15)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('BOOKED','RESCHEDULED','CANCELLED','NO_SHOW','COMPLETED')",
+    "null": false,
+    "key": "",
+    "default": "BOOKED",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "booked_at",
+    "type": "datetime",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   }
+  ],
+  "audit_logs": [
+   {
+    "name": "audit_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "table_name",
+    "type": "varchar(64)",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "record_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "action",
+    "type": "enum('INSERT','UPDATE','DELETE')",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "old_values",
+    "type": "json",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "new_values",
+    "type": "json",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "changed_by_user_id",
+    "type": "bigint unsigned",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "changed_at",
+    "type": "timestamp",
+    "null": false,
+    "key": "MUL",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   }
+  ],
+  "challan_status_history": [
+   {
+    "name": "history_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "challan_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "previous_status",
+    "type": "varchar(20)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "new_status",
+    "type": "varchar(20)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "changed_at",
+    "type": "timestamp",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   }
+  ],
+  "challan_violations": [
+   {
+    "name": "challan_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "violation_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "challans": [
+   {
+    "name": "challan_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "challan_number",
+    "type": "varchar(30)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "total_amount",
+    "type": "decimal(10,2)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('ISSUED','DISPUTED','PAID','CANCELLED')",
+    "null": false,
+    "key": "MUL",
+    "default": "ISSUED",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "issued_at",
+    "type": "datetime",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   }
+  ],
+  "citizens": [
+   {
+    "name": "citizen_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "person_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "citizen_code",
+    "type": "varchar(20)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "blacklisted",
+    "type": "tinyint(1)",
+    "null": false,
+    "key": "",
+    "default": "0",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "blacklist_reason",
+    "type": "varchar(255)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "registered_at",
+    "type": "timestamp",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   }
+  ],
+  "complaints": [
+   {
+    "name": "complaint_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "citizen_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "office_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "subject",
+    "type": "varchar(150)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "description",
+    "type": "varchar(1000)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('OPEN','IN_PROGRESS','RESOLVED','CLOSED')",
+    "null": false,
+    "key": "",
+    "default": "OPEN",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "filed_at",
+    "type": "datetime",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   }
+  ],
+  "counters": [
+   {
+    "name": "counter_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "office_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "counter_number",
+    "type": "varchar(10)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "service_category",
+    "type": "varchar(50)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "departments": [
+   {
+    "name": "department_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "department_name",
+    "type": "varchar(80)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "designations": [
+   {
+    "name": "designation_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "title",
+    "type": "varchar(80)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "rank_level",
+    "type": "tinyint unsigned",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "document_types": [
+   {
+    "name": "document_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "type_name",
+    "type": "varchar(100)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "is_mandatory_default",
+    "type": "tinyint(1)",
+    "null": false,
+    "key": "",
+    "default": "1",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "validity_period_days",
+    "type": "int unsigned",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "documents": [
+   {
+    "name": "document_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "application_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "document_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "file_path",
+    "type": "varchar(255)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "verification_status",
+    "type": "enum('PENDING','VERIFIED','REJECTED','EXPIRED')",
+    "null": false,
+    "key": "",
+    "default": "PENDING",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "verified_by_employee_id",
+    "type": "bigint unsigned",
+    "null": true,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "rejection_reason",
+    "type": "varchar(255)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "uploaded_at",
+    "type": "datetime",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   },
+   {
+    "name": "verified_at",
+    "type": "datetime",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "driving_instructors": [
+   {
+    "name": "instructor_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "person_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "school_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "licence_class_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "driving_licences": [
+   {
+    "name": "driving_licence_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "licence_number",
+    "type": "varchar(30)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "citizen_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "learner_licence_id",
+    "type": "bigint unsigned",
+    "null": true,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "application_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "office_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "issue_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "expiry_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "current_status",
+    "type": "enum('ACTIVE','SUSPENDED','REVOKED','EXPIRED')",
+    "null": false,
+    "key": "MUL",
+    "default": "ACTIVE",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "driving_schools": [
+   {
+    "name": "school_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "school_name",
+    "type": "varchar(120)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "licence_number",
+    "type": "varchar(30)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "office_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "driving_tests": [
+   {
+    "name": "test_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "application_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "citizen_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "test_centre_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "examiner_employee_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "scheduled_at",
+    "type": "datetime",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "result",
+    "type": "enum('PENDING','PASS','FAIL','ABSENT')",
+    "null": false,
+    "key": "",
+    "default": "PENDING",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "remarks",
+    "type": "varchar(255)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "employee_postings": [
+   {
+    "name": "posting_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "employee_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "office_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "department_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "posted_from",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "posted_to",
+    "type": "date",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "current_flag",
+    "type": "tinyint",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "STORED GENERATED",
+    "gen": "if((`posted_to` is null),1,NULL)"
+   }
+  ],
+  "employees": [
+   {
+    "name": "employee_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "person_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "employee_code",
+    "type": "varchar(20)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "designation_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "date_joined",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "is_active",
+    "type": "tinyint(1)",
+    "null": false,
+    "key": "",
+    "default": "1",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "fee_structures": [
+   {
+    "name": "fee_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "service_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "component_name",
+    "type": "varchar(80)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "amount",
+    "type": "decimal(10,2)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "effective_from",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "effective_to",
+    "type": "date",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "fitness_certificates": [
+   {
+    "name": "certificate_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "vehicle_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "inspection_id",
+    "type": "bigint unsigned",
+    "null": true,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "issue_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "expiry_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('ACTIVE','EXPIRED','REVOKED')",
+    "null": false,
+    "key": "",
+    "default": "ACTIVE",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "fuel_types": [
+   {
+    "name": "fuel_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "fuel_name",
+    "type": "varchar(30)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "insurance_policies": [
+   {
+    "name": "policy_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "vehicle_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "provider_name",
+    "type": "varchar(100)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "policy_number",
+    "type": "varchar(40)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "start_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "end_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "learner_licences": [
+   {
+    "name": "learner_licence_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "licence_number",
+    "type": "varchar(30)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "citizen_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "application_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "office_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "issue_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "expiry_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('ACTIVE','EXPIRED','CONVERTED','CANCELLED')",
+    "null": false,
+    "key": "",
+    "default": "ACTIVE",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "active_flag",
+    "type": "tinyint",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "STORED GENERATED",
+    "gen": "if((`status` = _utf8mb4\\\\'ACTIVE\\\\'),1,NULL)"
+   }
+  ],
+  "licence_class_assignments": [
+   {
+    "name": "driving_licence_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "licence_class_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "granted_on",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "licence_classes": [
+   {
+    "name": "licence_class_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "class_code",
+    "type": "varchar(10)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "description",
+    "type": "varchar(150)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "licence_status_history": [
+   {
+    "name": "history_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "driving_licence_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "previous_status",
+    "type": "varchar(20)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "new_status",
+    "type": "varchar(20)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "changed_by_user_id",
+    "type": "bigint unsigned",
+    "null": true,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "changed_at",
+    "type": "timestamp",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   },
+   {
+    "name": "reason",
+    "type": "varchar(255)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "notifications": [
+   {
+    "name": "notification_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "person_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "channel",
+    "type": "enum('SMS','EMAIL')",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "subject",
+    "type": "varchar(150)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "message",
+    "type": "varchar(500)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('QUEUED','SENT','FAILED')",
+    "null": false,
+    "key": "",
+    "default": "QUEUED",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "sent_at",
+    "type": "datetime",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "ownership_transfers": [
+   {
+    "name": "transfer_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "vehicle_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "from_citizen_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "to_citizen_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "application_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "requested_at",
+    "type": "datetime",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   },
+   {
+    "name": "approved_at",
+    "type": "datetime",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('PENDING','APPROVED','REJECTED')",
+    "null": false,
+    "key": "",
+    "default": "PENDING",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "payable_types": [
+   {
+    "name": "payable_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "type_name",
+    "type": "varchar(30)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "payment_attempts": [
+   {
+    "name": "attempt_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "payment_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "attempt_number",
+    "type": "smallint unsigned",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "gateway_reference",
+    "type": "varchar(60)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "outcome",
+    "type": "enum('SUCCESS','FAILED','TIMEOUT')",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "attempted_at",
+    "type": "datetime",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   }
+  ],
+  "payments": [
+   {
+    "name": "payment_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "receipt_number",
+    "type": "varchar(30)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "payable_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "payable_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "amount",
+    "type": "decimal(10,2)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('PENDING','SUCCESS','FAILED','REFUNDED')",
+    "null": false,
+    "key": "MUL",
+    "default": "PENDING",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "paid_at",
+    "type": "datetime",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "created_at",
+    "type": "datetime",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   }
+  ],
+  "permissions": [
+   {
+    "name": "permission_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "permission_key",
+    "type": "varchar(80)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "permit_status_history": [
+   {
+    "name": "history_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "permit_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "previous_status",
+    "type": "varchar(20)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "new_status",
+    "type": "varchar(20)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "changed_at",
+    "type": "timestamp",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   },
+   {
+    "name": "reason",
+    "type": "varchar(255)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "permit_types": [
+   {
+    "name": "permit_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "type_name",
+    "type": "varchar(50)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "validity_months",
+    "type": "int unsigned",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "permits": [
+   {
+    "name": "permit_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "permit_number",
+    "type": "varchar(30)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "vehicle_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "citizen_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "permit_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "route_id",
+    "type": "bigint unsigned",
+    "null": true,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "application_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "issue_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "expiry_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('ACTIVE','EXPIRED','SUSPENDED','CANCELLED')",
+    "null": false,
+    "key": "",
+    "default": "ACTIVE",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "persons": [
+   {
+    "name": "person_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "first_name",
+    "type": "varchar(60)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "last_name",
+    "type": "varchar(60)",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "date_of_birth",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "gender",
+    "type": "enum('MALE','FEMALE','OTHER')",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "national_id_number",
+    "type": "varchar(20)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "phone_primary",
+    "type": "varchar(15)",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "phone_secondary",
+    "type": "varchar(15)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "email",
+    "type": "varchar(120)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "photo_path",
+    "type": "varchar(255)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "created_at",
+    "type": "timestamp",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED",
+    "gen": ""
+   },
+   {
+    "name": "updated_at",
+    "type": "timestamp",
+    "null": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP",
+    "gen": ""
+   }
+  ],
+  "pollution_certificates": [
+   {
+    "name": "puc_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "vehicle_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "issue_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "expiry_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('ACTIVE','EXPIRED')",
+    "null": false,
+    "key": "",
+    "default": "ACTIVE",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "refunds": [
+   {
+    "name": "refund_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "payment_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "amount",
+    "type": "decimal(10,2)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "reason",
+    "type": "varchar(255)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('INITIATED','COMPLETED','FAILED')",
+    "null": false,
+    "key": "",
+    "default": "INITIATED",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "processed_at",
+    "type": "datetime",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "regions": [
+   {
+    "name": "region_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "region_name",
+    "type": "varchar(100)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "region_code",
+    "type": "varchar(10)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "parent_region_id",
+    "type": "bigint unsigned",
+    "null": true,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "road_tax_records": [
+   {
+    "name": "tax_record_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "vehicle_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "assessment_year",
+    "type": "year",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "amount_due",
+    "type": "decimal(10,2)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "due_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('DUE','PAID','OVERDUE')",
+    "null": false,
+    "key": "",
+    "default": "DUE",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "role_permissions": [
+   {
+    "name": "role_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "permission_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "roles": [
+   {
+    "name": "role_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "role_name",
+    "type": "varchar(50)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "route_segments": [
+   {
+    "name": "segment_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "route_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "sequence_no",
+    "type": "smallint unsigned",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "segment_name",
+    "type": "varchar(120)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "routes": [
+   {
+    "name": "route_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "route_name",
+    "type": "varchar(120)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "origin",
+    "type": "varchar(80)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "destination",
+    "type": "varchar(80)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "rto_offices": [
+   {
+    "name": "office_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "region_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "office_name",
+    "type": "varchar(100)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "office_code",
+    "type": "varchar(15)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "address_line",
+    "type": "varchar(200)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "is_active",
+    "type": "tinyint(1)",
+    "null": false,
+    "key": "",
+    "default": "1",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "service_types": [
+   {
+    "name": "service_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "service_name",
+    "type": "varchar(100)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "service_code",
+    "type": "varchar(30)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "base_fee",
+    "type": "decimal(10,2)",
+    "null": false,
+    "key": "",
+    "default": "0.00",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "sla_days",
+    "type": "int unsigned",
+    "null": false,
+    "key": "",
+    "default": "7",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "test_centres": [
+   {
+    "name": "test_centre_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "office_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "centre_name",
+    "type": "varchar(120)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "user_roles": [
+   {
+    "name": "user_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "role_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "users": [
+   {
+    "name": "user_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "person_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "username",
+    "type": "varchar(50)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "password_hash",
+    "type": "varchar(255)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "is_active",
+    "type": "tinyint(1)",
+    "null": false,
+    "key": "",
+    "default": "1",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "last_login_at",
+    "type": "datetime",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "vehicle_inspections": [
+   {
+    "name": "inspection_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "vehicle_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "inspector_employee_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "inspected_at",
+    "type": "datetime",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "result",
+    "type": "enum('PASS','FAIL')",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "remarks",
+    "type": "varchar(255)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "vehicle_manufacturers": [
+   {
+    "name": "manufacturer_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "name",
+    "type": "varchar(100)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "vehicle_models": [
+   {
+    "name": "model_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "manufacturer_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "model_name",
+    "type": "varchar(100)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "vehicle_ownerships": [
+   {
+    "name": "ownership_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "vehicle_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "citizen_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "effective_from",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "effective_to",
+    "type": "date",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "current_flag",
+    "type": "tinyint",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "STORED GENERATED",
+    "gen": "if((`effective_to` is null),1,NULL)"
+   }
+  ],
+  "vehicle_types": [
+   {
+    "name": "vehicle_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "type_name",
+    "type": "varchar(50)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "is_commercial",
+    "type": "tinyint(1)",
+    "null": false,
+    "key": "",
+    "default": "0",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "vehicles": [
+   {
+    "name": "vehicle_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "registration_number",
+    "type": "varchar(20)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "chassis_number",
+    "type": "varchar(40)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "engine_number",
+    "type": "varchar(40)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "manufacturer_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "model_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "vehicle_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "fuel_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "manufacture_year",
+    "type": "year",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "color",
+    "type": "varchar(30)",
+    "null": true,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "registering_office_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "registration_date",
+    "type": "date",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "status",
+    "type": "enum('ACTIVE','BLACKLISTED','SCRAPPED','DEREGISTERED')",
+    "null": false,
+    "key": "",
+    "default": "ACTIVE",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "violation_types": [
+   {
+    "name": "violation_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "description",
+    "type": "varchar(150)",
+    "null": false,
+    "key": "UNI",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "base_fine_amount",
+    "type": "decimal(10,2)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "is_cognizable",
+    "type": "tinyint(1)",
+    "null": false,
+    "key": "",
+    "default": "0",
+    "extra": "",
+    "gen": ""
+   }
+  ],
+  "violations": [
+   {
+    "name": "violation_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment",
+    "gen": ""
+   },
+   {
+    "name": "vehicle_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "driver_citizen_id",
+    "type": "bigint unsigned",
+    "null": true,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "violation_type_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "officer_employee_id",
+    "type": "bigint unsigned",
+    "null": false,
+    "key": "MUL",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "location",
+    "type": "varchar(200)",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   },
+   {
+    "name": "occurred_at",
+    "type": "datetime",
+    "null": false,
+    "key": "",
+    "default": "",
+    "extra": "",
+    "gen": ""
+   }
+  ]
+ },
+ "module": {
+  "regions": "02_reference_tables",
+  "vehicle_manufacturers": "02_reference_tables",
+  "vehicle_models": "02_reference_tables",
+  "vehicle_types": "02_reference_tables",
+  "fuel_types": "02_reference_tables",
+  "licence_classes": "02_reference_tables",
+  "document_types": "02_reference_tables",
+  "service_types": "02_reference_tables",
+  "violation_types": "02_reference_tables",
+  "permit_types": "02_reference_tables",
+  "payable_types": "02_reference_tables",
+  "persons": "03_identity",
+  "addresses": "03_identity",
+  "citizens": "03_identity",
+  "rto_offices": "04_office_structure",
+  "departments": "04_office_structure",
+  "designations": "04_office_structure",
+  "counters": "04_office_structure",
+  "employees": "05_employees",
+  "employee_postings": "05_employees",
+  "users": "06_rbac",
+  "roles": "06_rbac",
+  "permissions": "06_rbac",
+  "user_roles": "06_rbac",
+  "role_permissions": "06_rbac",
+  "applicants": "07_applications",
+  "applications": "07_applications",
+  "application_status_history": "07_applications",
+  "documents": "07_applications",
+  "appointment_slots": "07_applications",
+  "appointments": "07_applications",
+  "driving_schools": "08_licence",
+  "driving_instructors": "08_licence",
+  "test_centres": "08_licence",
+  "learner_licences": "08_licence",
+  "driving_licences": "08_licence",
+  "licence_class_assignments": "08_licence",
+  "licence_status_history": "08_licence",
+  "driving_tests": "08_licence",
+  "vehicles": "09_vehicles",
+  "vehicle_ownerships": "09_vehicles",
+  "ownership_transfers": "09_vehicles",
+  "vehicle_inspections": "10_compliance",
+  "fitness_certificates": "10_compliance",
+  "pollution_certificates": "10_compliance",
+  "insurance_policies": "10_compliance",
+  "road_tax_records": "10_compliance",
+  "routes": "11_permits",
+  "route_segments": "11_permits",
+  "permits": "11_permits",
+  "permit_status_history": "11_permits",
+  "violations": "12_violations",
+  "challans": "12_violations",
+  "challan_violations": "12_violations",
+  "challan_status_history": "12_violations",
+  "fee_structures": "13_payments",
+  "payments": "13_payments",
+  "payment_attempts": "13_payments",
+  "refunds": "13_payments",
+  "notifications": "14_support",
+  "complaints": "14_support",
+  "appeals": "14_support",
+  "audit_logs": "14_support"
+ },
+ "fks": [
+  [
+   "addresses",
+   "person_id",
+   "persons",
+   "person_id",
+   "fk_address_person",
+   "CASCADE",
+   "CASCADE"
+  ],
+  [
+   "appeals",
+   "citizen_id",
+   "citizens",
+   "citizen_id",
+   "fk_appeal_citizen",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "applicants",
+   "citizen_id",
+   "citizens",
+   "citizen_id",
+   "fk_applicant_citizen",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "applicants",
+   "preferred_office_id",
+   "rto_offices",
+   "office_id",
+   "fk_applicant_office",
+   "SET NULL",
+   "CASCADE"
+  ],
+  [
+   "application_status_history",
+   "application_id",
+   "applications",
+   "application_id",
+   "fk_ash_application",
+   "CASCADE",
+   "CASCADE"
+  ],
+  [
+   "application_status_history",
+   "changed_by_user_id",
+   "users",
+   "user_id",
+   "fk_ash_user",
+   "SET NULL",
+   "CASCADE"
+  ],
+  [
+   "applications",
+   "applicant_id",
+   "applicants",
+   "applicant_id",
+   "fk_application_applicant",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "applications",
+   "office_id",
+   "rto_offices",
+   "office_id",
+   "fk_application_office",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "applications",
+   "assigned_officer_id",
+   "employees",
+   "employee_id",
+   "fk_application_officer",
+   "SET NULL",
+   "CASCADE"
+  ],
+  [
+   "applications",
+   "service_type_id",
+   "service_types",
+   "service_type_id",
+   "fk_application_service",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "appointment_slots",
+   "counter_id",
+   "counters",
+   "counter_id",
+   "fk_slot_counter",
+   "SET NULL",
+   "CASCADE"
+  ],
+  [
+   "appointment_slots",
+   "office_id",
+   "rto_offices",
+   "office_id",
+   "fk_slot_office",
+   "CASCADE",
+   "CASCADE"
+  ],
+  [
+   "appointments",
+   "application_id",
+   "applications",
+   "application_id",
+   "fk_appointment_application",
+   "CASCADE",
+   "CASCADE"
+  ],
+  [
+   "appointments",
+   "slot_id",
+   "appointment_slots",
+   "slot_id",
+   "fk_appointment_slot",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "challan_status_history",
+   "challan_id",
+   "challans",
+   "challan_id",
+   "fk_csh_challan",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "challan_violations",
+   "challan_id",
+   "challans",
+   "challan_id",
+   "fk_cv_challan",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "challan_violations",
+   "violation_id",
+   "violations",
+   "violation_id",
+   "fk_cv_violation",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "citizens",
+   "person_id",
+   "persons",
+   "person_id",
+   "fk_citizen_person",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "complaints",
+   "citizen_id",
+   "citizens",
+   "citizen_id",
+   "fk_complaint_citizen",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "complaints",
+   "office_id",
+   "rto_offices",
+   "office_id",
+   "fk_complaint_office",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "counters",
+   "office_id",
+   "rto_offices",
+   "office_id",
+   "fk_counter_office",
+   "CASCADE",
+   "CASCADE"
+  ],
+  [
+   "documents",
+   "application_id",
+   "applications",
+   "application_id",
+   "fk_document_application",
+   "CASCADE",
+   "CASCADE"
+  ],
+  [
+   "documents",
+   "document_type_id",
+   "document_types",
+   "document_type_id",
+   "fk_document_type",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "documents",
+   "verified_by_employee_id",
+   "employees",
+   "employee_id",
+   "fk_document_verifier",
+   "SET NULL",
+   "CASCADE"
+  ],
+  [
+   "driving_instructors",
+   "licence_class_id",
+   "licence_classes",
+   "licence_class_id",
+   "fk_instructor_class",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "driving_instructors",
+   "person_id",
+   "persons",
+   "person_id",
+   "fk_instructor_person",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "driving_instructors",
+   "school_id",
+   "driving_schools",
+   "school_id",
+   "fk_instructor_school",
+   "CASCADE",
+   "CASCADE"
+  ],
+  [
+   "driving_licences",
+   "application_id",
+   "applications",
+   "application_id",
+   "fk_dl_application",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "driving_licences",
+   "citizen_id",
+   "citizens",
+   "citizen_id",
+   "fk_dl_citizen",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "driving_licences",
+   "learner_licence_id",
+   "learner_licences",
+   "learner_licence_id",
+   "fk_dl_learner",
+   "SET NULL",
+   "CASCADE"
+  ],
+  [
+   "driving_licences",
+   "office_id",
+   "rto_offices",
+   "office_id",
+   "fk_dl_office",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "driving_schools",
+   "office_id",
+   "rto_offices",
+   "office_id",
+   "fk_school_office",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "driving_tests",
+   "application_id",
+   "applications",
+   "application_id",
+   "fk_test_application",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "driving_tests",
+   "test_centre_id",
+   "test_centres",
+   "test_centre_id",
+   "fk_test_centre",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "driving_tests",
+   "citizen_id",
+   "citizens",
+   "citizen_id",
+   "fk_test_citizen",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "driving_tests",
+   "examiner_employee_id",
+   "employees",
+   "employee_id",
+   "fk_test_examiner",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "employee_postings",
+   "department_id",
+   "departments",
+   "department_id",
+   "fk_posting_department",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "employee_postings",
+   "employee_id",
+   "employees",
+   "employee_id",
+   "fk_posting_employee",
+   "CASCADE",
+   "CASCADE"
+  ],
+  [
+   "employee_postings",
+   "office_id",
+   "rto_offices",
+   "office_id",
+   "fk_posting_office",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "employees",
+   "designation_id",
+   "designations",
+   "designation_id",
+   "fk_employee_designation",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "employees",
+   "person_id",
+   "persons",
+   "person_id",
+   "fk_employee_person",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "fee_structures",
+   "service_type_id",
+   "service_types",
+   "service_type_id",
+   "fk_fee_service",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "fitness_certificates",
+   "inspection_id",
+   "vehicle_inspections",
+   "inspection_id",
+   "fk_fitness_inspection",
+   "SET NULL",
+   "NO ACTION"
+  ],
+  [
+   "fitness_certificates",
+   "vehicle_id",
+   "vehicles",
+   "vehicle_id",
+   "fk_fitness_vehicle",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "insurance_policies",
+   "vehicle_id",
+   "vehicles",
+   "vehicle_id",
+   "fk_insurance_vehicle",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "learner_licences",
+   "application_id",
+   "applications",
+   "application_id",
+   "fk_learner_application",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "learner_licences",
+   "citizen_id",
+   "citizens",
+   "citizen_id",
+   "fk_learner_citizen",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "learner_licences",
+   "office_id",
+   "rto_offices",
+   "office_id",
+   "fk_learner_office",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "licence_class_assignments",
+   "licence_class_id",
+   "licence_classes",
+   "licence_class_id",
+   "fk_lca_class",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "licence_class_assignments",
+   "driving_licence_id",
+   "driving_licences",
+   "driving_licence_id",
+   "fk_lca_licence",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "licence_status_history",
+   "driving_licence_id",
+   "driving_licences",
+   "driving_licence_id",
+   "fk_lsh_licence",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "licence_status_history",
+   "changed_by_user_id",
+   "users",
+   "user_id",
+   "fk_lsh_user",
+   "SET NULL",
+   "NO ACTION"
+  ],
+  [
+   "notifications",
+   "person_id",
+   "persons",
+   "person_id",
+   "fk_notification_person",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "ownership_transfers",
+   "application_id",
+   "applications",
+   "application_id",
+   "fk_transfer_application",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "ownership_transfers",
+   "from_citizen_id",
+   "citizens",
+   "citizen_id",
+   "fk_transfer_from",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "ownership_transfers",
+   "to_citizen_id",
+   "citizens",
+   "citizen_id",
+   "fk_transfer_to",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "ownership_transfers",
+   "vehicle_id",
+   "vehicles",
+   "vehicle_id",
+   "fk_transfer_vehicle",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "payment_attempts",
+   "payment_id",
+   "payments",
+   "payment_id",
+   "fk_attempt_payment",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "payments",
+   "payable_type_id",
+   "payable_types",
+   "payable_type_id",
+   "fk_payment_payable_type",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "permit_status_history",
+   "permit_id",
+   "permits",
+   "permit_id",
+   "fk_psh_permit",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "permits",
+   "application_id",
+   "applications",
+   "application_id",
+   "fk_permit_application",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "permits",
+   "citizen_id",
+   "citizens",
+   "citizen_id",
+   "fk_permit_citizen",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "permits",
+   "route_id",
+   "routes",
+   "route_id",
+   "fk_permit_route",
+   "SET NULL",
+   "NO ACTION"
+  ],
+  [
+   "permits",
+   "permit_type_id",
+   "permit_types",
+   "permit_type_id",
+   "fk_permit_type",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "permits",
+   "vehicle_id",
+   "vehicles",
+   "vehicle_id",
+   "fk_permit_vehicle",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "pollution_certificates",
+   "vehicle_id",
+   "vehicles",
+   "vehicle_id",
+   "fk_puc_vehicle",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "refunds",
+   "payment_id",
+   "payments",
+   "payment_id",
+   "fk_refund_payment",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "regions",
+   "parent_region_id",
+   "regions",
+   "region_id",
+   "fk_region_parent",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "road_tax_records",
+   "vehicle_id",
+   "vehicles",
+   "vehicle_id",
+   "fk_tax_vehicle",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "role_permissions",
+   "permission_id",
+   "permissions",
+   "permission_id",
+   "fk_roleperm_permission",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "role_permissions",
+   "role_id",
+   "roles",
+   "role_id",
+   "fk_roleperm_role",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "route_segments",
+   "route_id",
+   "routes",
+   "route_id",
+   "fk_segment_route",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "rto_offices",
+   "region_id",
+   "regions",
+   "region_id",
+   "fk_office_region",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "test_centres",
+   "office_id",
+   "rto_offices",
+   "office_id",
+   "fk_testcentre_office",
+   "CASCADE",
+   "CASCADE"
+  ],
+  [
+   "user_roles",
+   "role_id",
+   "roles",
+   "role_id",
+   "fk_userrole_role",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "user_roles",
+   "user_id",
+   "users",
+   "user_id",
+   "fk_userrole_user",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "users",
+   "person_id",
+   "persons",
+   "person_id",
+   "fk_user_person",
+   "CASCADE",
+   "CASCADE"
+  ],
+  [
+   "vehicle_inspections",
+   "inspector_employee_id",
+   "employees",
+   "employee_id",
+   "fk_inspection_inspector",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "vehicle_inspections",
+   "vehicle_id",
+   "vehicles",
+   "vehicle_id",
+   "fk_inspection_vehicle",
+   "CASCADE",
+   "NO ACTION"
+  ],
+  [
+   "vehicle_models",
+   "manufacturer_id",
+   "vehicle_manufacturers",
+   "manufacturer_id",
+   "fk_model_manufacturer",
+   "RESTRICT",
+   "CASCADE"
+  ],
+  [
+   "vehicle_ownerships",
+   "citizen_id",
+   "citizens",
+   "citizen_id",
+   "fk_ownership_citizen",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "vehicle_ownerships",
+   "vehicle_id",
+   "vehicles",
+   "vehicle_id",
+   "fk_ownership_vehicle",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "vehicles",
+   "fuel_type_id",
+   "fuel_types",
+   "fuel_type_id",
+   "fk_vehicle_fuel",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "vehicles",
+   "manufacturer_id",
+   "vehicle_manufacturers",
+   "manufacturer_id",
+   "fk_vehicle_manufacturer",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "vehicles",
+   "model_id",
+   "vehicle_models",
+   "model_id",
+   "fk_vehicle_model",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "vehicles",
+   "registering_office_id",
+   "rto_offices",
+   "office_id",
+   "fk_vehicle_office",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "vehicles",
+   "vehicle_type_id",
+   "vehicle_types",
+   "vehicle_type_id",
+   "fk_vehicle_type",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "violations",
+   "driver_citizen_id",
+   "citizens",
+   "citizen_id",
+   "fk_violation_driver",
+   "SET NULL",
+   "NO ACTION"
+  ],
+  [
+   "violations",
+   "officer_employee_id",
+   "employees",
+   "employee_id",
+   "fk_violation_officer",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "violations",
+   "violation_type_id",
+   "violation_types",
+   "violation_type_id",
+   "fk_violation_type",
+   "RESTRICT",
+   "NO ACTION"
+  ],
+  [
+   "violations",
+   "vehicle_id",
+   "vehicles",
+   "vehicle_id",
+   "fk_violation_vehicle",
+   "RESTRICT",
+   "NO ACTION"
+  ]
+ ],
+ "indexes": [
+  [
+   "addresses",
+   "idx_address_person",
+   "1",
+   "person_id"
+  ],
+  [
+   "addresses",
+   "idx_address_pincode",
+   "1",
+   "pincode"
+  ],
+  [
+   "addresses",
+   "PRIMARY",
+   "0",
+   "address_id"
+  ],
+  [
+   "appeals",
+   "fk_appeal_citizen",
+   "1",
+   "citizen_id"
+  ],
+  [
+   "appeals",
+   "PRIMARY",
+   "0",
+   "appeal_id"
+  ],
+  [
+   "applicants",
+   "fk_applicant_office",
+   "1",
+   "preferred_office_id"
+  ],
+  [
+   "applicants",
+   "PRIMARY",
+   "0",
+   "applicant_id"
+  ],
+  [
+   "applicants",
+   "uq_applicant_citizen",
+   "0",
+   "citizen_id"
+  ],
+  [
+   "application_status_history",
+   "fk_ash_user",
+   "1",
+   "changed_by_user_id"
+  ],
+  [
+   "application_status_history",
+   "idx_ash_application",
+   "1",
+   "application_id,changed_at"
+  ],
+  [
+   "application_status_history",
+   "PRIMARY",
+   "0",
+   "history_id"
+  ],
+  [
+   "applications",
+   "fk_application_officer",
+   "1",
+   "assigned_officer_id"
+  ],
+  [
+   "applications",
+   "fk_application_service",
+   "1",
+   "service_type_id"
+  ],
+  [
+   "applications",
+   "idx_application_applicant",
+   "1",
+   "applicant_id"
+  ],
+  [
+   "applications",
+   "idx_application_office_date",
+   "1",
+   "office_id,submitted_at"
+  ],
+  [
+   "applications",
+   "idx_application_status",
+   "1",
+   "current_status"
+  ],
+  [
+   "applications",
+   "PRIMARY",
+   "0",
+   "application_id"
+  ],
+  [
+   "applications",
+   "uq_application_number",
+   "0",
+   "application_number"
+  ],
+  [
+   "appointment_slots",
+   "fk_slot_counter",
+   "1",
+   "counter_id"
+  ],
+  [
+   "appointment_slots",
+   "PRIMARY",
+   "0",
+   "slot_id"
+  ],
+  [
+   "appointment_slots",
+   "uq_slot",
+   "0",
+   "office_id,counter_id,slot_date,start_time"
+  ],
+  [
+   "appointments",
+   "idx_appointment_slot",
+   "1",
+   "slot_id"
+  ],
+  [
+   "appointments",
+   "PRIMARY",
+   "0",
+   "appointment_id"
+  ],
+  [
+   "appointments",
+   "uq_appointment_application",
+   "0",
+   "application_id"
+  ],
+  [
+   "audit_logs",
+   "idx_audit_changed_at",
+   "1",
+   "changed_at"
+  ],
+  [
+   "audit_logs",
+   "idx_audit_table_record",
+   "1",
+   "table_name,record_id"
+  ],
+  [
+   "audit_logs",
+   "PRIMARY",
+   "0",
+   "audit_id"
+  ],
+  [
+   "challan_status_history",
+   "fk_csh_challan",
+   "1",
+   "challan_id"
+  ],
+  [
+   "challan_status_history",
+   "PRIMARY",
+   "0",
+   "history_id"
+  ],
+  [
+   "challan_violations",
+   "fk_cv_violation",
+   "1",
+   "violation_id"
+  ],
+  [
+   "challan_violations",
+   "PRIMARY",
+   "0",
+   "challan_id,violation_id"
+  ],
+  [
+   "challans",
+   "idx_challan_status",
+   "1",
+   "status"
+  ],
+  [
+   "challans",
+   "PRIMARY",
+   "0",
+   "challan_id"
+  ],
+  [
+   "challans",
+   "uq_challan_number",
+   "0",
+   "challan_number"
+  ],
+  [
+   "citizens",
+   "PRIMARY",
+   "0",
+   "citizen_id"
+  ],
+  [
+   "citizens",
+   "uq_citizen_code",
+   "0",
+   "citizen_code"
+  ],
+  [
+   "citizens",
+   "uq_citizen_person",
+   "0",
+   "person_id"
+  ],
+  [
+   "complaints",
+   "fk_complaint_citizen",
+   "1",
+   "citizen_id"
+  ],
+  [
+   "complaints",
+   "fk_complaint_office",
+   "1",
+   "office_id"
+  ],
+  [
+   "complaints",
+   "PRIMARY",
+   "0",
+   "complaint_id"
+  ],
+  [
+   "counters",
+   "PRIMARY",
+   "0",
+   "counter_id"
+  ],
+  [
+   "counters",
+   "uq_office_counter",
+   "0",
+   "office_id,counter_number"
+  ],
+  [
+   "departments",
+   "PRIMARY",
+   "0",
+   "department_id"
+  ],
+  [
+   "departments",
+   "uq_department_name",
+   "0",
+   "department_name"
+  ],
+  [
+   "designations",
+   "PRIMARY",
+   "0",
+   "designation_id"
+  ],
+  [
+   "designations",
+   "uq_designation_title",
+   "0",
+   "title"
+  ],
+  [
+   "document_types",
+   "PRIMARY",
+   "0",
+   "document_type_id"
+  ],
+  [
+   "document_types",
+   "uq_doc_type_name",
+   "0",
+   "type_name"
+  ],
+  [
+   "documents",
+   "fk_document_type",
+   "1",
+   "document_type_id"
+  ],
+  [
+   "documents",
+   "fk_document_verifier",
+   "1",
+   "verified_by_employee_id"
+  ],
+  [
+   "documents",
+   "idx_document_application",
+   "1",
+   "application_id"
+  ],
+  [
+   "documents",
+   "PRIMARY",
+   "0",
+   "document_id"
+  ],
+  [
+   "driving_instructors",
+   "fk_instructor_class",
+   "1",
+   "licence_class_id"
+  ],
+  [
+   "driving_instructors",
+   "fk_instructor_school",
+   "1",
+   "school_id"
+  ],
+  [
+   "driving_instructors",
+   "PRIMARY",
+   "0",
+   "instructor_id"
+  ],
+  [
+   "driving_instructors",
+   "uq_instructor_person",
+   "0",
+   "person_id"
+  ],
+  [
+   "driving_licences",
+   "fk_dl_application",
+   "1",
+   "application_id"
+  ],
+  [
+   "driving_licences",
+   "fk_dl_learner",
+   "1",
+   "learner_licence_id"
+  ],
+  [
+   "driving_licences",
+   "fk_dl_office",
+   "1",
+   "office_id"
+  ],
+  [
+   "driving_licences",
+   "idx_driving_licence_citizen",
+   "1",
+   "citizen_id"
+  ],
+  [
+   "driving_licences",
+   "idx_driving_licence_status",
+   "1",
+   "current_status"
+  ],
+  [
+   "driving_licences",
+   "PRIMARY",
+   "0",
+   "driving_licence_id"
+  ],
+  [
+   "driving_licences",
+   "uq_driving_licence_number",
+   "0",
+   "licence_number"
+  ],
+  [
+   "driving_schools",
+   "fk_school_office",
+   "1",
+   "office_id"
+  ],
+  [
+   "driving_schools",
+   "PRIMARY",
+   "0",
+   "school_id"
+  ],
+  [
+   "driving_schools",
+   "uq_school_licence",
+   "0",
+   "licence_number"
+  ],
+  [
+   "driving_tests",
+   "fk_test_application",
+   "1",
+   "application_id"
+  ],
+  [
+   "driving_tests",
+   "fk_test_examiner",
+   "1",
+   "examiner_employee_id"
+  ],
+  [
+   "driving_tests",
+   "idx_test_centre_date",
+   "1",
+   "test_centre_id,scheduled_at"
+  ],
+  [
+   "driving_tests",
+   "idx_test_citizen",
+   "1",
+   "citizen_id"
+  ],
+  [
+   "driving_tests",
+   "PRIMARY",
+   "0",
+   "test_id"
+  ],
+  [
+   "employee_postings",
+   "fk_posting_department",
+   "1",
+   "department_id"
+  ],
+  [
+   "employee_postings",
+   "fk_posting_office",
+   "1",
+   "office_id"
+  ],
+  [
+   "employee_postings",
+   "idx_posting_employee",
+   "1",
+   "employee_id,posted_to"
+  ],
+  [
+   "employee_postings",
+   "PRIMARY",
+   "0",
+   "posting_id"
+  ],
+  [
+   "employee_postings",
+   "uq_employee_current_posting",
+   "0",
+   "employee_id,current_flag"
+  ],
+  [
+   "employees",
+   "fk_employee_designation",
+   "1",
+   "designation_id"
+  ],
+  [
+   "employees",
+   "PRIMARY",
+   "0",
+   "employee_id"
+  ],
+  [
+   "employees",
+   "uq_employee_code",
+   "0",
+   "employee_code"
+  ],
+  [
+   "employees",
+   "uq_employee_person",
+   "0",
+   "person_id"
+  ],
+  [
+   "fee_structures",
+   "fk_fee_service",
+   "1",
+   "service_type_id"
+  ],
+  [
+   "fee_structures",
+   "PRIMARY",
+   "0",
+   "fee_id"
+  ],
+  [
+   "fitness_certificates",
+   "fk_fitness_inspection",
+   "1",
+   "inspection_id"
+  ],
+  [
+   "fitness_certificates",
+   "idx_fitness_vehicle",
+   "1",
+   "vehicle_id,expiry_date"
+  ],
+  [
+   "fitness_certificates",
+   "PRIMARY",
+   "0",
+   "certificate_id"
+  ],
+  [
+   "fuel_types",
+   "PRIMARY",
+   "0",
+   "fuel_type_id"
+  ],
+  [
+   "fuel_types",
+   "uq_fuel_name",
+   "0",
+   "fuel_name"
+  ],
+  [
+   "insurance_policies",
+   "idx_insurance_vehicle",
+   "1",
+   "vehicle_id,end_date"
+  ],
+  [
+   "insurance_policies",
+   "PRIMARY",
+   "0",
+   "policy_id"
+  ],
+  [
+   "insurance_policies",
+   "uq_policy_number",
+   "0",
+   "policy_number"
+  ],
+  [
+   "learner_licences",
+   "fk_learner_application",
+   "1",
+   "application_id"
+  ],
+  [
+   "learner_licences",
+   "fk_learner_office",
+   "1",
+   "office_id"
+  ],
+  [
+   "learner_licences",
+   "idx_learner_citizen",
+   "1",
+   "citizen_id"
+  ],
+  [
+   "learner_licences",
+   "PRIMARY",
+   "0",
+   "learner_licence_id"
+  ],
+  [
+   "learner_licences",
+   "uq_citizen_active_learner",
+   "0",
+   "citizen_id,active_flag"
+  ],
+  [
+   "learner_licences",
+   "uq_learner_licence_number",
+   "0",
+   "licence_number"
+  ],
+  [
+   "licence_class_assignments",
+   "fk_lca_class",
+   "1",
+   "licence_class_id"
+  ],
+  [
+   "licence_class_assignments",
+   "PRIMARY",
+   "0",
+   "driving_licence_id,licence_class_id"
+  ],
+  [
+   "licence_classes",
+   "PRIMARY",
+   "0",
+   "licence_class_id"
+  ],
+  [
+   "licence_classes",
+   "uq_class_code",
+   "0",
+   "class_code"
+  ],
+  [
+   "licence_status_history",
+   "fk_lsh_user",
+   "1",
+   "changed_by_user_id"
+  ],
+  [
+   "licence_status_history",
+   "idx_lsh_licence",
+   "1",
+   "driving_licence_id,changed_at"
+  ],
+  [
+   "licence_status_history",
+   "PRIMARY",
+   "0",
+   "history_id"
+  ],
+  [
+   "notifications",
+   "fk_notification_person",
+   "1",
+   "person_id"
+  ],
+  [
+   "notifications",
+   "PRIMARY",
+   "0",
+   "notification_id"
+  ],
+  [
+   "ownership_transfers",
+   "fk_transfer_application",
+   "1",
+   "application_id"
+  ],
+  [
+   "ownership_transfers",
+   "fk_transfer_from",
+   "1",
+   "from_citizen_id"
+  ],
+  [
+   "ownership_transfers",
+   "fk_transfer_to",
+   "1",
+   "to_citizen_id"
+  ],
+  [
+   "ownership_transfers",
+   "fk_transfer_vehicle",
+   "1",
+   "vehicle_id"
+  ],
+  [
+   "ownership_transfers",
+   "PRIMARY",
+   "0",
+   "transfer_id"
+  ],
+  [
+   "payable_types",
+   "PRIMARY",
+   "0",
+   "payable_type_id"
+  ],
+  [
+   "payable_types",
+   "uq_payable_type_name",
+   "0",
+   "type_name"
+  ],
+  [
+   "payment_attempts",
+   "PRIMARY",
+   "0",
+   "attempt_id"
+  ],
+  [
+   "payment_attempts",
+   "uq_payment_attempt",
+   "0",
+   "payment_id,attempt_number"
+  ],
+  [
+   "payments",
+   "idx_payment_payable",
+   "1",
+   "payable_type_id,payable_id"
+  ],
+  [
+   "payments",
+   "idx_payment_status",
+   "1",
+   "status"
+  ],
+  [
+   "payments",
+   "PRIMARY",
+   "0",
+   "payment_id"
+  ],
+  [
+   "payments",
+   "uq_receipt_number",
+   "0",
+   "receipt_number"
+  ],
+  [
+   "permissions",
+   "PRIMARY",
+   "0",
+   "permission_id"
+  ],
+  [
+   "permissions",
+   "uq_permission_key",
+   "0",
+   "permission_key"
+  ],
+  [
+   "permit_status_history",
+   "fk_psh_permit",
+   "1",
+   "permit_id"
+  ],
+  [
+   "permit_status_history",
+   "PRIMARY",
+   "0",
+   "history_id"
+  ],
+  [
+   "permit_types",
+   "PRIMARY",
+   "0",
+   "permit_type_id"
+  ],
+  [
+   "permit_types",
+   "uq_permit_type_name",
+   "0",
+   "type_name"
+  ],
+  [
+   "permits",
+   "fk_permit_application",
+   "1",
+   "application_id"
+  ],
+  [
+   "permits",
+   "fk_permit_citizen",
+   "1",
+   "citizen_id"
+  ],
+  [
+   "permits",
+   "fk_permit_route",
+   "1",
+   "route_id"
+  ],
+  [
+   "permits",
+   "fk_permit_type",
+   "1",
+   "permit_type_id"
+  ],
+  [
+   "permits",
+   "idx_permit_vehicle",
+   "1",
+   "vehicle_id,expiry_date"
+  ],
+  [
+   "permits",
+   "PRIMARY",
+   "0",
+   "permit_id"
+  ],
+  [
+   "permits",
+   "uq_permit_number",
+   "0",
+   "permit_number"
+  ],
+  [
+   "persons",
+   "idx_person_name",
+   "1",
+   "last_name,first_name"
+  ],
+  [
+   "persons",
+   "idx_person_phone",
+   "1",
+   "phone_primary"
+  ],
+  [
+   "persons",
+   "PRIMARY",
+   "0",
+   "person_id"
+  ],
+  [
+   "persons",
+   "uq_person_national_id",
+   "0",
+   "national_id_number"
+  ],
+  [
+   "pollution_certificates",
+   "idx_puc_vehicle",
+   "1",
+   "vehicle_id,expiry_date"
+  ],
+  [
+   "pollution_certificates",
+   "PRIMARY",
+   "0",
+   "puc_id"
+  ],
+  [
+   "refunds",
+   "fk_refund_payment",
+   "1",
+   "payment_id"
+  ],
+  [
+   "refunds",
+   "PRIMARY",
+   "0",
+   "refund_id"
+  ],
+  [
+   "regions",
+   "fk_region_parent",
+   "1",
+   "parent_region_id"
+  ],
+  [
+   "regions",
+   "PRIMARY",
+   "0",
+   "region_id"
+  ],
+  [
+   "regions",
+   "uq_region_code",
+   "0",
+   "region_code"
+  ],
+  [
+   "road_tax_records",
+   "idx_tax_vehicle_year",
+   "1",
+   "vehicle_id,assessment_year"
+  ],
+  [
+   "road_tax_records",
+   "PRIMARY",
+   "0",
+   "tax_record_id"
+  ],
+  [
+   "role_permissions",
+   "fk_roleperm_permission",
+   "1",
+   "permission_id"
+  ],
+  [
+   "role_permissions",
+   "PRIMARY",
+   "0",
+   "role_id,permission_id"
+  ],
+  [
+   "roles",
+   "PRIMARY",
+   "0",
+   "role_id"
+  ],
+  [
+   "roles",
+   "uq_role_name",
+   "0",
+   "role_name"
+  ],
+  [
+   "route_segments",
+   "PRIMARY",
+   "0",
+   "segment_id"
+  ],
+  [
+   "route_segments",
+   "uq_route_sequence",
+   "0",
+   "route_id,sequence_no"
+  ],
+  [
+   "routes",
+   "PRIMARY",
+   "0",
+   "route_id"
+  ],
+  [
+   "rto_offices",
+   "fk_office_region",
+   "1",
+   "region_id"
+  ],
+  [
+   "rto_offices",
+   "PRIMARY",
+   "0",
+   "office_id"
+  ],
+  [
+   "rto_offices",
+   "uq_office_code",
+   "0",
+   "office_code"
+  ],
+  [
+   "service_types",
+   "PRIMARY",
+   "0",
+   "service_type_id"
+  ],
+  [
+   "service_types",
+   "uq_service_code",
+   "0",
+   "service_code"
+  ],
+  [
+   "test_centres",
+   "fk_testcentre_office",
+   "1",
+   "office_id"
+  ],
+  [
+   "test_centres",
+   "PRIMARY",
+   "0",
+   "test_centre_id"
+  ],
+  [
+   "user_roles",
+   "fk_userrole_role",
+   "1",
+   "role_id"
+  ],
+  [
+   "user_roles",
+   "PRIMARY",
+   "0",
+   "user_id,role_id"
+  ],
+  [
+   "users",
+   "fk_user_person",
+   "1",
+   "person_id"
+  ],
+  [
+   "users",
+   "PRIMARY",
+   "0",
+   "user_id"
+  ],
+  [
+   "users",
+   "uq_username",
+   "0",
+   "username"
+  ],
+  [
+   "vehicle_inspections",
+   "fk_inspection_inspector",
+   "1",
+   "inspector_employee_id"
+  ],
+  [
+   "vehicle_inspections",
+   "idx_inspection_vehicle",
+   "1",
+   "vehicle_id"
+  ],
+  [
+   "vehicle_inspections",
+   "PRIMARY",
+   "0",
+   "inspection_id"
+  ],
+  [
+   "vehicle_manufacturers",
+   "PRIMARY",
+   "0",
+   "manufacturer_id"
+  ],
+  [
+   "vehicle_manufacturers",
+   "uq_manufacturer_name",
+   "0",
+   "name"
+  ],
+  [
+   "vehicle_models",
+   "PRIMARY",
+   "0",
+   "model_id"
+  ],
+  [
+   "vehicle_models",
+   "uq_manufacturer_model",
+   "0",
+   "manufacturer_id,model_name"
+  ],
+  [
+   "vehicle_ownerships",
+   "idx_ownership_citizen",
+   "1",
+   "citizen_id"
+  ],
+  [
+   "vehicle_ownerships",
+   "idx_ownership_vehicle",
+   "1",
+   "vehicle_id,effective_to"
+  ],
+  [
+   "vehicle_ownerships",
+   "PRIMARY",
+   "0",
+   "ownership_id"
+  ],
+  [
+   "vehicle_ownerships",
+   "uq_vehicle_current_owner",
+   "0",
+   "vehicle_id,current_flag"
+  ],
+  [
+   "vehicle_types",
+   "PRIMARY",
+   "0",
+   "vehicle_type_id"
+  ],
+  [
+   "vehicle_types",
+   "uq_vehicle_type_name",
+   "0",
+   "type_name"
+  ],
+  [
+   "vehicles",
+   "fk_vehicle_fuel",
+   "1",
+   "fuel_type_id"
+  ],
+  [
+   "vehicles",
+   "fk_vehicle_manufacturer",
+   "1",
+   "manufacturer_id"
+  ],
+  [
+   "vehicles",
+   "fk_vehicle_model",
+   "1",
+   "model_id"
+  ],
+  [
+   "vehicles",
+   "fk_vehicle_office",
+   "1",
+   "registering_office_id"
+  ],
+  [
+   "vehicles",
+   "idx_vehicle_type_status",
+   "1",
+   "vehicle_type_id,status"
+  ],
+  [
+   "vehicles",
+   "PRIMARY",
+   "0",
+   "vehicle_id"
+  ],
+  [
+   "vehicles",
+   "uq_vehicle_chassis",
+   "0",
+   "chassis_number"
+  ],
+  [
+   "vehicles",
+   "uq_vehicle_engine",
+   "0",
+   "engine_number"
+  ],
+  [
+   "vehicles",
+   "uq_vehicle_registration",
+   "0",
+   "registration_number"
+  ],
+  [
+   "violation_types",
+   "PRIMARY",
+   "0",
+   "violation_type_id"
+  ],
+  [
+   "violation_types",
+   "uq_violation_desc",
+   "0",
+   "description"
+  ],
+  [
+   "violations",
+   "fk_violation_officer",
+   "1",
+   "officer_employee_id"
+  ],
+  [
+   "violations",
+   "fk_violation_type",
+   "1",
+   "violation_type_id"
+  ],
+  [
+   "violations",
+   "idx_violation_driver",
+   "1",
+   "driver_citizen_id"
+  ],
+  [
+   "violations",
+   "idx_violation_vehicle",
+   "1",
+   "vehicle_id"
+  ],
+  [
+   "violations",
+   "PRIMARY",
+   "0",
+   "violation_id"
+  ]
+ ],
+ "checks": [
+  [
+   "appointment_slots",
+   "chk_slot_capacity",
+   "(`booked_count` <= `capacity`)"
+  ],
+  [
+   "driving_licences",
+   "chk_dl_dates",
+   "(`expiry_date` > `issue_date`)"
+  ],
+  [
+   "fitness_certificates",
+   "chk_fitness_dates",
+   "(`expiry_date` > `issue_date`)"
+  ],
+  [
+   "insurance_policies",
+   "chk_insurance_dates",
+   "(`end_date` > `start_date`)"
+  ],
+  [
+   "learner_licences",
+   "chk_learner_dates",
+   "(`expiry_date` > `issue_date`)"
+  ],
+  [
+   "permits",
+   "chk_permit_dates",
+   "(`expiry_date` > `issue_date`)"
+  ],
+  [
+   "pollution_certificates",
+   "chk_puc_dates",
+   "(`expiry_date` > `issue_date`)"
+  ]
+ ],
+ "rows": [
+  [
+   "addresses",
+   "37"
+  ],
+  [
+   "appeals",
+   "6"
+  ],
+  [
+   "applicants",
+   "23"
+  ],
+  [
+   "application_status_history",
+   "21"
+  ],
+  [
+   "applications",
+   "20"
+  ],
+  [
+   "appointment_slots",
+   "9"
+  ],
+  [
+   "appointments",
+   "7"
+  ],
+  [
+   "audit_logs",
+   "61"
+  ],
+  [
+   "challan_status_history",
+   "8"
+  ],
+  [
+   "challan_violations",
+   "10"
+  ],
+  [
+   "challans",
+   "9"
+  ],
+  [
+   "citizens",
+   "23"
+  ],
+  [
+   "complaints",
+   "8"
+  ],
+  [
+   "counters",
+   "12"
+  ],
+  [
+   "departments",
+   "5"
+  ],
+  [
+   "designations",
+   "5"
+  ],
+  [
+   "document_types",
+   "7"
+  ],
+  [
+   "documents",
+   "13"
+  ],
+  [
+   "driving_instructors",
+   "4"
+  ],
+  [
+   "driving_licences",
+   "11"
+  ],
+  [
+   "driving_schools",
+   "4"
+  ],
+  [
+   "driving_tests",
+   "7"
+  ],
+  [
+   "employee_postings",
+   "8"
+  ],
+  [
+   "employees",
+   "8"
+  ],
+  [
+   "fee_structures",
+   "7"
+  ],
+  [
+   "fitness_certificates",
+   "8"
+  ],
+  [
+   "fuel_types",
+   "5"
+  ],
+  [
+   "insurance_policies",
+   "7"
+  ],
+  [
+   "learner_licences",
+   "7"
+  ],
+  [
+   "licence_class_assignments",
+   "15"
+  ],
+  [
+   "licence_classes",
+   "6"
+  ],
+  [
+   "licence_status_history",
+   "6"
+  ],
+  [
+   "notifications",
+   "7"
+  ],
+  [
+   "ownership_transfers",
+   "4"
+  ],
+  [
+   "payable_types",
+   "4"
+  ],
+  [
+   "payment_attempts",
+   "9"
+  ],
+  [
+   "payments",
+   "13"
+  ],
+  [
+   "permissions",
+   "62"
+  ],
+  [
+   "permit_status_history",
+   "4"
+  ],
+  [
+   "permit_types",
+   "5"
+  ],
+  [
+   "permits",
+   "8"
+  ],
+  [
+   "persons",
+   "32"
+  ],
+  [
+   "pollution_certificates",
+   "7"
+  ],
+  [
+   "refunds",
+   "5"
+  ],
+  [
+   "regions",
+   "7"
+  ],
+  [
+   "road_tax_records",
+   "9"
+  ],
+  [
+   "role_permissions",
+   "158"
+  ],
+  [
+   "roles",
+   "7"
+  ],
+  [
+   "route_segments",
+   "15"
+  ],
+  [
+   "routes",
+   "4"
+  ],
+  [
+   "rto_offices",
+   "6"
+  ],
+  [
+   "service_types",
+   "7"
+  ],
+  [
+   "test_centres",
+   "4"
+  ],
+  [
+   "user_roles",
+   "12"
+  ],
+  [
+   "users",
+   "10"
+  ],
+  [
+   "vehicle_inspections",
+   "6"
+  ],
+  [
+   "vehicle_manufacturers",
+   "11"
+  ],
+  [
+   "vehicle_models",
+   "18"
+  ],
+  [
+   "vehicle_ownerships",
+   "16"
+  ],
+  [
+   "vehicle_types",
+   "4"
+  ],
+  [
+   "vehicles",
+   "15"
+  ],
+  [
+   "violation_types",
+   "8"
+  ],
+  [
+   "violations",
+   "10"
+  ]
+ ],
+ "creation_order": [
+  "regions",
+  "vehicle_manufacturers",
+  "vehicle_models",
+  "vehicle_types",
+  "fuel_types",
+  "licence_classes",
+  "document_types",
+  "service_types",
+  "violation_types",
+  "permit_types",
+  "payable_types",
+  "persons",
+  "addresses",
+  "citizens",
+  "rto_offices",
+  "departments",
+  "designations",
+  "counters",
+  "employees",
+  "employee_postings",
+  "users",
+  "roles",
+  "permissions",
+  "user_roles",
+  "role_permissions",
+  "applicants",
+  "applications",
+  "application_status_history",
+  "documents",
+  "appointment_slots",
+  "appointments",
+  "driving_schools",
+  "driving_instructors",
+  "test_centres",
+  "learner_licences",
+  "driving_licences",
+  "licence_class_assignments",
+  "licence_status_history",
+  "driving_tests",
+  "vehicles",
+  "vehicle_ownerships",
+  "ownership_transfers",
+  "vehicle_inspections",
+  "fitness_certificates",
+  "pollution_certificates",
+  "insurance_policies",
+  "road_tax_records",
+  "routes",
+  "route_segments",
+  "permits",
+  "permit_status_history",
+  "violations",
+  "challans",
+  "challan_violations",
+  "challan_status_history",
+  "fee_structures",
+  "payments",
+  "payment_attempts",
+  "refunds",
+  "notifications",
+  "complaints",
+  "appeals",
+  "audit_logs"
+ ],
+ "order_violations": [],
+ "levels": {
+  "persons": 0,
+  "addresses": 1,
+  "citizens": 1,
+  "appeals": 2,
+  "regions": 0,
+  "rto_offices": 1,
+  "applicants": 2,
+  "designations": 0,
+  "employees": 1,
+  "service_types": 0,
+  "applications": 3,
+  "users": 1,
+  "application_status_history": 4,
+  "counters": 2,
+  "appointment_slots": 3,
+  "appointments": 4,
+  "audit_logs": 0,
+  "challans": 0,
+  "challan_status_history": 1,
+  "violation_types": 0,
+  "fuel_types": 0,
+  "vehicle_types": 0,
+  "vehicle_manufacturers": 0,
+  "vehicle_models": 1,
+  "vehicles": 2,
+  "violations": 3,
+  "challan_violations": 4,
+  "complaints": 2,
+  "departments": 0,
+  "document_types": 0,
+  "documents": 4,
+  "driving_schools": 2,
+  "licence_classes": 0,
+  "driving_instructors": 3,
+  "learner_licences": 4,
+  "driving_licences": 5,
+  "test_centres": 2,
+  "driving_tests": 4,
+  "employee_postings": 2,
+  "fee_structures": 1,
+  "vehicle_inspections": 3,
+  "fitness_certificates": 4,
+  "insurance_policies": 3,
+  "licence_class_assignments": 6,
+  "licence_status_history": 6,
+  "notifications": 1,
+  "ownership_transfers": 4,
+  "payable_types": 0,
+  "payments": 1,
+  "payment_attempts": 2,
+  "permissions": 0,
+  "permit_types": 0,
+  "routes": 0,
+  "permits": 4,
+  "permit_status_history": 5,
+  "pollution_certificates": 3,
+  "refunds": 2,
+  "road_tax_records": 3,
+  "roles": 0,
+  "role_permissions": 1,
+  "route_segments": 1,
+  "user_roles": 2,
+  "vehicle_ownerships": 3
+ },
+ "self_refs": [
+  [
+   "regions",
+   "parent_region_id",
+   "regions"
+  ]
+ ]
+}
